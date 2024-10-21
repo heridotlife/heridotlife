@@ -16,6 +16,13 @@
   }
 }
 
+/* Optional - Custom colors for dark mode */
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 20, 20, 20;
+  --background-end-rgb: 30, 30, 30;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
