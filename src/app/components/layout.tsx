@@ -1,8 +1,9 @@
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Metadata } from 'next';
 import * as React from 'react';
 
 import '@/styles/colors.css';
-import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: 'Components',
@@ -16,8 +17,9 @@ export default function ComponentsLayout({
 }) {
   return (
     <>
-      <Analytics />
       {children}
+      <Analytics />
+      <SpeedInsights />
     </>
   );
 }

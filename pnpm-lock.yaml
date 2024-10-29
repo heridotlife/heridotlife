@@ -14,6 +14,9 @@ importers:
       '@vercel/analytics':
         specifier: ^1.3.2
         version: 1.3.2(next@14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@vercel/speed-insights':
+        specifier: ^1.0.14
+        version: 1.0.14(next@14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -1381,6 +1384,29 @@ packages:
       next:
         optional: true
       react:
+        optional: true
+
+  '@vercel/speed-insights@1.0.14':
+    resolution: {integrity: sha512-env1BkPddz1UaEZwBL4GmfRksMi2LbiYaKuoxMQjfLk83aEh7kkWMukkUhpQVs717NE6nnD+1+KO85GZHOZ4nQ==}
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
         optional: true
 
   JSONStream@1.3.5:
@@ -5747,6 +5773,11 @@ snapshots:
   '@vercel/analytics@1.3.2(next@14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
       server-only: 0.0.1
+    optionalDependencies:
+      next: 14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+
+  '@vercel/speed-insights@1.0.14(next@14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:
       next: 14.2.15(@babel/core@7.22.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
