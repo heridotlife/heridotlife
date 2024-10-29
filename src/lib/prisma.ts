@@ -5,13 +5,22 @@ let prisma: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
-  const globalAny: any = global;
-  if (!globalAny.prisma) {
-    globalAny.prisma = new PrismaClient();
+  // Extend the NodeJS.Global interface to include the prisma property
+  interface CustomNodeJsGlobal extends NodeJS.Global {
+    prisma: PrismaClient;
   }
-  prisma = globalAny.prisma;
+
+  const globalForPrisma = global as CustomNodeJsGlobal;
+
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient();
+  }
+  prisma = globalForPrisma.prisma;
 }
+
+// Declare the global prisma variable
 declare global {
   const prisma: PrismaClient | undefined;
 }
+
 export default prisma;
