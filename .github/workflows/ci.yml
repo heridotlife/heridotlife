@@ -1,0 +1,217 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.job }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # Code Quality & Security
+  code-quality:
+    name: 🔍 Code Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔬 Run ESLint
+        run: pnpm run lint:strict
+
+      - name: 🔎 TypeScript type check
+        run: pnpm run typecheck
+
+      - name: 💅 Prettier format check
+        run: pnpm run format:check
+
+      - name: 🔒 Security audit
+        run: pnpm audit --audit-level moderate
+
+      - name: 📦 Check for outdated dependencies
+        run: pnpm outdated || true
+
+  # Testing
+  test:
+    name: 🧪 Testing
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🃏 Run unit tests
+        run: pnpm run test
+
+      - name: 📊 Test coverage
+        run: pnpm run test -- --coverage --watchAll=false
+
+      - name: 📈 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  # Build & Deploy Preview
+  build:
+    name: 🏗️ Build & Deploy Preview
+    runs-on: ubuntu-latest
+    needs: [code-quality, test]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Setup environment variables
+        run: |
+          echo "NODE_ENV=production" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_APP_URL=${{ github.server_url }}/${{ github.repository }}" >> $GITHUB_ENV
+
+      - name: 🏗️ Build application
+        run: pnpm run build
+
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+          retention-days: 1
+
+  # Database Migration Check
+  database:
+    name: 🗄️ Database Migration Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: 📋 Check Prisma schema
+        run: pnpm prisma validate
+
+  # Performance & Bundle Analysis
+  performance:
+    name: ⚡ Performance Check
+    runs-on: ubuntu-latest
+    needs: [code-quality, test]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build for analysis
+        run: pnpm run build
+
+      - name: 📊 Bundle analysis
+        run: |
+          echo "Bundle size analysis:"
+          du -sh .next/static/chunks/
+          du -sh .next/static/css/
+          echo "Total build size:"
+          du -sh .next/
+
+  # Notifications
+  notify:
+    name: 📢 Notifications
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, database]
+    if: always()
+    steps:
+      - name: ✅ Success notification
+        if: success()
+        run: |
+          echo "✅ All checks passed successfully!"
+          echo "🚀 Ready for deployment"
+
+      - name: ❌ Failure notification
+        if: failure()
+        run: |
+          echo "❌ Some checks failed"
+          echo "🔍 Please review the logs above"

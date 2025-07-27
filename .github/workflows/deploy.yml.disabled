@@ -1,0 +1,113 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: 🔧 Setup environment variables
+        run: |
+          echo "NODE_ENV=production" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> $GITHUB_ENV
+          echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> $GITHUB_ENV
+          echo "POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}" >> $GITHUB_ENV
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+          echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" >> $GITHUB_ENV
+          echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> $GITHUB_ENV
+
+      - name: 🏗️ Build application
+        run: pnpm run build
+
+      - name: 🧪 Run tests before deployment
+        run: pnpm run test -- --watchAll=false
+
+      - name: 📦 Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          directory: .next
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          environmentName: production
+          environmentVariables: |
+            NODE_ENV=production
+            NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}
+            POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}
+            POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+
+      - name: 📊 Post-deployment checks
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Application URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}"
+          echo "📅 Deployed at: $(date)"
+
+  # Database migration (if needed)
+  migrate:
+    name: 🗄️ Database Migration
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤌 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Setup database environment
+        run: |
+          echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> $GITHUB_ENV
+          echo "POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}" >> $GITHUB_ENV
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: 📋 Run database migrations
+        run: pnpm prisma migrate deploy
+
+      - name: ✅ Migration completed
+        run: echo "✅ Database migration completed successfully!"
