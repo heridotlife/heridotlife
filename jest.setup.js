@@ -1,13 +1,15 @@
-import '@testing-library/jest-dom/extend-expect';
 import { TextEncoder, TextDecoder } from 'util';
+
+import '@testing-library/jest-dom/extend-expect';
 
 // Polyfills for Jest environment
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
 // Mock fetch for tests
-global.fetch = jest.fn();
+global.fetch = () => Promise.resolve({});
 
 // Allow router mocks.
-// eslint-disable-next-line no-undef
-jest.mock('next/router', () => require('next-router-mock'));
+const mockRouter = require('next-router-mock');
+jest.mock('next/router', () => mockRouter);
+jest.mock('next/navigation', () => mockRouter);
