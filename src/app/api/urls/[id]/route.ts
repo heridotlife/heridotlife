@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import prisma from '@/lib/prisma';
 import { validateSession } from '@/lib/session';
+import prisma from '@/lib/prisma';
 
 // Force dynamic rendering for authenticated routes
 export const dynamic = 'force-dynamic';
 
 const updateUrlSchema = z.object({
-  originalUrl: z.string().url('Please provide a valid URL').optional(),
-  shortUrl: z
-    .string()
-    .min(3, 'Short URL must be at least 3 characters')
-    .max(20, 'Short URL must be less than 20 characters')
-    .optional(),
   title: z
     .string()
     .min(1, 'Title is required')
@@ -24,7 +18,7 @@ const updateUrlSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Get session token from cookies
@@ -43,7 +37,8 @@ export async function GET(
       );
     }
 
-    const urlId = parseInt(params.id);
+    const { id } = await params;
+    const urlId = parseInt(id);
     if (isNaN(urlId)) {
       return NextResponse.json({ error: 'Invalid URL ID' }, { status: 400 });
     }
@@ -83,7 +78,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Get session token from cookies
@@ -102,7 +97,8 @@ export async function PUT(
       );
     }
 
-    const urlId = parseInt(params.id);
+    const { id } = await params;
+    const urlId = parseInt(id);
     if (isNaN(urlId)) {
       return NextResponse.json({ error: 'Invalid URL ID' }, { status: 400 });
     }
@@ -118,7 +114,7 @@ export async function PUT(
       );
     }
 
-    const { originalUrl, shortUrl, title, categoryIds } = validationResult.data;
+    const { title, categoryIds } = validationResult.data;
 
     // Check if URL exists and belongs to user
     const existingUrl = await prisma.shortUrl.findFirst({
@@ -132,34 +128,16 @@ export async function PUT(
       return NextResponse.json({ error: 'URL not found' }, { status: 404 });
     }
 
-    // Check if new short URL already exists (if being updated)
-    if (shortUrl && shortUrl !== existingUrl.shortUrl) {
-      const duplicateUrl = await prisma.shortUrl.findUnique({
-        where: { shortUrl },
-      });
-
-      if (duplicateUrl) {
-        return NextResponse.json(
-          { error: 'Short URL already exists' },
-          { status: 409 },
-        );
-      }
+    // Update URL data
+    const updateData: any = {};
+    if (title !== undefined) {
+      updateData.title = title;
     }
 
     // Update the URL
     const updatedUrl = await prisma.shortUrl.update({
       where: { id: urlId },
-      data: {
-        ...(originalUrl && { originalUrl }),
-        ...(shortUrl && { shortUrl }),
-        ...(title && { title }),
-        updatedAt: new Date(),
-        ...(categoryIds && {
-          categories: {
-            set: categoryIds.map((id) => ({ id })),
-          },
-        }),
-      },
+      data: updateData,
       include: {
         categories: {
           select: {
@@ -170,10 +148,52 @@ export async function PUT(
       },
     });
 
+    // Update categories if provided
+    if (categoryIds !== undefined) {
+      // Remove all existing category associations
+      await prisma.shortUrl.update({
+        where: { id: urlId },
+        data: {
+          categories: {
+            set: [],
+          },
+        },
+      });
+
+      // Add new category associations
+      if (categoryIds.length > 0) {
+        await prisma.shortUrl.update({
+          where: { id: urlId },
+          data: {
+            categories: {
+              connect: categoryIds.map((categoryId) => ({ id: categoryId })),
+            },
+          },
+        });
+      }
+
+      // Fetch updated URL with categories
+      const finalUrl = await prisma.shortUrl.findFirst({
+        where: { id: urlId },
+        include: {
+          categories: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: finalUrl,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       data: updatedUrl,
-      message: 'URL updated successfully',
     });
   } catch (error) {
     console.error('Update URL error:', error);
@@ -186,7 +206,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Get session token from cookies
@@ -205,7 +225,8 @@ export async function DELETE(
       );
     }
 
-    const urlId = parseInt(params.id);
+    const { id } = await params;
+    const urlId = parseInt(id);
     if (isNaN(urlId)) {
       return NextResponse.json({ error: 'Invalid URL ID' }, { status: 400 });
     }

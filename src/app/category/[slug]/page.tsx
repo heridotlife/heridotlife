@@ -6,12 +6,13 @@ import prisma from '@/lib/prisma';
 export default async function CategoryDetails({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const categoryName = params.category;
+  const { category } = await params;
+  const categoryName = category;
 
   // Fetch category data from Prisma
-  const category = await prisma.category.findUnique({
+  const categoryData = await prisma.category.findUnique({
     where: { name: categoryName },
     include: {
       shortUrls: {
@@ -24,11 +25,11 @@ export default async function CategoryDetails({
     },
   });
 
-  if (!category) {
+  if (!categoryData) {
     notFound(); // Trigger a 404 page if the category is not found
   }
 
-  const shortUrls = category.shortUrls;
+  const shortUrls = categoryData.shortUrls;
 
   return (
     <div>

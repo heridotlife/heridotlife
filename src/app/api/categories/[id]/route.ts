@@ -13,7 +13,7 @@ const updateCategorySchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromRequest(request);
@@ -21,7 +21,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return NextResponse.json(
         { error: 'Invalid category ID' },
@@ -76,7 +77,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromRequest(request);
@@ -84,7 +85,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return NextResponse.json(
         { error: 'Invalid category ID' },
@@ -114,41 +116,31 @@ export async function PUT(
       );
     }
 
-    // Check if new name already exists
-    const nameExists = await prisma.category.findFirst({
+    // Check if name already exists for this user
+    const duplicateCategory = await prisma.category.findFirst({
       where: {
         name: validatedData.name,
-        id: {
-          not: categoryId,
+        shortUrls: {
+          some: {
+            userId: user.id,
+          },
         },
+        id: { not: categoryId },
       },
     });
 
-    if (nameExists) {
+    if (duplicateCategory) {
       return NextResponse.json(
         { error: 'Category name already exists' },
         { status: 409 },
       );
     }
 
+    // Update the category
     const updatedCategory = await prisma.category.update({
       where: { id: categoryId },
       data: {
         name: validatedData.name,
-      },
-      include: {
-        shortUrls: {
-          where: {
-            userId: user.id,
-          },
-          select: {
-            id: true,
-            title: true,
-            shortUrl: true,
-            clickCount: true,
-            createdAt: true,
-          },
-        },
       },
     });
 
@@ -157,13 +149,6 @@ export async function PUT(
       data: updatedCategory,
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid input data', details: error.errors },
-        { status: 400 },
-      );
-    }
-
     console.error('Category PUT error:', error);
     return NextResponse.json(
       { error: 'Failed to update category' },
@@ -174,7 +159,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromRequest(request);
@@ -182,7 +167,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categoryId = parseInt(params.id);
+    const { id } = await params;
+    const categoryId = parseInt(id);
     if (isNaN(categoryId)) {
       return NextResponse.json(
         { error: 'Invalid category ID' },
@@ -200,13 +186,6 @@ export async function DELETE(
           },
         },
       },
-      include: {
-        shortUrls: {
-          where: {
-            userId: user.id,
-          },
-        },
-      },
     });
 
     if (!existingCategory) {
@@ -216,33 +195,7 @@ export async function DELETE(
       );
     }
 
-    // Remove category from all user's URLs
-    const userUrlsWithCategory = await prisma.shortUrl.findMany({
-      where: {
-        userId: user.id,
-        categories: {
-          some: {
-            id: categoryId,
-          },
-        },
-      },
-    });
-
-    // Disconnect category from each URL
-    for (const url of userUrlsWithCategory) {
-      await prisma.shortUrl.update({
-        where: { id: url.id },
-        data: {
-          categories: {
-            disconnect: {
-              id: categoryId,
-            },
-          },
-        },
-      });
-    }
-
-    // Delete the category
+    // Delete the category (this will also remove category associations from short URLs)
     await prisma.category.delete({
       where: { id: categoryId },
     });

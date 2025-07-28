@@ -96,7 +96,7 @@ jobs:
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: 📊 Test coverage
-        run: pnpm run test -- --coverage --watchAll=false
+        run: npx jest --coverage --watchAll=false
         env:
           POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}

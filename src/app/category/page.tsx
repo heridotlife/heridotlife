@@ -3,6 +3,9 @@ import Link from 'next/link';
 
 import prisma from '@/lib/prisma';
 
+// Force dynamic rendering to prevent build-time database access
+export const dynamic = 'force-dynamic';
+
 type Category = {
   id: number;
   name: string;
