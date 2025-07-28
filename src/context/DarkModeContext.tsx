@@ -25,7 +25,9 @@ export const DarkModeProvider: React.FC<{ children: React.ReactNode }> = ({
       setDarkMode(storedMode === 'true');
     } else {
       // If not set, check the user's system preference
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
       setDarkMode(prefersDark);
     }
   }, []);
