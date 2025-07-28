@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  apiKey             String? @unique
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String?
+  email     String?    @unique
+  image     String?
+  password  String
+  shortUrls ShortUrl[] // Relation field to `ShortUrl`
+  accounts  Account[]
+  sessions  Session[]
+}
+
+model ShortUrl {
+  id          Int        @id @default(autoincrement())
+  shortUrl    String     @unique
+  originalUrl String
+  title       String?
+  userId      String?    @map("user_id")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime?  @default(now())
+  categories  Category[] @relation("ShortUrlCategories")
+  User        User?      @relation(fields: [userId], references: [id])
+  clickCount  Int        @default(0)
+  latestClick DateTime?
+}
+
+model Category {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  clickCount Int        @default(0)
+  shortUrls  ShortUrl[] @relation("ShortUrlCategories")
+} 

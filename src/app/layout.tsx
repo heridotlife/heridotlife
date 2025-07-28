@@ -1,54 +1,63 @@
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Metadata } from 'next';
-import * as React from 'react';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 
-import '@/styles/globals.css';
-// !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
-import '@/styles/colors.css';
+import './globals.css';
 
-import { siteConfig } from '@/constant/config';
+import { DarkModeProvider } from '@/context/DarkModeContext';
 
-// !STARTERCONF Change these default meta
-// !STARTERCONF Look at @/constant/config to change them
+const inter = Inter({ subsets: ['latin'] });
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: siteConfig.title,
-    template: `%s | ${siteConfig.title}`,
-  },
-  description: siteConfig.description,
-  robots: { index: true, follow: true },
-  // !STARTERCONF this is the default favicon, you can generate your own from https://realfavicongenerator.net/
-  // ! copy to /favicon folder
-  icons: {
-    icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon-16x16.png',
-    apple: '/favicon/apple-touch-icon.png',
-  },
-  manifest: `/favicon/site.webmanifest`,
+  title: 'Heri Dot Life - URL Shortener & Analytics',
+  description:
+    'Professional URL shortener with analytics, category management, and user dashboard.',
+  keywords: 'url shortener, link management, analytics, dashboard',
+  authors: [{ name: 'Heri' }],
+  creator: 'Heri',
+  publisher: 'Heri',
+  robots: 'index, follow',
   openGraph: {
-    url: siteConfig.url,
-    title: siteConfig.title,
-    description: siteConfig.description,
-    siteName: siteConfig.title,
-    images: [`${siteConfig.url}/images/og.jpg`],
     type: 'website',
     locale: 'en_US',
+    url: 'https://heridotlife.com',
+    title: 'Heri Dot Life - URL Shortener & Analytics',
+    description:
+      'Professional URL shortener with analytics, category management, and user dashboard.',
+    siteName: 'Heri Dot Life',
+    images: [
+      {
+        url: '/images/og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Heri Dot Life - URL Shortener',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: siteConfig.title,
-    description: siteConfig.description,
-    images: [`${siteConfig.url}/images/og.jpg`],
-    creator: '@heridotlife',
+    title: 'Heri Dot Life - URL Shortener & Analytics',
+    description:
+      'Professional URL shortener with analytics, category management, and user dashboard.',
+    images: ['/images/og.jpg'],
   },
-  authors: [
-    {
-      name: 'Heri Rusmanto',
-      url: 'https://heri.life',
-    },
-  ],
+  viewport: 'width=device-width, initial-scale=1',
+  themeColor: '#000000',
+  manifest: '/favicon/site.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+    ],
+    apple: [
+      {
+        url: '/favicon/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    other: [{ url: '/favicon/favicon.ico', sizes: 'any' }],
+  },
 };
 
 export default function RootLayout({
@@ -57,10 +66,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>{children}</body>
-      <Analytics />
-      <SpeedInsights />
+    <html lang='en' suppressHydrationWarning>
+      <head>
+        {/* Cloudflare Analytics */}
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "YOUR_CLOUDFLARE_ANALYTICS_TOKEN"}'
+        />
+      </head>
+      <body className={inter.className}>
+        <DarkModeProvider>{children}</DarkModeProvider>
+      </body>
     </html>
   );
 }
