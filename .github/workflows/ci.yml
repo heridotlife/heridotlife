@@ -41,6 +41,9 @@ jobs:
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
+
       - name: 🔬 Run ESLint
         run: pnpm run lint
 
@@ -80,6 +83,9 @@ jobs:
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
 
       - name: 🃏 Run unit tests
         run: pnpm run test
@@ -128,6 +134,9 @@ jobs:
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
 
       - name: 🔧 Setup environment variables
         run: |
@@ -200,6 +209,9 @@ jobs:
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma client
+        run: pnpm prisma generate
 
       - name: 🏗️ Build for analysis
         run: pnpm run build:cloudflare
