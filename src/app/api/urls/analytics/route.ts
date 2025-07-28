@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate category totals
-    const categoryTotals = categoryStats.map((category) => ({
+    const categoryTotals = categoryStats.map((category: any) => ({
       name: category.name,
       urlCount: category.shortUrls.length,
       totalClicks: category.shortUrls.reduce(

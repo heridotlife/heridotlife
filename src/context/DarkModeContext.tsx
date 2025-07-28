@@ -1,3 +1,5 @@
+'use client';
+
 // /src/context/DarkModeContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
@@ -13,33 +15,39 @@ const DarkModeContext = createContext<DarkModeContextType | undefined>(
 export const DarkModeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
+  const [darkMode, setDarkMode] = useState<boolean>(false); // Default to false for SSR
+
+  // Initialize dark mode on client side
+  useEffect(() => {
     // Check local storage for user preference
     const storedMode = localStorage.getItem('darkMode');
     if (storedMode !== null) {
-      return storedMode === 'true'; // Convert string to boolean
+      setDarkMode(storedMode === 'true');
+    } else {
+      // If not set, check the user's system preference
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setDarkMode(prefersDark);
     }
-    // If not set, check the user's system preference
-    return (
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-  });
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => {
       const newMode = !prevMode;
-      localStorage.setItem('darkMode', String(newMode)); // Store new mode in local storage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('darkMode', String(newMode));
+      }
       return newMode;
     });
   };
 
   useEffect(() => {
     // Set body class based on darkMode state
-    if (darkMode) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
+    if (typeof document !== 'undefined') {
+      if (darkMode) {
+        document.body.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+      }
     }
   }, [darkMode]);
 
