@@ -4,6 +4,9 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { validateSession } from '@/lib/session';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+
 const createUrlSchema = z.object({
   originalUrl: z.string().url('Please provide a valid URL'),
   shortUrl: z

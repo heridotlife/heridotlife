@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { getUserFromRequest } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+
 const analyticsQuerySchema = z.object({
   dateRange: z.enum(['7d', '30d', '90d', '1y']).default('7d'),
   categoryId: z.string().optional(),

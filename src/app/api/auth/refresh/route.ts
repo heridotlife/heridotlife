@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { generateToken, verifyToken } from '@/lib/auth';
+
+// Force dynamic rendering for authentication routes
+export const dynamic = 'force-dynamic';
 import { validateSession } from '@/lib/session';
 
 export async function POST(request: NextRequest) {

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { validateSession } from '@/lib/session';
 
+// Force dynamic rendering for authentication routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Get session token from cookies

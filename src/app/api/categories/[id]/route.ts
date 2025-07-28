@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { getUserFromRequest } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+
 const updateCategorySchema = z.object({
   name: z.string().min(1).max(50),
 });
