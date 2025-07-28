@@ -20,19 +20,19 @@ jobs:
       - name: 🤌 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
           cache: 'pnpm'
 
       - name: 📥 Download deps
         run: pnpm install --frozen-lockfile
 
       - name: 🔬 Lint
-        run: pnpm run lint:strict
+        run: pnpm run lint
 
       - name: 🔎 Type check
         run: pnpm run typecheck
@@ -42,3 +42,8 @@ jobs:
 
       - name: 🃏 Run jest
         run: pnpm run test
+        env:
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}

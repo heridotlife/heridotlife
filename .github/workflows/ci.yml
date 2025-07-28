@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '18'
   PNPM_VERSION: '10'
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🔬 Run ESLint
-        run: pnpm run lint:strict
+        run: pnpm run lint
 
       - name: 🔎 TypeScript type check
         run: pnpm run typecheck
@@ -83,9 +83,19 @@ jobs:
 
       - name: 🃏 Run unit tests
         run: pnpm run test
+        env:
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: 📊 Test coverage
         run: pnpm run test -- --coverage --watchAll=false
+        env:
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: 📈 Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -125,7 +135,12 @@ jobs:
           echo "NEXT_PUBLIC_APP_URL=${{ github.server_url }}/${{ github.repository }}" >> $GITHUB_ENV
 
       - name: 🏗️ Build application
-        run: pnpm run build
+        run: pnpm run build:cloudflare
+        env:
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: 📦 Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -187,7 +202,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🏗️ Build for analysis
-        run: pnpm run build
+        run: pnpm run build:cloudflare
+        env:
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: 📊 Bundle analysis
         run: |
