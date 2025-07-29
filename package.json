@@ -94,7 +94,6 @@
       "ws": "^8.18.3",
       "semver": "^7.7.2",
       "cookie": "^1.0.2",
-      "brace-expansion": "^4.0.1",
       "braces": "^3.0.3"
     }
   }
