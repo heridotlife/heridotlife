@@ -61,6 +61,8 @@ model ShortUrl {
   User        User?      @relation(fields: [userId], references: [id])
   clickCount  Int        @default(0)
   latestClick DateTime?
+  isActive    Boolean    @default(true)
+  expiresAt   DateTime?
 }
 
 model Category {

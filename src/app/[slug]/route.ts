@@ -31,30 +31,51 @@ export async function GET(
       );
     }
 
-    // Update the click count and latest click timestamp
-    await prisma.shortUrl.update({
-      where: { id: shortUrlRecord.id },
-      data: {
-        clickCount: { increment: 1 },
-        latestClick: new Date(),
-      },
-    });
+    // Check if URL is inactive
+    if (!shortUrlRecord.isActive) {
+      return NextResponse.json(
+        { error: 'This short URL has been disabled' },
+        { status: 410 },
+      );
+    }
 
-    // Update click count for all associated categories
-    const allCategories = shortUrlRecord.categories;
-    await Promise.all(
-      allCategories.map(
-        (category: { id: number; clickCount: number; name: string }) =>
-          prisma.category.update({
-            where: { id: category.id },
-            data: { clickCount: { increment: 1 } },
-          }),
-      ),
-    );
+    // Check if URL has expired
+    if (shortUrlRecord.expiresAt && shortUrlRecord.expiresAt < new Date()) {
+      return NextResponse.json(
+        { error: 'This short URL has expired' },
+        { status: 410 },
+      );
+    }
+
+    // Update click count and categories in a single transaction
+    const categoryIds = shortUrlRecord.categories.map((c) => c.id);
+
+    await prisma.$transaction([
+      // Update short URL click count and timestamp
+      prisma.shortUrl.update({
+        where: { id: shortUrlRecord.id },
+        data: {
+          clickCount: { increment: 1 },
+          latestClick: new Date(),
+        },
+      }),
+      // Batch update all categories at once
+      ...(categoryIds.length > 0
+        ? [
+            prisma.category.updateMany({
+              where: { id: { in: categoryIds } },
+              data: { clickCount: { increment: 1 } },
+            }),
+          ]
+        : []),
+    ]);
 
     // Perform the redirection using a 302 response
     return NextResponse.redirect(shortUrlRecord.originalUrl); // 302 redirect
-  } catch {
+  } catch (error) {
+    // Log error for debugging
+    // eslint-disable-next-line no-console
+    console.error('Error processing short URL redirect:', error);
     return NextResponse.redirect('/c');
   }
 }
