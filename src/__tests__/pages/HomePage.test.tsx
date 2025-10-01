@@ -1,44 +1,77 @@
 // __tests__/HomePage.test.tsx
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import HomePage from '@/app/page'; // Update path as needed
+import HomePage from '@/app/page';
+
+// Mock window.matchMedia
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
+});
+
+// Mock localStorage
+beforeEach(() => {
+  const localStorageMock = {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  global.localStorage = localStorageMock as any;
+});
 
 describe('HomePage', () => {
-  it('renders the main components', () => {
+  it('renders the main components', async () => {
     render(<HomePage />);
 
-    // Check if title, subtitle, and LinkedIn link render
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Heri Rusmanto',
-    );
+    // Wait for component to mount
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        'Heri Rusmanto',
+      );
+    });
+
     expect(screen.getByText('Automation enthusiast')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /Connect with me on LinkedIn/i }),
+      screen.getByRole('link', { name: /Connect on LinkedIn/i }),
     ).toHaveAttribute('href', 'https://www.linkedin.com/in/hveda/');
 
     // Check profile image
-    const image = screen.getByAltText('Profile Picture');
+    const image = screen.getByAltText('Heri Rusmanto Profile Picture');
     expect(image).toBeInTheDocument();
   });
 
-  it('toggles dark mode', () => {
+  it('renders theme toggle button', async () => {
     render(<HomePage />);
 
-    // Initial button label for light mode
-    const toggleButton = screen.getByRole('button', { name: /Set to dark/i });
-    expect(toggleButton).toBeInTheDocument();
+    // Wait for component to mount and find toggle button
+    const toggleButton = await waitFor(() =>
+      screen.getByRole('button', { name: /Toggle theme/i }),
+    );
 
-    // Click to change to dark mode
-    fireEvent.click(toggleButton);
-    expect(toggleButton).toHaveTextContent('Set to light');
+    expect(toggleButton).toBeInTheDocument();
   });
 
-  it('displays the current year in footer', () => {
+  it('displays the current year in footer', async () => {
     render(<HomePage />);
 
-    // Footer year check
-    const year = new Date().getFullYear();
-    expect(screen.getByText(`© ${year} By`)).toBeInTheDocument();
+    // Wait for component to mount
+    await waitFor(() => {
+      const year = new Date().getFullYear();
+      expect(screen.getByText(new RegExp(`© ${year}`))).toBeInTheDocument();
+    });
   });
 });

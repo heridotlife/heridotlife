@@ -63,7 +63,7 @@ export async function GET(req: Request) {
 
     // Perform the redirection using a 302 response
     return NextResponse.redirect(shortUrlRecord.originalUrl); // 302 redirect
-  } catch (error) {
+  } catch {
     return NextResponse.redirect('/c');
   }
 }

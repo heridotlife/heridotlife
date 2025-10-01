@@ -8,17 +8,11 @@ import UnstyledLink, {
   UnstyledLinkProps,
 } from '@/components/links/UnstyledLink';
 
-const IconLinkVariant = [
-  'primary',
-  'outline',
-  'ghost',
-  'light',
-  'dark',
-] as const;
+type IconLinkVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
 
 type IconLinkProps = {
   isDarkBg?: boolean;
-  variant?: (typeof IconLinkVariant)[number];
+  variant?: IconLinkVariant;
   icon?: IconType | LucideIcon;
   classNames?: {
     icon?: string;

@@ -4,9 +4,9 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = params;
+  const { slug } = await params;
 
   // Check for valid slug parameter
   if (!slug || typeof slug !== 'string') {
@@ -54,7 +54,7 @@ export async function GET(
 
     // Perform the redirection using a 302 response
     return NextResponse.redirect(shortUrlRecord.originalUrl); // 302 redirect
-  } catch (error) {
+  } catch {
     return NextResponse.redirect('/c');
   }
 }
