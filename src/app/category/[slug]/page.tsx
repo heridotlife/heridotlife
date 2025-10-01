@@ -3,12 +3,15 @@ import { notFound } from 'next/navigation';
 
 import prisma from '@/lib/prisma';
 
+// Force dynamic rendering (no static generation)
+export const dynamic = 'force-dynamic';
+
 export default async function CategoryDetails({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const categoryName = params.category;
+  const { category: categoryName } = await params;
 
   // Fetch category data from Prisma
   const category = await prisma.category.findUnique({

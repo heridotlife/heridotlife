@@ -2,6 +2,9 @@ import Link from 'next/link'; // Import Link from next/link
 
 import prisma from '@/lib/prisma'; // Adjust the import path as needed
 
+// Force dynamic rendering (no static generation)
+export const dynamic = 'force-dynamic';
+
 interface ShortUrl {
   shortUrl: string;
   id: number;

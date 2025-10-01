@@ -5,18 +5,12 @@ import { ImSpinner2 } from 'react-icons/im';
 
 import { cn } from '@/lib/utils';
 
-const IconButtonVariant = [
-  'primary',
-  'outline',
-  'ghost',
-  'light',
-  'dark',
-] as const;
+type IconButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
 
 type IconButtonProps = {
   isLoading?: boolean;
   isDarkBg?: boolean;
-  variant?: (typeof IconButtonVariant)[number];
+  variant?: IconButtonVariant;
   icon?: IconType | LucideIcon;
   classNames?: {
     icon?: string;
