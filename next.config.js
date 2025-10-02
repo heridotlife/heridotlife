@@ -6,6 +6,21 @@ const nextConfig = {
 
   reactStrictMode: true,
 
+  // Skip static generation for auth-protected routes
+  async headers() {
+    return [
+      {
+        source: '/admin/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
+    ];
+  },
+
   // Uncoment to add domain whitelist
   // images: {
   //   remotePatterns: [
