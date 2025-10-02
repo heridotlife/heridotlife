@@ -16,6 +16,12 @@ export async function GET(
     );
   }
 
+  // Exclude reserved paths (admin, api, _next, etc.)
+  const reservedPaths = ['admin', 'api', '_next', 'category', 'urls', 'c'];
+  if (reservedPaths.includes(slug.toLowerCase())) {
+    return NextResponse.json({ error: 'Reserved path' }, { status: 404 });
+  }
+
   try {
     // Fetch the short URL record from the database
     const shortUrlRecord = await prisma.shortUrl.findUnique({
