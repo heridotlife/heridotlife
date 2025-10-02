@@ -1,133 +1,228 @@
-# Next.js + Tailwind CSS + TypeScript Starter and Boilerplate
+# Personal Website & URL Shortener
 
 <div align="center">
-  <h2>🔋 ts-nextjs-tailwind-starter</h2>
-  <p>Next.js + Tailwind CSS + TypeScript starter packed with useful development features.</p>
+  <h2>🔗 heri.life</h2>
+  <p>Personal portfolio website and URL shortener built with Next.js 15, TypeScript, and Prisma</p>
   <p>Made by <a href="https://heri.life">Heri Rusmanto</a></p>
-
-[![GitHub Repo stars](https://img.shields.io/github/stars/theodorusclarence/ts-nextjs-tailwind-starter)](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/stargazers)
-[![Depfu](https://badges.depfu.com/badges/fc6e730632ab9dacaf7df478a08684a7/overview.svg)](https://depfu.com/github/theodorusclarence/ts-nextjs-tailwind-starter?project_id=30160)
-[![Last Update](https://img.shields.io/badge/deps%20update-every%20sunday-blue.svg)](https://shields.io/)
-
 </div>
+
+## Overview
+
+A modern personal website featuring:
+
+- **Portfolio Homepage** - Clean profile page with LinkedIn integration
+- **URL Shortener** - Full-featured URL shortening with analytics
+- **Admin Dashboard** - Complete management interface for short URLs
 
 ## Features
 
-This repository is 🔋 battery packed with:
+### Tech Stack
 
-- ⚡️ Next.js 14 with App Router
-- ⚛️ React 18
-- ✨ TypeScript
-- 💨 Tailwind CSS 3 — Configured with CSS Variables to extend the **primary** color
-- 💎 Pre-built Components — Components that will **automatically adapt** with your brand color, [check here for the demo](https://heri.life/components)
-- 🃏 Jest — Configured for unit testing
-- 📈 Absolute Import and Path Alias — Import components using `@/` prefix
-- 📏 ESLint — Find and fix problems in your code, also will **auto sort** your imports
-- 💖 Prettier — Format your code consistently
-- 🐶 Husky & Lint Staged — Run scripts on your staged files before they are committed
-- 🤖 Conventional Commit Lint — Make sure you & your teammates follow conventional commit
-- ⏰ Release Please — Generate your changelog by activating the `release-please` workflow
-- 👷 Github Actions — Lint your code on PR
-- 🚘 Automatic Branch and Issue Autolink — Branch will be automatically created on issue **assign**, and auto linked on PR
-- 🔥 Snippets — A collection of useful snippets
-- 👀 Open Graph Helper Function — Awesome open graph generated using [og](https://github.com/theodorusclarence/og), fork it and deploy!
-- 🗺 Site Map — Automatically generate sitemap.xml
-- 📦 Expansion Pack — Easily install common libraries, additional components, and configs.
+- ⚡️ **Next.js 15** - App Router with server components
+- ⚛️ **React 19** - Latest React features
+- ✨ **TypeScript 5.9** - Type-safe development
+- 🎨 **Tailwind CSS 4** - Modern styling with dark mode
+- 🗄️ **Prisma 6** - Type-safe database ORM
+- 🐘 **PostgreSQL** - Reliable database (Vercel Postgres)
+- 🔒 **JWT Authentication** - Simple session-based auth
+- 🧪 **Jest 30** - Unit testing with React Testing Library
 
-See the 👉 [feature details and changelog](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/blob/main/CHANGELOG.md) 👈 for more.
+### URL Shortener Features
 
-You can also check all of the **details and demos** on my blog post:
+- 🔗 Custom short URL slugs
+- 📊 Click tracking and analytics
+- 🏷️ Category organization
+- ⏰ Optional URL expiration
+- 🔄 Active/Inactive URL toggle
+- 📈 Click count per URL and category
+- 🔍 Search and filter URLs
 
-- [One-stop Starter to Maximize Efficiency on Next.js & Tailwind CSS Projects](https://heri.life/blog/one-stop-starter)
+### Admin Dashboard
+
+- 🔐 Password-protected admin panel
+- 📊 Dashboard with statistics overview
+- 📝 CRUD operations for URLs
+- 🏷️ Category management
+- 🎨 Custom branded UI (sky/blue/cyan theme)
+- 🌙 Dark mode support
+- 📱 Responsive design
+
+### Development Features
+
+- 📈 Absolute imports with `@/` prefix
+- 📏 ESLint with auto-sort imports
+- 💖 Prettier code formatting
+- 🐶 Husky pre-commit hooks
+- 🤖 Conventional commit linting
+- 🗺️ Automatic sitemap generation
+- 🎯 Type-safe API routes
 
 ## Getting Started
 
-### 1. Clone this template using one of the three ways
+### 1. Clone the repository
 
-1. Use this repository as template
-
-   **Disclosure:** by using this repository as a template, there will be an attribution on your repository.
-
-   I'll appreciate if you do, so this template can be known by others too 😄
-
-   ![Use as template](https://user-images.githubusercontent.com/55318172/129183039-1a61e68d-dd90-4548-9489-7b3ccbb35810.png)
-
-2. Using `create-next-app`
-
-   ```bash
-   pnpm create next-app  -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter ts-pnpm
-   ```
-
-   If you still want to use **pages directory** (_is not actively maintained_) you can use this command
-
-   ```bash
-   npx create-next-app -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/tree/pages-directory project-name
-   ```
-
-3. Using `degit`
-
-   ```bash
-   npx degit theodorusclarence/ts-nextjs-tailwind-starter YOUR_APP_NAME
-   ```
-
-4. Deploy to Vercel
-
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter)
+```bash
+git clone https://github.com/hveda/heridotlife.git
+cd heridotlife
+```
 
 ### 2. Install dependencies
-
-It is encouraged to use **pnpm** so the husky hooks can work properly.
 
 ```bash
 pnpm install
 ```
 
-### 3. Run the development server
+### 3. Set up environment variables
 
-You can start the server using this command:
+Create a `.env.local` file in the root directory:
+
+```bash
+# Database (Vercel Postgres or Neon)
+POSTGRES_PRISMA_URL=postgresql://user:password@host:5432/database?schema=public
+POSTGRES_URL_NON_POOLING=postgresql://user:password@host:5432/database?schema=public
+
+# Admin Authentication
+ADMIN_PASSWORD=your-secure-password
+AUTH_SECRET=your-random-secret-at-least-32-characters
+
+# Optional: Analytics
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your-analytics-id
+```
+
+**Important**: Change `ADMIN_PASSWORD` and `AUTH_SECRET` to secure values in production!
+
+### 4. Set up the database
+
+Generate Prisma client and run migrations:
+
+```bash
+# Generate Prisma client
+pnpm prisma generate --schema=src/db/schema.prisma
+
+# Run database migrations
+pnpm db:migrate:deploy
+```
+
+For development with migration creation:
+
+```bash
+pnpm db:migrate:dev
+```
+
+### 5. Run the development server
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can start editing the page by modifying `src/pages/index.tsx`.
+Open [http://localhost:3000](http://localhost:3000) to see your website.
 
-### 4. Change defaults
+### 6. Access the admin dashboard
 
-There are some things you need to change including title, urls, favicons, etc.
+Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) and log in with your `ADMIN_PASSWORD`.
 
-Find all comments with !STARTERCONF, then follow the guide.
+## Admin Dashboard Usage
 
-Don't forget to change the package name in package.json
+### Authentication
 
-### 5. Commit Message Convention
+- **Login**: Navigate to `/admin` - you'll be redirected to `/admin/login`
+- **Password**: Uses the `ADMIN_PASSWORD` from your `.env.local` file
+- **Session**: JWT-based session stored in HTTP-only cookies (7-day expiration)
+- **Logout**: Click the logout button in the dashboard header
 
-This starter is using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), it is mandatory to use it to commit changes.
+### Managing URLs
 
-## Projects using ts-nextjs-tailwind-starter
+#### Create a new short URL
 
-<!--
-TEMPLATE
-- [sitename](https://sitelink.com) ([Source](https://github.com/githublink))
-- [sitename](https://sitelink.com)
--->
+1. Go to **Short URLs** page
+2. Click **Add New URL**
+3. Fill in the form:
+   - **Short URL Slug**: The unique identifier (e.g., `my-link` → `heri.life/my-link`)
+   - **Original URL**: The destination URL (must be absolute with `https://`)
+   - **Title**: Optional descriptive title
+   - **Categories**: Select one or more categories (optional)
+   - **Expires At**: Optional expiration date/time
+   - **Active**: Toggle to enable/disable the URL
+4. Click **Create URL**
 
-- [heri.life](https://heri.life) ([Source](https://github.com/theodorusclarence/heri.life))
-- [Notiolink](https://notiolink.thcl.dev/) ([Source](https://github.com/theodorusclarence/notiolink))
-- [NextJs + Materia UI + Typescript](https://github.com/AlexStack/nextjs-materia-mui-typescript-hook-form-scaffold-boilerplate-starter)
+#### Edit a URL
 
-Are you using this starter? Please add your page (and repo) to the end of the list via a [Pull Request](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/edit/main/README.md). 😃
+1. Click the **Edit** icon (pencil) on any URL in the table
+2. Modify the fields as needed
+3. Click **Update URL**
 
-## Expansion Pack 📦
+#### Toggle URL status
 
-This starter is now equipped with an [expansion pack](https://github.com/theodorusclarence/expansion-pack).
+Click the **Power** icon to quickly activate/deactivate a URL without editing.
 
-You can easily add expansion such as React Hook Form + Components, Storybook, and more just using a single command line.
+#### Delete a URL
 
-<https://user-images.githubusercontent.com/55318172/146631994-e1cac137-1664-4cfe-950b-a96decc1eaa6.mp4>
+Click the **Trash** icon and confirm deletion. This action cannot be undone.
 
-Check out the [expansion pack repository](https://github.com/theodorusclarence/expansion-pack) for the commands
+### Managing Categories
 
-### App Router Update
+1. Go to **Categories** page
+2. Type a category name and click **Add Category**
+3. View statistics for each category:
+   - Number of URLs in the category
+   - Total clicks across all URLs in the category
 
-Due to App Router update, the expansion pack is currently **outdated**. It will be updated in the future. You can still use them by copy and pasting the files.
+### Dashboard Overview
+
+The main dashboard shows:
+
+- **Total URLs**: All short URLs created
+- **Total Clicks**: Aggregate click count across all URLs
+- **Active URLs**: Currently active short URLs
+- **Expired URLs**: URLs that have passed their expiration date
+- **Recent Activity**: Last 10 clicked URLs with timestamp
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import your repository on [Vercel](https://vercel.com)
+3. Add environment variables in Vercel project settings
+4. Deploy!
+
+**Important**: Run database migrations separately in production:
+
+```bash
+pnpm db:migrate:deploy
+```
+
+### Environment Variables for Production
+
+Make sure to set these in your Vercel project settings:
+
+- `POSTGRES_PRISMA_URL`
+- `POSTGRES_URL_NON_POOLING`
+- `ADMIN_PASSWORD` (use a strong password!)
+- `AUTH_SECRET` (generate with: `openssl rand -base64 32`)
+
+## Development
+
+### Code Quality
+
+Always run these before committing:
+
+```bash
+pnpm typecheck    # TypeScript type checking
+pnpm lint         # ESLint checks
+pnpm test         # Run test suite
+pnpm build        # Production build test
+```
+
+### Conventional Commits
+
+This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages must follow this format:
+
+```
+feat: add new feature
+fix: resolve bug
+docs: update documentation
+chore: update dependencies
+```
+
+Pre-commit hooks will enforce code quality and commit message format.
