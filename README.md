@@ -56,6 +56,10 @@ A modern personal website featuring:
 - 🤖 Conventional commit linting
 - 🗺️ Automatic sitemap generation
 - 🎯 Type-safe API routes
+- 🔒 **Type-safe Environment Variables** - Validated at runtime with Zod
+- ⚙️ **Centralized API Response Handling** - Consistent success and error responses across API routes
+- 📝 **API Route Logging** - Integrated logger for better visibility into API operations
+- 🧪 **Expanded Test Coverage** - Comprehensive unit tests for all API routes
 
 ## Getting Started
 

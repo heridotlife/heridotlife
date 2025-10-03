@@ -1,69 +1,29 @@
 import { NextResponse } from 'next/server';
 
-import prisma from '@/lib/prisma';
+import { redirectLogic } from '@/lib/api-handlers/redirect';
+import { respondBadRequest, respondNotFound } from '@/lib/api-responses';
+import logger from '@/lib/logger';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const shortUrlParam = searchParams.get('shortUrl');
 
-  // Check for valid short URL parameter
-  if (!shortUrlParam) {
-    return NextResponse.json(
-      { error: 'Missing short URL parameter' },
-      { status: 400 },
-    );
-  }
-
   try {
-    let shortUrlRecord;
-
-    // Check if the parameter is an integer ID or a short URL string
-    const id = parseInt(shortUrlParam, 10);
-    if (!isNaN(id)) {
-      // If it's a number, find by ID
-      shortUrlRecord = await prisma.shortUrl.findUnique({
-        where: { id },
-        include: { categories: true },
-      });
-    } else {
-      // Otherwise, find by short URL string
-      shortUrlRecord = await prisma.shortUrl.findUnique({
-        where: { shortUrl: shortUrlParam },
-        include: { categories: true },
-      });
+    const originalUrl = await redirectLogic(shortUrlParam);
+    logger({ shortUrlParam, originalUrl }, 'Redirecting short URL');
+    return NextResponse.redirect(originalUrl);
+  } catch (error: unknown) {
+    logger(error, `Error redirecting short URL: ${shortUrlParam}`);
+    if (
+      error instanceof Error &&
+      error.message === 'Missing short URL parameter'
+    ) {
+      return respondBadRequest(error.message);
     }
-
-    // If the short URL doesn't exist, return 404
-    if (!shortUrlRecord) {
-      return NextResponse.json(
-        { error: 'Short URL not found' },
-        { status: 404 },
-      );
+    if (error instanceof Error && error.message === 'Short URL not found') {
+      return respondNotFound(error.message);
     }
-
-    // Update the click count and latest click timestamp
-    await prisma.shortUrl.update({
-      where: { id: shortUrlRecord.id },
-      data: {
-        clickCount: { increment: 1 },
-        latestClick: new Date(),
-      },
-    });
-
-    // Update click count for all associated categories
-    const allCategories = shortUrlRecord.categories;
-    await Promise.all(
-      allCategories.map((category: { id: number }) =>
-        prisma.category.update({
-          where: { id: category.id },
-          data: { clickCount: { increment: 1 } },
-        }),
-      ),
-    );
-
-    // Perform the redirection using a 302 response
-    return NextResponse.redirect(shortUrlRecord.originalUrl); // 302 redirect
-  } catch {
+    // Fallback for any other errors, redirect to a generic error page or home
     return NextResponse.redirect('/c');
   }
 }
