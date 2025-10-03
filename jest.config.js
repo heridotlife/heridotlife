@@ -15,6 +15,12 @@ const customJestConfig = {
 
   testEnvironment: 'jest-environment-jsdom',
 
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+    '^.+\\.mjs$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['<rootDir>/node_modules/(?!node-fetch)'],
+
   /**
    * Absolute imports and Module Path Aliases
    */

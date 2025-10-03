@@ -1,6 +1,8 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
+export type AuthenticatedSession = { authenticated: boolean };
+
 const SECRET_KEY = new TextEncoder().encode(
   process.env.AUTH_SECRET || 'your-secret-key-change-in-production',
 );

@@ -1,36 +1,28 @@
-import { NextResponse } from 'next/server';
-
+import {
+  createCategoryLogic,
+  getCategoriesLogic,
+} from '@/lib/api-handlers/categories';
+import {
+  respondBadRequest,
+  respondError,
+  respondSuccess,
+  respondUnauthorized,
+} from '@/lib/api-responses';
 import { getSession } from '@/lib/auth';
-import prisma from '@/lib/prisma';
-import { createCategorySchema } from '@/lib/validations';
 
 // GET all categories
 export async function GET() {
   try {
     const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const categories = await prisma.category.findMany({
-      include: {
-        _count: {
-          select: { shortUrls: true },
-        },
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    });
-
-    return NextResponse.json(categories);
-  } catch (error) {
+    const categories = await getCategoriesLogic(session);
+    return respondSuccess(categories);
+  } catch (error: unknown) {
     // eslint-disable-next-line no-console
     console.error('Error fetching categories:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return respondUnauthorized();
+    }
+    return respondError('Internal server error');
   }
 }
 
@@ -38,36 +30,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
-    const validation = createCategorySchema.safeParse(body);
-
-    if (!validation.success) {
-      const errorMessage = Object.values(
-        validation.error.flatten().fieldErrors,
-      )[0]?.[0];
-      return NextResponse.json(
-        { error: errorMessage || 'Invalid input.' },
-        { status: 400 },
-      );
-    }
-
-    const { name } = validation.data;
-
-    const category = await prisma.category.create({
-      data: { name },
-    });
-
-    return NextResponse.json(category, { status: 201 });
-  } catch (error) {
+    const category = await createCategoryLogic(session, body);
+    return respondSuccess(category, 201);
+  } catch (error: unknown) {
     // eslint-disable-next-line no-console
     console.error('Error creating category:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return respondUnauthorized();
+    }
+    if (error instanceof Error && error.message.startsWith('Invalid input')) {
+      // Catch Zod validation errors
+      return respondBadRequest(error.message);
+    }
+    return respondError('Internal server error');
   }
 }
