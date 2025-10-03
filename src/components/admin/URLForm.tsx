@@ -48,7 +48,7 @@ export default function URLForm({ urlId }: URLFormProps) {
 
   const fetchUrl = async () => {
     try {
-      const response = await fetch(`/api/admin/urls/${urlId}`);
+      const response = await fetch(`/api/admin/urls/id?id=${urlId}`);
       if (!response.ok) throw new Error('Failed to fetch URL');
       const data = await response.json();
       setFormData({
@@ -78,7 +78,7 @@ export default function URLForm({ urlId }: URLFormProps) {
       };
 
       const response = await fetch(
-        urlId ? `/api/admin/urls/${urlId}` : '/api/admin/urls',
+        urlId ? `/api/admin/urls/id?id=${urlId}` : '/api/admin/urls',
         {
           method: urlId ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },

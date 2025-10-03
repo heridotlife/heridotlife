@@ -1,21 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // PATCH toggle isActive
-export async function PATCH(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = await params;
-    const urlId = parseInt(id);
+    const id = request.nextUrl.searchParams.get('id');
+    const urlId = Number(id);
 
     if (isNaN(urlId)) {
       return NextResponse.json({ error: 'Invalid URL ID' }, { status: 400 });

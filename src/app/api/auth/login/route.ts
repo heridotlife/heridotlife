@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server';
 
 import { createSession, verifyPassword } from '@/lib/auth';
+import { loginSchema } from '@/lib/validations';
 
 export async function POST(request: Request) {
   try {
-    const { password } = await request.json();
+    const body = await request.json();
+    const validation = loginSchema.safeParse(body);
 
-    if (!password || typeof password !== 'string') {
+    if (!validation.success) {
+      const errorMessage = Object.values(
+        validation.error.flatten().fieldErrors,
+      )[0]?.[0];
       return NextResponse.json(
-        { error: 'Password is required' },
+        { error: errorMessage || 'Invalid input.' },
         { status: 400 },
       );
     }
+
+    const { password } = validation.data;
 
     if (!verifyPassword(password)) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 });

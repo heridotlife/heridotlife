@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { createCategorySchema } from '@/lib/validations';
 
 // GET all categories
 export async function GET() {
@@ -42,14 +43,19 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name } = body;
+    const validation = createCategorySchema.safeParse(body);
 
-    if (!name || typeof name !== 'string') {
+    if (!validation.success) {
+      const errorMessage = Object.values(
+        validation.error.flatten().fieldErrors,
+      )[0]?.[0];
       return NextResponse.json(
-        { error: 'Category name is required' },
+        { error: errorMessage || 'Invalid input.' },
         { status: 400 },
       );
     }
+
+    const { name } = validation.data;
 
     const category = await prisma.category.create({
       data: { name },

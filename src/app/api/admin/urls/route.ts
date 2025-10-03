@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { createUrlSchema } from '@/lib/validations';
 
 // GET all URLs
 export async function GET() {
@@ -45,20 +46,24 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { shortUrl, originalUrl, title, categoryIds, expiresAt, isActive } =
-      body;
+    const validation = createUrlSchema.safeParse(body);
 
-    // Validation
-    if (!shortUrl || !originalUrl) {
+    if (!validation.success) {
+      const errorMessage = Object.values(
+        validation.error.flatten().fieldErrors,
+      )[0]?.[0];
       return NextResponse.json(
-        { error: 'Short URL and Original URL are required' },
+        { error: errorMessage || 'Invalid input.' },
         { status: 400 },
       );
     }
 
+    const { slug, originalUrl, title, categoryId, expiresAt, active } =
+      validation.data;
+
     // Check if slug already exists
     const existing = await prisma.shortUrl.findUnique({
-      where: { shortUrl },
+      where: { shortUrl: slug },
     });
 
     if (existing) {
@@ -71,14 +76,14 @@ export async function POST(request: Request) {
     // Create URL
     const url = await prisma.shortUrl.create({
       data: {
-        shortUrl,
+        shortUrl: slug,
         originalUrl,
         title: title || null,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
-        isActive: isActive !== undefined ? isActive : true,
-        categories: categoryIds?.length
+        isActive: active !== undefined ? active : true,
+        categories: categoryId
           ? {
-              connect: categoryIds.map((id: number) => ({ id })),
+              connect: { id: Number(categoryId) },
             }
           : undefined,
       },
