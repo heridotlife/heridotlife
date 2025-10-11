@@ -13,28 +13,28 @@ const urlRegex = /^[a-zA-Z0-9_-]+$/;
 export const createUrlSchema = z.object({
   slug: z
     .string()
-    .min(3, { message: 'Slug must be at least 3 characters long.' })
+    .min(2, { message: 'Slug must be at least 2 characters long.' })
     .regex(urlRegex, {
       message:
         'Slug can only contain letters, numbers, underscores, and hyphens.',
     }),
   originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
   title: z.string().optional(),
-  categoryId: z.string().optional(),
-  expiresAt: z.date().optional().nullable(),
+  categoryIds: z.array(z.number()).optional(),
+  expiresAt: z.string().optional().nullable(),
   active: z.boolean().optional(),
 });
 
 export const updateUrlSchema = z.object({
   slug: z
     .string()
-    .min(3, { message: 'Slug must be at least 3 characters long.' })
+    .min(2, { message: 'Slug must be at least 2 characters long.' })
     .regex(urlRegex, {
       message:
         'Slug can only contain letters, numbers, underscores, and hyphens.',
     }),
   originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
   title: z.string().optional(),
-  categoryId: z.string().optional(),
-  expiresAt: z.date().optional().nullable(),
+  categoryIds: z.array(z.number()).optional(),
+  expiresAt: z.string().optional().nullable(),
 });

@@ -1,13 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import PrismaClientPkg from '@prisma/client';
 
-let prisma: PrismaClient;
+const { PrismaClient } = PrismaClientPkg;
+type PrismaClientType = InstanceType<typeof PrismaClient>;
 
-if (process.env.NODE_ENV === 'production') {
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClientType | undefined;
+};
+
+let prisma: PrismaClientType;
+
+if (import.meta.env.PROD) {
   prisma = new PrismaClient();
 } else {
-  // Extend the NodeJS.Global interface to include the prisma property
-  const globalForPrisma = global as typeof global & { prisma?: PrismaClient };
-
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = new PrismaClient();
   }

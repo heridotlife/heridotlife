@@ -3,7 +3,7 @@ import * as React from 'react';
 import { IconType } from 'react-icons';
 import { ImSpinner2 } from 'react-icons/im';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../lib/utils';
 
 type IconButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
 

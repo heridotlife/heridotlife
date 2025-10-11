@@ -1,4 +1,7 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react';
+
+type LucideIcon = ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>;
 
 interface StatsCardProps {
   title: string;

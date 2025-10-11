@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 
 interface Category {
@@ -13,16 +12,15 @@ interface URLFormProps {
 }
 
 export default function URLForm({ urlId }: URLFormProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
-    shortUrl: '',
+    slug: '',
     originalUrl: '',
     title: '',
     categoryIds: [] as number[],
     expiresAt: '',
-    isActive: true,
+    active: true,
   });
   const [error, setError] = useState('');
 
@@ -52,14 +50,14 @@ export default function URLForm({ urlId }: URLFormProps) {
       if (!response.ok) throw new Error('Failed to fetch URL');
       const data = await response.json();
       setFormData({
-        shortUrl: data.shortUrl,
+        slug: data.shortUrl,
         originalUrl: data.originalUrl,
         title: data.title || '',
         categoryIds: data.categories.map((c: Category) => c.id),
         expiresAt: data.expiresAt
           ? new Date(data.expiresAt).toISOString().slice(0, 16)
           : '',
-        isActive: data.isActive,
+        active: data.isActive,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load URL');
@@ -89,7 +87,7 @@ export default function URLForm({ urlId }: URLFormProps) {
       const data = await response.json();
 
       if (response.ok) {
-        router.push('/admin/urls');
+        window.location.href = '/admin/urls';
       } else {
         setError(data.error || 'Failed to save URL');
       }
@@ -119,7 +117,7 @@ export default function URLForm({ urlId }: URLFormProps) {
 
       <div>
         <label
-          htmlFor='shortUrl'
+          htmlFor='slug'
           className='block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2'
         >
           Short URL Slug *
@@ -127,11 +125,11 @@ export default function URLForm({ urlId }: URLFormProps) {
         <div className='flex items-center'>
           <span className='text-sky-600 dark:text-sky-400 mr-1'>/</span>
           <input
-            id='shortUrl'
+            id='slug'
             type='text'
-            value={formData.shortUrl}
+            value={formData.slug}
             onChange={(e) =>
-              setFormData({ ...formData, shortUrl: e.target.value })
+              setFormData({ ...formData, slug: e.target.value })
             }
             className='flex-1 px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
             placeholder='my-link'
@@ -221,16 +219,16 @@ export default function URLForm({ urlId }: URLFormProps) {
 
       <div className='flex items-center'>
         <input
-          id='isActive'
+          id='active'
           type='checkbox'
-          checked={formData.isActive}
+          checked={formData.active}
           onChange={(e) =>
-            setFormData({ ...formData, isActive: e.target.checked })
+            setFormData({ ...formData, active: e.target.checked })
           }
           className='w-4 h-4 text-sky-600 bg-white dark:bg-slate-900 border-sky-300 dark:border-sky-700 rounded focus:ring-sky-500'
         />
         <label
-          htmlFor='isActive'
+          htmlFor='active'
           className='ml-2 text-sm font-medium text-sky-700 dark:text-sky-300'
         >
           Active
@@ -247,7 +245,7 @@ export default function URLForm({ urlId }: URLFormProps) {
         </button>
         <button
           type='button'
-          onClick={() => router.push('/admin/urls')}
+          onClick={() => (window.location.href = '/admin/urls')}
           className='flex-1 px-6 py-3 rounded-lg border border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 font-medium hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors duration-200'
         >
           Cancel

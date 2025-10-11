@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../../lib/utils';
 
 import UnstyledLink, {
   UnstyledLinkProps,
-} from '@/components/links/UnstyledLink';
+} from './UnstyledLink';
 
 type PrimaryLinkVariant = 'primary' | 'basic';
 type PrimaryLinkProps = {

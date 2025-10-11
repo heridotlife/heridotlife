@@ -1,0 +1,43 @@
+---
+import { D1Helper, toBool, toDate } from '../lib/d1';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect('/404');
+}
+
+const reservedPaths = ['admin', 'api', 'category', 'urls', 'c'];
+if (reservedPaths.includes(slug.toLowerCase())) {
+    return Astro.redirect('/404');
+}
+
+try {
+    const db = new D1Helper(Astro.locals.runtime.env.D1_db);
+    const shortUrlRecord = await db.findShortUrl(slug);
+
+    if (!shortUrlRecord) {
+        return Astro.redirect('/404');
+    }
+
+    // Convert SQLite integers to booleans/dates
+    const isActive = toBool(shortUrlRecord.isActive);
+    const expiresAt = shortUrlRecord.expiresAt ? toDate(shortUrlRecord.expiresAt) : null;
+
+    if (!isActive) {
+        return new Response('This short URL has been disabled', { status: 410 });
+    }
+
+    if (expiresAt && expiresAt < new Date()) {
+        return new Response('This short URL has expired', { status: 410 });
+    }
+
+    // Increment click count
+    await db.incrementClickCount(slug);
+
+    return Astro.redirect(shortUrlRecord.originalUrl, 302);
+} catch (error) {
+    console.error('Error processing short URL redirect:', error);
+    return Astro.redirect('/404');
+}
+---

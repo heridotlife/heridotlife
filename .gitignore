@@ -1,42 +1,43 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Generic
+.DS_Store
+*.pem
+*.tsbuildinfo
+GEMINI.md
 
-# dependencies
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# next.js
-/.next/
+# Build output
+/dist/
 /out/
+/build/
+.astro/
+.wrangler/
 
-# production
-/build
+# Testing
+/coverage/
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# local env files
+# Env
 .env
 .env*.local
+.env.production
+import_remote_data.sql
 
-# vercel
-.vercel
+# Vercel
+.vercel/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# IDEs
+.idea/
 
-# next-sitemap
+# Sitemap (can be auto-generated, but good to ignore if manual)
 robots.txt
 sitemap.xml
 sitemap-*.xml

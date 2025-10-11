@@ -1,0 +1,54 @@
+---
+import '../styles/globals.css';
+import { siteConfig } from '../consts';
+
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+        <meta name="description" content={siteConfig.description} />
+        <link rel="author" href="https://heri.life" />
+        <meta name="author" content="Heri Rusmanto" />
+        <link rel="manifest" href="/favicon/site.webmanifest" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content={siteConfig.title} />
+        <meta property="og:description" content={siteConfig.description} />
+        <meta property="og:url" content={siteConfig.url} />
+        <meta property="og:site_name" content={siteConfig.title} />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:image" content=`${siteConfig.url}/images/og.jpg` />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:creator" content="@heridotlife" />
+        <meta name="twitter:title" content={siteConfig.title} />
+        <meta name="twitter:description" content={siteConfig.description} />
+        <meta name="twitter:image" content=`${siteConfig.url}/images/og.jpg` />
+        <link rel="shortcut icon" href="/favicon/favicon-16x16.png" />
+        <link rel="icon" href="/favicon/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+        <script is:inline>
+              (function() {
+                const savedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const shouldBeDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+                if (shouldBeDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+        </script>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>

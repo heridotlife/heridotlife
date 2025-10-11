@@ -2,7 +2,7 @@
 
 <div align="center">
   <h2>🔗 heri.life</h2>
-  <p>Personal portfolio website and URL shortener built with Next.js 15, TypeScript, and Prisma</p>
+  <p>Personal portfolio website and URL shortener built with Astro, TypeScript, and Cloudflare D1</p>
   <p>Made by <a href="https://heri.life">Heri Rusmanto</a></p>
 </div>
 
@@ -18,14 +18,13 @@ A modern personal website featuring:
 
 ### Tech Stack
 
-- ⚡️ **Next.js 15** - App Router with server components
-- ⚛️ **React 19** - Latest React features
+- ⚡️ **Astro 4.16** - The web framework for building content-driven websites
 - ✨ **TypeScript 5.9** - Type-safe development
-- 🎨 **Tailwind CSS 4** - Modern styling with dark mode
-- 🗄️ **Prisma 6** - Type-safe database ORM
-- 🐘 **PostgreSQL** - Reliable database (Vercel Postgres)
-- 🔒 **JWT Authentication** - Simple session-based auth
-- 🧪 **Jest 30** - Unit testing with React Testing Library
+- 🎨 **Tailwind CSS** - Modern styling with dark mode
+- 🗄️ **Cloudflare D1** - Serverless SQLite database at the edge
+- ☁️ **Cloudflare Pages** - Global CDN deployment
+- 🔒 **JWT Authentication** - Secure session-based auth
+- ⚛️ **React 18** - Interactive UI components
 
 ### URL Shortener Features
 
@@ -56,81 +55,107 @@ A modern personal website featuring:
 - 🤖 Conventional commit linting
 - 🗺️ Automatic sitemap generation
 - 🎯 Type-safe API routes
-- 🔒 **Type-safe Environment Variables** - Validated at runtime with Zod
-- ⚙️ **Centralized API Response Handling** - Consistent success and error responses across API routes
-- 📝 **API Route Logging** - Integrated logger for better visibility into API operations
-- 🧪 **Expanded Test Coverage** - Comprehensive unit tests for all API routes
+- 🔒 Type-safe environment variables validated with Zod
+- ⚙️ Centralized API response handling
+- 📝 Comprehensive error logging
 
-## Getting Started
+## Quick Start
 
-### 1. Clone the repository
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Cloudflare account (free tier works!)
+- Git
+
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/hveda/heridotlife.git
 cd heridotlife
-```
-
-### 2. Install dependencies
-
-```bash
 pnpm install
 ```
 
-### 3. Set up environment variables
-
-Create a `.env.local` file in the root directory:
+### 2. Set up Cloudflare D1 Database
 
 ```bash
-# Database (Vercel Postgres or Neon)
-POSTGRES_PRISMA_URL=postgresql://user:password@host:5432/database?schema=public
-POSTGRES_URL_NON_POOLING=postgresql://user:password@host:5432/database?schema=public
+# Login to Cloudflare
+pnpm wrangler login
 
-# Admin Authentication
-ADMIN_PASSWORD=your-secure-password
+# Create D1 database (if not exists)
+pnpm wrangler d1 create heridotlife
+
+# Copy the database_id from output and update wrangler.toml
+```
+
+Update `wrangler.toml`:
+```toml
+[[d1_databases]]
+binding = "D1_db"
+database_name = "heridotlife"
+database_id = "your-database-id-here"  # ← Paste your ID
+```
+
+### 3. Create Database Tables
+
+```bash
+# Run schema migration
+pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
+
+# (Optional) Import sample data
+pnpm wrangler d1 execute heridotlife --remote --file=migrate_data.sql
+```
+
+### 4. Configure Environment Variables
+
+Create `.env`:
+```bash
 AUTH_SECRET=your-random-secret-at-least-32-characters
-
-# Optional: Analytics
-NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your-analytics-id
+ADMIN_PASSWORD=your-secure-password
 ```
 
-**Important**: Change `ADMIN_PASSWORD` and `AUTH_SECRET` to secure values in production!
+**Generate AUTH_SECRET**: `openssl rand -base64 32`
 
-### 4. Set up the database
+### 5. Run Development Server
 
-Generate Prisma client and run migrations:
-
-```bash
-# Generate Prisma client
-pnpm prisma generate --schema=src/db/schema.prisma
-
-# Run database migrations
-pnpm db:migrate:deploy
-```
-
-For development with migration creation:
-
-```bash
-pnpm db:migrate:dev
-```
-
-### 5. Run the development server
-
+**Option 1: Regular Astro dev (no D1 database access)**
 ```bash
 pnpm dev
 ```
+Open [http://localhost:4321](http://localhost:4321)
 
-Open [http://localhost:3000](http://localhost:3000) to see your website.
+**Option 2: With D1 database access (recommended for admin features)**
+```bash
+pnpm dev:d1
+```
+Open [http://localhost:8788](http://localhost:8788)
 
-### 6. Access the admin dashboard
+This uses Wrangler to proxy the built app with D1 bindings. Any code changes require rebuilding.
 
-Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) and log in with your `ADMIN_PASSWORD`.
+> **Note**: For active development with live reload and D1 access, use `pnpm dev:d1`. This builds the project and runs it through Wrangler with local D1 database access.
+
+### 6. Access Admin Dashboard
+
+Navigate to [http://localhost:4321/admin](http://localhost:4321/admin) and login with your `ADMIN_PASSWORD`.
+
+## Database Schema
+
+Cloudflare D1 (SQLite) with these tables:
+
+- **ShortUrl** - URL mappings with click tracking
+- **Category** - URL categories
+- **ShortUrlCategory** - Many-to-many relationship
+- **User** - Future user management
+- **Session** - Session storage
+- **Account** - OAuth accounts
+
+See `schema.sql` for complete structure.
 
 ## Admin Dashboard Usage
 
 ### Authentication
 
 - **Login**: Navigate to `/admin` - you'll be redirected to `/admin/login`
-- **Password**: Uses the `ADMIN_PASSWORD` from your `.env.local` file
+- **Password**: Uses the `ADMIN_PASSWORD` from your `.env` file
 - **Session**: JWT-based session stored in HTTP-only cookies (7-day expiration)
 - **Logout**: Click the logout button in the dashboard header
 
@@ -183,50 +208,102 @@ The main dashboard shows:
 
 ## Deployment
 
-### Vercel (Recommended)
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
 
-1. Push your code to GitHub
-2. Import your repository on [Vercel](https://vercel.com)
-3. Add environment variables in Vercel project settings
-4. Deploy!
-
-**Important**: Run database migrations separately in production:
+### Quick Deploy to Cloudflare Pages
 
 ```bash
-pnpm db:migrate:deploy
+# Build the project
+pnpm build
+
+# Deploy (via Git - recommended)
+git add .
+git commit -m "Deploy to Cloudflare"
+git push
+
+# Or deploy manually
+pnpm wrangler pages deploy dist
 ```
 
-### Environment Variables for Production
+**Post-deployment setup:**
+1. Add D1 binding in Cloudflare Dashboard: `D1_db` → `heridotlife`
+2. Add environment variables: `AUTH_SECRET`, `ADMIN_PASSWORD`
+3. Redeploy
 
-Make sure to set these in your Vercel project settings:
-
-- `POSTGRES_PRISMA_URL`
-- `POSTGRES_URL_NON_POOLING`
-- `ADMIN_PASSWORD` (use a strong password!)
-- `AUTH_SECRET` (generate with: `openssl rand -base64 32`)
-
-## Development
-
-### Code Quality
-
-Always run these before committing:
+## Development Commands
 
 ```bash
+# Development servers
+pnpm dev          # Start Astro dev server (no D1 access)
+pnpm dev:d1       # Build + Wrangler dev with D1 (http://localhost:8788)
+
+# Building and previewing
+pnpm build        # Build for production
+pnpm preview      # Preview production build with D1
+
+# Code quality
+pnpm astro sync   # Regenerate TypeScript types
 pnpm typecheck    # TypeScript type checking
 pnpm lint         # ESLint checks
-pnpm test         # Run test suite
-pnpm build        # Production build test
+pnpm format       # Format code with Prettier
 ```
 
-### Conventional Commits
+### Database Commands
 
-This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages must follow this format:
+```bash
+# Execute queries on remote D1
+pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
+
+# Run migration to remote database
+pnpm db:migrate
+# Or: pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
+
+# Run migration to local database
+pnpm db:migrate:local
+# Or: pnpm wrangler d1 execute heridotlife --local --file=schema.sql
+
+# View database info
+pnpm wrangler d1 info heridotlife
+
+# Access local D1 in development
+pnpm dev:d1  # Runs with local D1 binding
+```
+
+## Project Structure
 
 ```
-feat: add new feature
-fix: resolve bug
-docs: update documentation
-chore: update dependencies
+heridotlife/
+├── src/
+│   ├── components/       # React components
+│   │   └── admin/        # Admin dashboard components
+│   ├── layouts/          # Astro layouts
+│   ├── lib/              # Utilities
+│   │   ├── d1.ts         # D1 database helper
+│   │   └── auth.ts       # JWT authentication
+│   ├── pages/            # Astro pages & API routes
+│   │   ├── api/admin/    # Admin API endpoints
+│   │   └── [slug].astro  # Dynamic URL redirects
+│   └── middleware.ts     # Request middleware
+├── public/               # Static assets
+├── schema.sql            # D1 database schema
+├── wrangler.toml         # Cloudflare configuration
+└── package.json          # Dependencies
 ```
 
-Pre-commit hooks will enforce code quality and commit message format.
+## API Routes
+
+### Public
+- `GET /[slug]` - Redirect short URL
+
+### Admin (Protected)
+- `POST /api/admin/login` - Admin login
+- `POST /api/admin/logout` - Admin logout
+- `GET /api/admin/urls` - List all URLs
+- `POST /api/admin/urls` - Create URL
+- `GET /api/admin/urls/id?id=X` - Get URL by ID
+- `PUT /api/admin/urls/id?id=X` - Update URL
+- `DELETE /api/admin/urls/id?id=X` - Delete URL
+- `PATCH /api/admin/urls/id/toggle?id=X` - Toggle URL active status
+- `GET /api/admin/categories` - List categories
+- `POST /api/admin/categories` - Create category
+- `GET /api/admin/stats` - Dashboard statistics
