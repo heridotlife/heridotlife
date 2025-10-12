@@ -20,6 +20,7 @@
     "@astrojs/cloudflare": "^10.4.2",
     "@astrojs/react": "^4.4.0",
     "@astrojs/tailwind": "^5.1.0",
+    "@vercel/og": "^0.8.5",
     "astro": "^4.5.12",
     "clsx": "^2.1.1",
     "jose": "^6.1.0",

@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS ShortUrl (
   shortUrl TEXT UNIQUE NOT NULL,
   originalUrl TEXT NOT NULL,
   title TEXT,
+  description TEXT,
+  ogImage TEXT,
   userId TEXT,
   createdAt INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
   updatedAt INTEGER DEFAULT (strftime('%s', 'now')),

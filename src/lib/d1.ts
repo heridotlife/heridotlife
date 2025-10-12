@@ -1,8 +1,6 @@
 // D1 Database Helper for heridotlife
 // Replaces Prisma ORM with direct D1 SQL queries
 
-import { cache } from './cache';
-
 export interface D1Database {
   prepare(query: string): D1PreparedStatement;
   dump(): Promise<ArrayBuffer>;
@@ -51,6 +49,8 @@ export interface ShortUrl {
   shortUrl: string;
   originalUrl: string;
   title: string | null;
+  description: string | null;
+  ogImage: string | null;
   userId: string | null;
   createdAt: number;
   updatedAt: number | null;
@@ -156,9 +156,6 @@ export class D1Helper {
       throw new Error('Failed to create short URL');
     }
 
-    // Invalidate stats cache when new URL is created
-    cache.delete('dashboard-stats');
-
     return (await this.findShortUrlById(result.meta.last_row_id))!;
   }
 
@@ -236,14 +233,6 @@ export class D1Helper {
 
   // Category operations
   async getAllCategories(): Promise<Array<Category & { _count: { shortUrls: number } }>> {
-    const cacheKey = 'all-categories';
-    
-    // Try to get cached categories first
-    const cachedCategories = cache.get<Array<Category & { _count: { shortUrls: number } }>>(cacheKey);
-    if (cachedCategories) {
-      return cachedCategories;
-    }
-
     const result = await this.db
       .prepare(
         `SELECT 
@@ -267,9 +256,6 @@ export class D1Helper {
         shortUrls: cat.shortUrlsCount || 0
       }
     }));
-
-    // Cache categories for 5 minutes (they don't change often)
-    cache.set(cacheKey, categories, 5 * 60 * 1000);
     
     return categories;
   }
@@ -279,9 +265,6 @@ export class D1Helper {
       .prepare('INSERT INTO Category (name, clickCount) VALUES (?, 0)')
       .bind(name)
       .run();
-
-    // Invalidate categories cache when new category is created
-    cache.delete('all-categories');
 
     return (await this.db
       .prepare('SELECT * FROM Category WHERE id = ?')
@@ -389,14 +372,6 @@ export class D1Helper {
 
   // Stats operations
   async getStats() {
-    const cacheKey = 'dashboard-stats';
-    
-    // Try to get cached stats first
-    const cachedStats = cache.get(cacheKey);
-    if (cachedStats) {
-      return cachedStats;
-    }
-
     // Optimize queries by selecting only needed fields and using efficient indexes
     const [totalUrls, activeUrls, totalClicks, expiredUrls] = await Promise.all([
       this.db.prepare('SELECT COUNT(*) as count FROM ShortUrl').first<{ count: number }>(),
@@ -422,9 +397,6 @@ export class D1Helper {
       expiredUrls: expiredUrls?.count || 0,
       recentClicks: recentClicks.results,
     };
-
-    // Cache stats for 2 minutes
-    cache.set(cacheKey, stats, 2 * 60 * 1000);
     
     return stats;
   }
