@@ -186,7 +186,7 @@ export default function URLForm({ urlId }: URLFormProps) {
                 key={category.id}
                 type='button'
                 onClick={() => handleCategoryToggle(category.id)}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                className={`min-h-[44px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   formData.categoryIds.includes(category.id)
                     ? 'bg-sky-500 dark:bg-sky-600 text-white'
                     : 'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800'

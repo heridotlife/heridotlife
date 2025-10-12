@@ -1,11 +1,12 @@
 'use client';
 
-import { LogOut, Moon, Sun } from 'lucide-react';
+import { LogOut, Menu, Moon, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 function DashboardLayout({ children, pathname }: { children: React.ReactNode, pathname: string }) {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +38,25 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
     window.location.href = '/admin/login';
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (isMobileMenuOpen && !target.closest('.mobile-menu') && !target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
   if (!mounted) {
     return null;
   }
@@ -59,7 +79,7 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
       <nav className='relative z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-sky-200 dark:border-sky-700 shadow-lg'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
-            {/* Logo */}
+            {/* Left Side - Logo and Desktop Nav */}
             <div className='flex items-center space-x-8'>
               <a
                 href='/admin/dashboard'
@@ -68,13 +88,13 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
                 URL Admin
               </a>
 
-              {/* Nav Links */}
+              {/* Desktop Nav Links */}
               <div className='hidden md:flex space-x-4'>
                 {navItems.map((item) => (
                   <a
                     key={item.href}
                     href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                    className={`min-h-[44px] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
                       pathname === item.href
                         ? 'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300'
                         : 'text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-700'
@@ -86,12 +106,12 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
               </div>
             </div>
 
-            {/* Right Side - User & Actions */}
-            <div className='flex items-center space-x-4'>
+            {/* Right Side - Desktop Actions */}
+            <div className='hidden md:flex items-center space-x-4'>
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className='p-2 rounded-full bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 transition-colors duration-200'
+                className='min-h-[44px] min-w-[44px] p-2 rounded-full bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 transition-colors duration-200'
                 aria-label='Toggle theme'
               >
                 {isDark ? (
@@ -102,28 +122,63 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
               </button>
 
               {/* User Info */}
-              <div className='hidden sm:block text-sm text-sky-700 dark:text-sky-300'>
+              <div className='text-sm text-sky-700 dark:text-sky-300'>
                 Admin
               </div>
 
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className='flex items-center space-x-2 px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg'
+                className='flex items-center space-x-2 min-h-[44px] px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg'
               >
                 <LogOut className='w-4 h-4' />
-                <span className='hidden sm:inline'>Logout</span>
+                <span>Logout</span>
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className='md:hidden flex items-center space-x-2'>
+              {/* Mobile Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className='min-h-[44px] min-w-[44px] p-2 rounded-full bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 transition-colors duration-200'
+                aria-label='Toggle theme'
+              >
+                {isDark ? (
+                  <Sun className='w-5 h-5 text-amber-500' />
+                ) : (
+                  <Moon className='w-5 h-5 text-sky-600' />
+                )}
+              </button>
+
+              {/* Hamburger Menu Button */}
+              <button
+                onClick={toggleMobileMenu}
+                className='mobile-menu-button min-h-[44px] min-w-[44px] p-2 rounded-md text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors duration-200'
+                aria-label='Toggle menu'
+              >
+                {isMobileMenuOpen ? (
+                  <X className='w-6 h-6' />
+                ) : (
+                  <Menu className='w-6 h-6' />
+                )}
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Mobile Nav Links */}
-          <div className='md:hidden pb-4 space-y-1'>
+        {/* Mobile Slide-out Menu */}
+        <div className={`md:hidden mobile-menu absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-sky-200 dark:border-sky-700 shadow-lg transform transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+        }`}>
+          <div className='px-4 py-4 space-y-2'>
+            {/* Navigation Links */}
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block min-h-[44px] px-4 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${
                   pathname === item.href
                     ? 'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300'
                     : 'text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-700'
@@ -132,12 +187,29 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
                 {item.label}
               </a>
             ))}
+            
+            {/* Mobile User Info */}
+            <div className='px-4 py-2 text-sm text-sky-600 dark:text-sky-400 border-t border-sky-200 dark:border-sky-700 mt-4 pt-4'>
+              Logged in as <span className='font-medium'>Admin</span>
+            </div>
+            
+            {/* Mobile Logout Button */}
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                handleLogout();
+              }}
+              className='w-full flex items-center justify-center space-x-2 min-h-[44px] px-4 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg'
+            >
+              <LogOut className='w-4 h-4' />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+      <main className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8'>
         {children}
       </main>
     </div>

@@ -20,10 +20,10 @@ export default function StatsCard({
     <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-6 hover:shadow-xl transition-shadow duration-300'>
       <div className='flex items-center justify-between'>
         <div>
-          <p className='text-sm font-medium text-sky-600 dark:text-sky-400 mb-1'>
+          <p className='text-body-sm font-medium text-sky-600 dark:text-sky-400 mb-1'>
             {title}
           </p>
-          <p className='text-3xl font-bold text-sky-900 dark:text-sky-100'>
+          <p className='text-display-sm font-bold text-sky-900 dark:text-sky-100'>
             {value.toLocaleString()}
           </p>
         </div>

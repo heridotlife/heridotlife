@@ -1,5 +1,7 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import { D1Helper, toBool, toDate } from '../lib/d1';
+import { siteConfig } from '../consts';
 
 const { slug } = Astro.params;
 
@@ -7,37 +9,186 @@ if (!slug) {
     return Astro.redirect('/404');
 }
 
-const reservedPaths = ['admin', 'api', 'category', 'urls', 'c'];
+const reservedPaths = ['admin', 'api', 'category', 'urls', 'c', 'categories'];
 if (reservedPaths.includes(slug.toLowerCase())) {
     return Astro.redirect('/404');
 }
 
-try {
-    const db = new D1Helper(Astro.locals.runtime.env.D1_db);
-    const shortUrlRecord = await db.findShortUrl(slug);
+const db = new D1Helper(Astro.locals.runtime.env.D1_db);
 
-    if (!shortUrlRecord) {
-        return Astro.redirect('/404');
-    }
+// Check if this is a category first
+const categoryRecord = await db.getCategoryByName(slug);
 
-    // Convert SQLite integers to booleans/dates
-    const isActive = toBool(shortUrlRecord.isActive);
-    const expiresAt = shortUrlRecord.expiresAt ? toDate(shortUrlRecord.expiresAt) : null;
+if (categoryRecord) {
+    // This is a category - render the category page
+    const shortUrls = await db.getShortUrlsByCategory(categoryRecord.name);
+    const activeUrls = shortUrls.filter(url => toBool(url.isActive));
+    
+    const pageTitle = `${categoryRecord.name} Links | ${siteConfig.title}`;
+    const pageDescription = `Browse all links in the ${categoryRecord.name} category`;
+}
 
-    if (!isActive) {
-        return new Response('This short URL has been disabled', { status: 410 });
-    }
+// Not a category, check if it's a short URL  
+const shortUrlRecord = await db.findShortUrl(slug);
 
-    if (expiresAt && expiresAt < new Date()) {
-        return new Response('This short URL has expired', { status: 410 });
-    }
-
-    // Increment click count
-    await db.incrementClickCount(slug);
-
-    return Astro.redirect(shortUrlRecord.originalUrl, 302);
-} catch (error) {
-    console.error('Error processing short URL redirect:', error);
+if (!shortUrlRecord) {
     return Astro.redirect('/404');
 }
+
+const isActive = toBool(shortUrlRecord.isActive);
+const expiresAt = shortUrlRecord.expiresAt ? toDate(shortUrlRecord.expiresAt) : null;
+
+if (!isActive) {
+    return new Response('This short URL has been disabled', { status: 410 });
+}
+
+if (expiresAt && expiresAt < new Date()) {
+    return new Response('This short URL has expired', { status: 410 });
+}
+
+await db.incrementClickCount(slug);
+return Astro.redirect(shortUrlRecord.originalUrl, 302);
 ---
+
+{categoryRecord ? (
+    <Layout title={pageTitle} description={pageDescription}>
+        <main class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950 transition-colors duration-500">
+            <button id="theme-toggle" class="fixed top-6 right-6 min-h-[44px] min-w-[44px] p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border border-sky-200 dark:border-sky-700 group z-50" aria-label="Toggle theme">
+                <svg id="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-amber-500 group-hover:rotate-180 transition-transform duration-500"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m4.93 19.07 1.41-1.41"></path><path d="m17.66 6.34 1.41-1.41"></path></svg>
+                <svg id="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-sky-600 group-hover:-rotate-12 transition-transform duration-300"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+            </button>
+
+            <div class="container mx-auto px-4 py-12 max-w-5xl">
+                <!-- Header -->
+                <div class="mb-12 text-center">
+                    <div class="flex justify-center items-center gap-4 mb-6">
+                        <a href="/categories" class="inline-block text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
+                            <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Back to Categories
+                        </a>
+                        <span class="text-sky-400 dark:text-sky-500">|</span>
+                        <a href="/" class="inline-block text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
+                            Home
+                        </a>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-4">
+                        {categoryRecord.name}
+                    </h1>
+                    <p class="text-lg text-sky-700 dark:text-sky-300">
+                        {activeUrls.length} {activeUrls.length === 1 ? 'link' : 'links'} in this category
+                    </p>
+                </div>
+
+                <!-- Links List -->
+                {activeUrls.length === 0 ? (
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-12 text-center">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        <h2 class="text-2xl font-semibold text-slate-700 dark:text-slate-300 mb-2">No Links Yet</h2>
+                        <p class="text-slate-600 dark:text-slate-400">There are no active links in this category at the moment.</p>
+                    </div>
+                ) : (
+                    <div class="space-y-4">
+                        {activeUrls.map((url) => (
+                            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-sky-100 dark:border-sky-900 p-6 hover:shadow-xl transition-all duration-300">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <div class="p-2 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-lg">
+                                                <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate-2-lines">
+                                                    {url.title || 'Untitled Link'}
+                                                </h3>
+                                                <p class="text-sm text-sky-600 dark:text-sky-400 truncate">
+                                                    {siteConfig.url}/{url.slug}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                </svg>
+                                                <span class="url-display">{url.originalUrl}</span>
+                                            </div>
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    <span>{url.clickCount || 0} clicks</span>
+                                                </div>
+                                                {url.createdAt && (
+                                                    <div class="flex items-center gap-1">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                        <span>Created {new Date(url.createdAt).toLocaleDateString()}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <a 
+                                        href={`/${url.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="flex-shrink-0 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
+                                    >
+                                        Visit
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <footer class="py-8 text-center text-sm text-sky-600 dark:text-sky-400">
+                <p>
+                    &copy; {new Date().getFullYear()}
+                    <a
+                        href="https://heri.life"
+                        class="hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200 font-medium"
+                    >
+                        Heri Rusmanto
+                    </a>
+                </p>
+            </footer>
+        </main>
+        
+        <script is:inline>
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            function updateIcons() {
+                if (document.documentElement.classList.contains('dark')) {
+                    sunIcon.style.display = 'block';
+                    moonIcon.style.display = 'none';
+                } else {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'block';
+                }
+            }
+
+            updateIcons();
+
+            themeToggleButton.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+                updateIcons();
+            });
+        </script>
+    </Layout>
+) : null}

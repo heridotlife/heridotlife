@@ -78,10 +78,10 @@ export default function DashboardPage() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300'>
+          <h1 className='text-display-md font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300'>
             Dashboard
           </h1>
-          <p className='text-sky-600 dark:text-sky-400 mt-2'>
+          <p className='text-body-lg text-sky-600 dark:text-sky-400 mt-2'>
             Overview of your short URLs
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-6'>
-        <h2 className='text-xl font-bold text-sky-900 dark:text-sky-100 mb-4'>
+        <h2 className='text-heading-lg font-bold text-sky-900 dark:text-sky-100 mb-4'>
           Recent Activity
         </h2>
         {stats.recentClicks.length > 0 ? (
@@ -137,24 +137,24 @@ export default function DashboardPage() {
                   <a
                     href={`/${click.shortUrl}`}
                     target='_blank'
-                    className='font-medium text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200'
+                    className='text-body-md font-medium text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200'
                   >
                     /{click.shortUrl}
                   </a>
                   {click.title && (
-                    <p className='text-sm text-sky-600 dark:text-sky-400 mt-1'>
+                    <p className='text-body-sm text-sky-600 dark:text-sky-400 mt-1'>
                       {click.title}
                     </p>
                   )}
                 </div>
-                <div className='text-sm text-sky-500 dark:text-sky-500'>
+                <div className='text-caption text-sky-500 dark:text-sky-500'>
                   {new Date(click.latestClick).toLocaleString()}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className='text-sky-600 dark:text-sky-400 text-center py-8'>
+          <p className='text-body-md text-sky-600 dark:text-sky-400 text-center py-8'>
             No recent activity yet
           </p>
         )}

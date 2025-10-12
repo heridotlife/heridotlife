@@ -345,6 +345,27 @@ export class D1Helper {
     }
   }
 
+  async getCategoryByName(name: string): Promise<Category | null> {
+    return await this.db
+      .prepare('SELECT * FROM Category WHERE LOWER(name) = LOWER(?)')
+      .bind(name)
+      .first<Category>();
+  }
+
+  async getShortUrlsByCategory(categoryName: string): Promise<ShortUrl[]> {
+    const result = await this.db
+      .prepare(
+        `SELECT s.* FROM ShortUrl s
+         INNER JOIN ShortUrlCategory suc ON s.id = suc.shortUrlId
+         INNER JOIN Category c ON suc.categoryId = c.id
+         WHERE LOWER(c.name) = LOWER(?) AND s.isActive = 1
+         ORDER BY s.createdAt DESC`
+      )
+      .bind(categoryName)
+      .all<ShortUrl>();
+    return result.results;
+  }
+
   // Stats operations
   async getStats() {
     const [totalUrls, activeUrls, totalClicks, expiredUrls] = await Promise.all([

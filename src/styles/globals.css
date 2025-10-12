@@ -45,3 +45,155 @@
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
 }
+
+/* Typography System */
+.text-display-lg {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.text-display-md {
+  font-size: 2rem;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.text-display-sm {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.text-heading-lg {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.text-heading-md {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.text-heading-sm {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.text-body-lg {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.text-body-md {
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.text-body-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+/* Responsive Typography */
+@media (min-width: 640px) {
+  .text-display-lg {
+    font-size: 3rem;
+  }
+  
+  .text-display-md {
+    font-size: 2.5rem;
+  }
+  
+  .text-display-sm {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-display-lg {
+    font-size: 3.5rem;
+  }
+  
+  .text-display-md {
+    font-size: 3rem;
+  }
+  
+  .text-display-sm {
+    font-size: 2.5rem;
+  }
+}
+
+/* Text Truncation Utilities */
+.truncate-2-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.truncate-3-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Long URL Handling */
+.break-long-words {
+  word-wrap: break-word;
+  word-break: break-all;
+  hyphens: auto;
+}
+
+/* Mobile-friendly URL display */
+.url-display {
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* Responsive Spacing Utilities */
+.space-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .space-responsive {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .space-responsive {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Interactive States */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #0ea5e9;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
