@@ -14,7 +14,17 @@ export const createUrlSchema = z.object({
   slug: z.string().min(2, { message: 'Slug must be at least 2 characters long.' }).regex(urlRegex, {
     message: 'Slug can only contain letters, numbers, underscores, and hyphens.',
   }),
-  originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
+  originalUrl: z.string().refine(
+    (url) => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'Please enter a valid URL.' }
+  ),
   title: z.string().optional(),
   categoryIds: z.array(z.number()).optional(),
   expiresAt: z.string().optional().nullable(),
@@ -25,7 +35,17 @@ export const updateUrlSchema = z.object({
   slug: z.string().min(1, { message: 'Slug must be at least 1 characters long.' }).regex(urlRegex, {
     message: 'Slug can only contain letters, numbers, underscores, and hyphens.',
   }),
-  originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
+  originalUrl: z.string().refine(
+    (url) => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'Please enter a valid URL.' }
+  ),
   title: z.string().optional(),
   categoryIds: z.array(z.number()).optional(),
   expiresAt: z.string().optional().nullable(),

@@ -1,6 +1,7 @@
 ---
 import '../styles/globals.css';
 import { siteConfig } from '../consts';
+import { getSafeCanonicalUrl } from '../lib/security';
 
 export interface Props {
   title: string;
@@ -21,6 +22,13 @@ const {
   ogImage,
   originalUrl,
 } = Astro.props;
+
+// Generate safe canonical URL using validated host
+const canonicalUrl = getSafeCanonicalUrl(
+  Astro.request,
+  Astro.url.pathname,
+  Astro.locals?.runtime?.env
+);
 
 // Generate dynamic OG image URL
 const ogImageUrl =
@@ -48,13 +56,14 @@ const ogImageUrl =
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="author" href="https://heri.life" />
     <meta name="author" content="Heri Rusmanto" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={siteConfig.title} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={ogImageUrl} />

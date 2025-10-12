@@ -18,13 +18,13 @@ A modern personal website featuring:
 
 ### Tech Stack
 
-- ⚡️ **Astro 4.16** - The web framework for building content-driven websites
+- ⚡️ **Astro 5** - The web framework for building content-driven websites
 - ✨ **TypeScript 5.9** - Type-safe development
 - 🎨 **Tailwind CSS** - Modern styling with dark mode
 - 🗄️ **Cloudflare D1** - Serverless SQLite database at the edge
-- ☁️ **Cloudflare Pages** - Global CDN deployment
+- ☁️ **Cloudflare Workers** - Global edge deployment with static assets
 - 🔒 **JWT Authentication** - Secure session-based auth
-- ⚛️ **React 18** - Interactive UI components
+- ⚛️ **React 19** - Interactive UI components
 
 ### URL Shortener Features
 
@@ -85,15 +85,21 @@ pnpm wrangler login
 # Create D1 database (if not exists)
 pnpm wrangler d1 create heridotlife
 
-# Copy the database_id from output and update wrangler.toml
+# Copy the database_id from output and update wrangler.json
 ```
 
-Update `wrangler.toml`:
-```toml
-[[d1_databases]]
-binding = "D1_db"
-database_name = "heridotlife"
-database_id = "your-database-id-here"  # ← Paste your ID
+Update `wrangler.json`:
+
+```json
+{
+  "d1_databases": [
+    {
+      "binding": "D1_db",
+      "database_name": "heridotlife",
+      "database_id": "your-database-id-here"
+    }
+  ]
+}
 ```
 
 ### 3. Create Database Tables
@@ -109,6 +115,7 @@ pnpm wrangler d1 execute heridotlife --remote --file=migrate_data.sql
 ### 4. Configure Environment Variables
 
 Create `.env`:
+
 ```bash
 AUTH_SECRET=your-random-secret-at-least-32-characters
 ADMIN_PASSWORD=your-secure-password
@@ -118,21 +125,25 @@ ADMIN_PASSWORD=your-secure-password
 
 ### 5. Run Development Server
 
-**Option 1: Regular Astro dev (no D1 database access)**
+**Option 1: Regular Astro dev (for quick iteration)**
+
 ```bash
 pnpm dev
 ```
+
 Open [http://localhost:4321](http://localhost:4321)
 
-**Option 2: With D1 database access (recommended for admin features)**
+**Option 2: With Wrangler dev (for testing with D1/KV bindings)**
+
 ```bash
-pnpm dev:d1
+pnpm dev:wrangler
 ```
+
 Open [http://localhost:8788](http://localhost:8788)
 
 This uses Wrangler to proxy the built app with D1 bindings. Any code changes require rebuilding.
 
-> **Note**: For active development with live reload and D1 access, use `pnpm dev:d1`. This builds the project and runs it through Wrangler with local D1 database access.
+> **Note**: For active development with live reload, use `pnpm dev`. For testing with actual D1/KV bindings, use `pnpm dev:wrangler`.
 
 ### 6. Access Admin Dashboard
 
@@ -159,6 +170,7 @@ The URL shortener now includes public category pages that allow visitors to brow
 ### Example Usage
 
 If you have a category named "General":
+
 1. Users can visit `/categories` to see all available categories
 2. Click on "General" to navigate to `/general`
 3. See all short URLs tagged with the "General" category
@@ -172,6 +184,7 @@ If you have a category named "General":
 ### How It Works
 
 The system intelligently distinguishes between category pages and short URL redirects:
+
 1. When a user visits `/{slug}`, the system first checks if it matches a category name
 2. If it's a category, it displays the category page with all links
 3. If not, it checks if it's a short URL and redirects accordingly
@@ -182,6 +195,7 @@ The system intelligently distinguishes between category pages and short URL redi
 ### Reserved Paths
 
 The following paths are reserved and cannot be used as short URL slugs:
+
 - `/admin`, `/api`, `/c`, `/categories`, `/category`, `/urls`
 
 These are automatically blocked when creating new short URLs.
@@ -259,7 +273,7 @@ The main dashboard shows:
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
 
-### Quick Deploy to Cloudflare Pages
+### Quick Deploy to Cloudflare Workers
 
 ```bash
 # Build the project
@@ -271,30 +285,32 @@ git commit -m "Deploy to Cloudflare"
 git push
 
 # Or deploy manually
-pnpm wrangler pages deploy dist
+pnpm deploy
 ```
 
 **Post-deployment setup:**
-1. Add D1 binding in Cloudflare Dashboard: `D1_db` → `heridotlife`
-2. Add environment variables: `AUTH_SECRET`, `ADMIN_PASSWORD`
-3. Redeploy
+
+1. Bindings (D1, KV) are configured in `wrangler.json` and automatically applied
+2. Add environment variables in Cloudflare Dashboard: `AUTH_SECRET`, `ADMIN_PASSWORD`
+3. Redeploy if needed
 
 ## Development Commands
 
 ```bash
 # Development servers
-pnpm dev          # Start Astro dev server (no D1 access)
-pnpm dev:d1       # Build + Wrangler dev with D1 (http://localhost:8788)
+pnpm dev              # Start Astro dev server (recommended for local development)
+pnpm dev:wrangler     # Build + Wrangler dev with D1/KV bindings
 
 # Building and previewing
-pnpm build        # Build for production
-pnpm preview      # Preview production build with D1
+pnpm build            # Build for production
+pnpm preview          # Preview production build with Wrangler
+pnpm deploy           # Deploy to Cloudflare Workers
 
 # Code quality
-pnpm astro sync   # Regenerate TypeScript types
-pnpm typecheck    # TypeScript type checking
-pnpm lint         # ESLint checks
-pnpm format       # Format code with Prettier
+pnpm astro sync       # Regenerate TypeScript types
+pnpm typecheck        # TypeScript type checking
+pnpm lint             # ESLint checks
+pnpm format           # Format code with Prettier
 ```
 
 ### Database Commands
@@ -342,11 +358,13 @@ heridotlife/
 ## API Routes
 
 ### Public
+
 - `GET /[slug]` - Redirect short URL or display category page
 - `GET /categories` - List all public categories
 - `GET /{category-name}` - View all links in a category (if category exists)
 
 ### Admin (Protected)
+
 - `POST /api/admin/login` - Admin login
 - `POST /api/admin/logout` - Admin logout
 - `GET /api/admin/urls` - List all URLs

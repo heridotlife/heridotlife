@@ -4,6 +4,7 @@ import { Activity, CheckCircle, LinkIcon, XCircle } from '../ui/icons';
 import { useEffect, useState } from 'react';
 
 import StatsCard from './StatsCard';
+import CacheManagement from './CacheManagement';
 
 // Disable prerendering - this is a client-only page with auth
 export const dynamic = 'force-dynamic';
@@ -159,6 +160,9 @@ export default function DashboardPage() {
           </p>
         )}
       </div>
+
+      {/* Cache Management */}
+      <CacheManagement />
     </div>
   );
 }

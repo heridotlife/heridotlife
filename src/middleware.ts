@@ -1,7 +1,15 @@
 import { defineMiddleware } from 'astro:middleware';
 import { getSession } from './lib/auth';
+import { validateHostMiddleware } from './lib/security';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Validate host headers to prevent Host Header Injection attacks
+  const hostValidation = validateHostMiddleware(context.request, context.locals?.runtime?.env);
+
+  if (!hostValidation.valid && hostValidation.response) {
+    return hostValidation.response;
+  }
+
   // Initialize runtime env for development
   // In production, context.locals.runtime should be provided by Cloudflare
   if (!context.locals.runtime) {
@@ -10,6 +18,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         AUTH_SECRET: import.meta.env.AUTH_SECRET || '',
         ADMIN_PASSWORD: import.meta.env.ADMIN_PASSWORD || '',
         D1_db: import.meta.env.D1_db || null, // D1 binding from Cloudflare
+        heridotlife_kv: null as any, // KV binding will be available in production
+        SESSION: null as any, // Session KV binding
       },
       cf: {} as any,
       ctx: {
