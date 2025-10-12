@@ -3,19 +3,20 @@ import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ url }) => {
   const searchParams = new URL(url).searchParams;
-  
+
   const title = searchParams.get('title') || 'heridotlife';
-  const description = searchParams.get('description') || 'DevOps & Software Engineer, automation enthusiast';
+  const description =
+    searchParams.get('description') || 'DevOps & Software Engineer, automation enthusiast';
   const type = searchParams.get('type') || 'default';
   const category = searchParams.get('category') || '';
   const originalUrl = searchParams.get('originalUrl') || '';
-  
+
   // For short URLs, try to fetch OG image from original URL
   if (type === 'url' && originalUrl) {
     try {
       const response = await fetch(originalUrl);
       const html = await response.text();
-      
+
       // Extract OG image from HTML
       const ogImageMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/i);
       if (ogImageMatch && ogImageMatch[1]) {
@@ -24,9 +25,9 @@ export const GET: APIRoute = async ({ url }) => {
         return new Response(null, {
           status: 302,
           headers: {
-            'Location': ogImageUrl,
-            'Cache-Control': 'public, max-age=3600'
-          }
+            Location: ogImageUrl,
+            'Cache-Control': 'public, max-age=3600',
+          },
         });
       }
     } catch (error) {
@@ -34,12 +35,12 @@ export const GET: APIRoute = async ({ url }) => {
       // Fall back to generated image if fetching fails
     }
   }
-  
+
   // Color schemes for different types
   const colorSchemes = {
     default: { primary: '#0369a1', secondary: '#0891b2', accent: '#0284c7' },
     category: { primary: '#7c3aed', secondary: '#a855f7', accent: '#8b5cf6' },
-    url: { primary: '#dc2626', secondary: '#ea580c', accent: '#f97316' }
+    url: { primary: '#dc2626', secondary: '#ea580c', accent: '#f97316' },
   };
 
   const colors = colorSchemes[type as keyof typeof colorSchemes] || colorSchemes.default;

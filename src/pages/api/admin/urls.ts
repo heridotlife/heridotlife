@@ -25,7 +25,7 @@ export const GET: APIRoute = async (context) => {
           updatedAt: toDate(url.updatedAt),
           latestClick: toDate(url.latestClick),
           expiresAt: toDate(url.expiresAt),
-          categories: categories.map(c => ({ id: c.id, name: c.name })),
+          categories: categories.map((c) => ({ id: c.id, name: c.name })),
         };
       })
     );
@@ -35,7 +35,7 @@ export const GET: APIRoute = async (context) => {
     console.error('Error fetching URLs', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
+};
 
 // POST create new URL
 export const POST: APIRoute = async (context) => {
@@ -49,10 +49,11 @@ export const POST: APIRoute = async (context) => {
     const validation = createUrlSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(
-        validation.error.flatten().fieldErrors,
-      )[0]?.[0];
-      return new Response(JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }), { status: 400 });
+      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      return new Response(
+        JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }),
+        { status: 400 }
+      );
     }
 
     const { slug, originalUrl, title, categoryIds, expiresAt, active } = validation.data;
@@ -86,7 +87,7 @@ export const POST: APIRoute = async (context) => {
       updatedAt: toDate(url.updatedAt),
       latestClick: toDate(url.latestClick),
       expiresAt: toDate(url.expiresAt),
-      categories: categories.map(c => ({ id: c.id, name: c.name })),
+      categories: categories.map((c) => ({ id: c.id, name: c.name })),
     };
 
     return new Response(JSON.stringify(urlWithCategories), { status: 201 });
@@ -94,4 +95,4 @@ export const POST: APIRoute = async (context) => {
     console.error('Error creating URL', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
+};

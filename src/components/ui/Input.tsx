@@ -47,9 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         'text-sky-900 dark:text-sky-100',
         'placeholder:text-sky-400 dark:placeholder:text-sky-500',
         'focus:ring-sky-500 focus:border-sky-500',
-        error
-          ? 'border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500'
-          : '',
+        error ? 'border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500' : '',
       ],
       filled: [
         'border-0',
@@ -57,18 +55,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         'text-sky-900 dark:text-sky-100',
         'placeholder:text-sky-400 dark:placeholder:text-sky-500',
         'focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-900',
-        error
-          ? 'bg-red-50 dark:bg-red-900/20 focus:ring-red-500'
-          : '',
+        error ? 'bg-red-50 dark:bg-red-900/20 focus:ring-red-500' : '',
       ],
     };
 
     // Padding based on icons
-    const paddingClasses = [
-      leftIcon ? 'pl-10' : 'px-4',
-      rightIcon ? 'pr-10' : 'px-4',
-      'py-3',
-    ].join(' ');
+    const paddingClasses = [leftIcon ? 'pl-10' : 'px-4', rightIcon ? 'pr-10' : 'px-4', 'py-3'].join(
+      ' '
+    );
 
     const inputClasses = [
       ...baseInputClasses,
@@ -123,9 +117,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {/* Helper Text */}
         {helperText && !error && (
-          <p className="mt-2 text-sm text-sky-600 dark:text-sky-400">
-            {helperText}
-          </p>
+          <p className="mt-2 text-sm text-sky-600 dark:text-sky-400">{helperText}</p>
         )}
       </div>
     );

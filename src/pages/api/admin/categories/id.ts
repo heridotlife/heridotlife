@@ -28,7 +28,10 @@ export const PUT: APIRoute = async (context) => {
 
     if (!validation.success) {
       const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
-      return new Response(JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }),
+        { status: 400 }
+      );
     }
 
     const { name } = validation.data;
@@ -37,7 +40,7 @@ export const PUT: APIRoute = async (context) => {
 
     try {
       const updated = await db.updateCategory(categoryId, name);
-      
+
       if (!updated) {
         return new Response(JSON.stringify({ error: 'Category not found' }), { status: 404 });
       }

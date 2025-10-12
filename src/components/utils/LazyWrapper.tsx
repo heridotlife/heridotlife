@@ -5,19 +5,15 @@ interface LazyComponentWrapperProps {
   children: React.ReactNode;
 }
 
-export function LazyComponentWrapper({ 
+export function LazyComponentWrapper({
   fallback = (
     <div className="flex items-center justify-center min-h-[200px]">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600 dark:border-sky-400"></div>
     </div>
-  ), 
-  children 
+  ),
+  children,
 }: LazyComponentWrapperProps) {
-  return (
-    <Suspense fallback={fallback}>
-      {children}
-    </Suspense>
-  );
+  return <Suspense fallback={fallback}>{children}</Suspense>;
 }
 
 // Lazy load admin components for better code splitting

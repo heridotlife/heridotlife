@@ -3,158 +3,160 @@ import '../styles/globals.css';
 import { siteConfig } from '../consts';
 
 export interface Props {
-	title: string;
-	description?: string;
-	ogType?: 'default' | 'category' | 'url';
-	ogCategory?: string;
-	ogClicks?: string;
-	ogImage?: string;
-	originalUrl?: string;
+  title: string;
+  description?: string;
+  ogType?: 'default' | 'category' | 'url';
+  ogCategory?: string;
+  ogClicks?: string;
+  ogImage?: string;
+  originalUrl?: string;
 }
 
-const { 
-	title, 
-	description = siteConfig.description,
-	ogType = 'default',
-	ogCategory,
-	ogClicks,
-	ogImage,
-	originalUrl
+const {
+  title,
+  description = siteConfig.description,
+  ogType = 'default',
+  ogCategory,
+  ogClicks,
+  ogImage,
+  originalUrl,
 } = Astro.props;
 
 // Generate dynamic OG image URL
-const ogImageUrl = ogImage || (() => {
-	const params = new URLSearchParams();
-	params.set('title', title);
-	params.set('description', description);
-	params.set('type', ogType);
-	
-	if (ogCategory) params.set('category', ogCategory);
-	if (ogClicks) params.set('clicks', ogClicks);
-	if (originalUrl) params.set('originalUrl', originalUrl);
-	
-	return `${siteConfig.url}/api/og?${params.toString()}`;
-})();
+const ogImageUrl =
+  ogImage ||
+  (() => {
+    const params = new URLSearchParams();
+    params.set('title', title);
+    params.set('description', description);
+    params.set('type', ogType);
+
+    if (ogCategory) params.set('category', ogCategory);
+    if (ogClicks) params.set('clicks', ogClicks);
+    if (originalUrl) params.set('originalUrl', originalUrl);
+
+    return `${siteConfig.url}/api/og?${params.toString()}`;
+  })();
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="author" href="https://heri.life" />
-        <meta name="author" content="Heri Rusmanto" />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:url" content={Astro.url.href} />
-        <meta property="og:site_name" content={siteConfig.title} />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:image" content={ogImageUrl} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:creator" content="@heridotlife" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={ogImageUrl} />
-        <link rel="shortcut icon" href="/favicon/favicon-16x16.png" />
-        <link rel="icon" href="/favicon/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
-        <script is:inline>
-              (function() {
-                const savedTheme = localStorage.getItem('theme');
-                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const shouldBeDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
-                if (shouldBeDark) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-        </script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="author" href="https://heri.life" />
+    <meta name="author" content="Heri Rusmanto" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:site_name" content={siteConfig.title} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@heridotlife" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <link rel="shortcut icon" href="/favicon/favicon-16x16.png" />
+    <link rel="icon" href="/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+    <script is:inline>
+      (function () {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
 
-        <!-- Cloudflare Analytics and Performance Monitoring -->
-        <script is:inline>
-          // Simple Core Web Vitals tracking for Cloudflare
-          function sendToAnalytics(metric) {
-            // Log to console in development
-            if (typeof console !== 'undefined') {
-              console.log('[Performance]', metric.name, metric.value, metric);
-            }
-            
-            // Send to Cloudflare Analytics endpoint
-            if (navigator.sendBeacon && window.location.hostname !== 'localhost') {
-              const data = {
-                metric: metric.name,
-                value: metric.value,
-                id: metric.id,
-                timestamp: Date.now(),
-                url: window.location.href
-              };
-              navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(data));
-            }
-          }
+    <!-- Cloudflare Analytics and Performance Monitoring -->
+    <script is:inline>
+      // Simple Core Web Vitals tracking for Cloudflare
+      function sendToAnalytics(metric) {
+        // Log to console in development
+        if (typeof console !== 'undefined') {
+          console.log('[Performance]', metric.name, metric.value, metric);
+        }
 
-          // Basic performance observation without external dependencies
-          if ('PerformanceObserver' in window) {
-            // Largest Contentful Paint (LCP)
-            try {
-              const lcpObserver = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                  if (entry.entryType === 'largest-contentful-paint') {
-                    sendToAnalytics({
-                      name: 'LCP',
-                      value: entry.startTime,
-                      id: crypto.randomUUID?.() || Math.random().toString(36)
-                    });
-                  }
-                }
-              });
-              lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-            } catch (_e) {
-              // Performance API not available
-            }
+        // Send to Cloudflare Analytics endpoint
+        if (navigator.sendBeacon && window.location.hostname !== 'localhost') {
+          const data = {
+            metric: metric.name,
+            value: metric.value,
+            id: metric.id,
+            timestamp: Date.now(),
+            url: window.location.href,
+          };
+          navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(data));
+        }
+      }
 
-            // First Contentful Paint (FCP) and Navigation Timing
-            try {
-              const observer = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                  if (entry.name === 'first-contentful-paint') {
-                    sendToAnalytics({
-                      name: 'FCP',
-                      value: entry.startTime,
-                      id: crypto.randomUUID?.() || Math.random().toString(36)
-                    });
-                  }
-                }
-              });
-              observer.observe({ type: 'paint', buffered: true });
-            } catch (_e) {
-              // Performance API not available
-            }
-          }
-
-          // Time to First Byte (TTFB) using Navigation Timing
-          window.addEventListener('load', () => {
-            if ('performance' in window && 'getEntriesByType' in performance) {
-              const navEntry = performance.getEntriesByType('navigation')[0];
-              if (navEntry) {
+      // Basic performance observation without external dependencies
+      if ('PerformanceObserver' in window) {
+        // Largest Contentful Paint (LCP)
+        try {
+          const lcpObserver = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (entry.entryType === 'largest-contentful-paint') {
                 sendToAnalytics({
-                  name: 'TTFB',
-                  value: navEntry.responseStart - navEntry.requestStart,
-                  id: crypto.randomUUID?.() || Math.random().toString(36)
+                  name: 'LCP',
+                  value: entry.startTime,
+                  id: crypto.randomUUID?.() || Math.random().toString(36),
                 });
               }
             }
           });
-        </script>
-	</head>
-	<body>
-		<slot />
-	</body>
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+        } catch (_e) {
+          // Performance API not available
+        }
+
+        // First Contentful Paint (FCP) and Navigation Timing
+        try {
+          const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (entry.name === 'first-contentful-paint') {
+                sendToAnalytics({
+                  name: 'FCP',
+                  value: entry.startTime,
+                  id: crypto.randomUUID?.() || Math.random().toString(36),
+                });
+              }
+            }
+          });
+          observer.observe({ type: 'paint', buffered: true });
+        } catch (_e) {
+          // Performance API not available
+        }
+      }
+
+      // Time to First Byte (TTFB) using Navigation Timing
+      window.addEventListener('load', () => {
+        if ('performance' in window && 'getEntriesByType' in performance) {
+          const navEntry = performance.getEntriesByType('navigation')[0];
+          if (navEntry) {
+            sendToAnalytics({
+              name: 'TTFB',
+              value: navEntry.responseStart - navEntry.requestStart,
+              id: crypto.randomUUID?.() || Math.random().toString(36),
+            });
+          }
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>

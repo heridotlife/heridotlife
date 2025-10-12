@@ -70,50 +70,48 @@ export default function URLsPage() {
     (url) =>
       url.shortUrl.toLowerCase().includes(search.toLowerCase()) ||
       url.title?.toLowerCase().includes(search.toLowerCase()) ||
-      url.originalUrl.toLowerCase().includes(search.toLowerCase()),
+      url.originalUrl.toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='text-sky-600 dark:text-sky-400'>Loading URLs...</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-sky-600 dark:text-sky-400">Loading URLs...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='text-red-600 dark:text-red-400'>{error}</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-red-600 dark:text-red-400">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className='space-y-4 sm:space-y-6'>
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className='text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300'>
+          <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300">
             Short URLs
           </h1>
-          <p className='text-sky-600 dark:text-sky-400 mt-1 sm:mt-2'>
-            Manage your short URLs
-          </p>
+          <p className="text-sky-600 dark:text-sky-400 mt-1 sm:mt-2">Manage your short URLs</p>
         </div>
         <a
-          href='/admin/urls/new'
-          className='flex items-center justify-center min-h-[44px] px-4 sm:px-6 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300 w-full sm:w-auto'
+          href="/admin/urls/new"
+          className="flex items-center justify-center min-h-[44px] px-4 sm:px-6 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300 w-full sm:w-auto"
         >
           Add New URL
         </a>
       </div>
 
       {/* Search */}
-      <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4'>
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4">
         <Input
-          type='text'
-          placeholder='Search URLs...'
+          type="text"
+          placeholder="Search URLs..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           fullWidth
@@ -121,62 +119,60 @@ export default function URLsPage() {
       </div>
 
       {/* URLs Table - Desktop */}
-      <div className='hidden md:block bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 overflow-hidden'>
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='bg-sky-100 dark:bg-sky-900/50'>
+      <div className="hidden md:block bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-sky-100 dark:bg-sky-900/50">
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider">
                   Short URL
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider">
                   Original URL
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider">
                   Clicks
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider">
                   Status
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider'>
+                <th className="px-6 py-3 text-left text-xs font-medium text-sky-700 dark:text-sky-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className='divide-y divide-sky-200 dark:divide-sky-700'>
+            <tbody className="divide-y divide-sky-200 dark:divide-sky-700">
               {filteredUrls.length > 0 ? (
                 filteredUrls.map((url) => (
                   <tr
                     key={url.id}
-                    className='hover:bg-sky-50 dark:hover:bg-slate-700/50 transition-colors duration-200'
+                    className="hover:bg-sky-50 dark:hover:bg-slate-700/50 transition-colors duration-200"
                   >
-                    <td className='px-6 py-4 whitespace-nowrap'>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <a
                           href={`/${url.shortUrl}`}
-                          target='_blank'
-                          className='font-medium text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 flex items-center gap-1'
+                          target="_blank"
+                          className="font-medium text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 flex items-center gap-1"
                         >
                           /{url.shortUrl}
-                          <ExternalLink className='w-3 h-3' />
+                          <ExternalLink className="w-3 h-3" />
                         </a>
                         {url.title && (
-                          <p className='text-sm text-sky-600 dark:text-sky-400 mt-1'>
-                            {url.title}
-                          </p>
+                          <p className="text-sm text-sky-600 dark:text-sky-400 mt-1">{url.title}</p>
                         )}
                       </div>
                     </td>
-                    <td className='px-6 py-4'>
-                      <div className='text-sm text-sky-600 dark:text-sky-400 max-w-xs truncate'>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-sky-600 dark:text-sky-400 max-w-xs truncate">
                         {url.originalUrl}
                       </div>
                       {url.categories.length > 0 && (
-                        <div className='flex gap-1 mt-1 flex-wrap'>
+                        <div className="flex gap-1 mt-1 flex-wrap">
                           {url.categories.map((cat) => (
                             <span
                               key={cat.id}
-                              className='inline-block px-2 py-0.5 text-xs bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 rounded'
+                              className="inline-block px-2 py-0.5 text-xs bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 rounded"
                             >
                               {cat.name}
                             </span>
@@ -184,10 +180,10 @@ export default function URLsPage() {
                         </div>
                       )}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 dark:text-sky-400'>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600 dark:text-sky-400">
                       {url.clickCount}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap'>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           url.isActive
@@ -198,30 +194,30 @@ export default function URLsPage() {
                         {url.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm'>
-                      <div className='flex items-center gap-2'>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleToggle(url.id)}
                           icon={Power}
-                          className='text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200'
+                          className="text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200"
                           title={url.isActive ? 'Deactivate' : 'Activate'}
                         />
                         <a
                           href={`/admin/urls/${url.id}/edit`}
-                          className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center'
-                          title='Edit'
+                          className="min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                          title="Edit"
                         >
-                          <Edit className='w-4 h-4' />
+                          <Edit className="w-4 h-4" />
                         </a>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(url.id, url.shortUrl)}
                           icon={Trash2}
-                          className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200'
-                          title='Delete'
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+                          title="Delete"
                         />
                       </div>
                     </td>
@@ -229,13 +225,8 @@ export default function URLsPage() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className='px-6 py-8 text-center text-sky-600 dark:text-sky-400'
-                  >
-                    {search
-                      ? 'No URLs match your search'
-                      : 'No URLs yet. Create your first one!'}
+                  <td colSpan={5} className="px-6 py-8 text-center text-sky-600 dark:text-sky-400">
+                    {search ? 'No URLs match your search' : 'No URLs yet. Create your first one!'}
                   </td>
                 </tr>
               )}
@@ -245,31 +236,31 @@ export default function URLsPage() {
       </div>
 
       {/* URLs Cards - Mobile */}
-      <div className='block md:hidden space-y-4'>
+      <div className="block md:hidden space-y-4">
         {filteredUrls.length > 0 ? (
           filteredUrls.map((url) => (
             <div
               key={url.id}
-              className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4'
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4"
             >
               {/* Card Header */}
-              <div className='flex justify-between items-start mb-3'>
-                <div className='flex-1 min-w-0'>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1 min-w-0">
                   <a
                     href={`/${url.shortUrl}`}
-                    target='_blank'
-                    className='font-semibold text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 flex items-center gap-1 text-base'
+                    target="_blank"
+                    className="font-semibold text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 flex items-center gap-1 text-base"
                   >
                     /{url.shortUrl}
-                    <ExternalLink className='w-4 h-4 flex-shrink-0' />
+                    <ExternalLink className="w-4 h-4 flex-shrink-0" />
                   </a>
                   {url.title && (
-                    <p className='text-sm text-sky-600 dark:text-sky-400 mt-1 truncate'>
+                    <p className="text-sm text-sky-600 dark:text-sky-400 mt-1 truncate">
                       {url.title}
                     </p>
                   )}
                 </div>
-                
+
                 {/* Status Badge */}
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${
@@ -283,20 +274,20 @@ export default function URLsPage() {
               </div>
 
               {/* Original URL */}
-              <div className='mb-3'>
-                <div className='text-sm text-sky-600 dark:text-sky-400 url-display'>
+              <div className="mb-3">
+                <div className="text-sm text-sky-600 dark:text-sky-400 url-display">
                   {url.originalUrl}
                 </div>
               </div>
 
               {/* Categories */}
               {url.categories.length > 0 && (
-                <div className='mb-3'>
-                  <div className='flex gap-1 flex-wrap'>
+                <div className="mb-3">
+                  <div className="flex gap-1 flex-wrap">
                     {url.categories.map((cat) => (
                       <span
                         key={cat.id}
-                        className='inline-block px-2 py-0.5 text-xs bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 rounded'
+                        className="inline-block px-2 py-0.5 text-xs bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 rounded"
                       >
                         {cat.name}
                       </span>
@@ -306,46 +297,44 @@ export default function URLsPage() {
               )}
 
               {/* Stats and Actions */}
-              <div className='flex items-center justify-between pt-3 border-t border-sky-200 dark:border-sky-700'>
-                <div className='text-sm text-sky-600 dark:text-sky-400'>
+              <div className="flex items-center justify-between pt-3 border-t border-sky-200 dark:border-sky-700">
+                <div className="text-sm text-sky-600 dark:text-sky-400">
                   {url.clickCount} clicks
                 </div>
-                
+
                 {/* Action Buttons */}
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleToggle(url.id)}
                     icon={Power}
-                    className='text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200'
+                    className="text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200"
                     title={url.isActive ? 'Deactivate' : 'Activate'}
                   />
                   <a
                     href={`/admin/urls/${url.id}/edit`}
-                    className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center'
-                    title='Edit'
+                    className="min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                    title="Edit"
                   >
-                    <Edit className='w-5 h-5' />
+                    <Edit className="w-5 h-5" />
                   </a>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(url.id, url.shortUrl)}
                     icon={Trash2}
-                    className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200'
-                    title='Delete'
+                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+                    title="Delete"
                   />
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-8 text-center'>
-            <div className='text-sky-600 dark:text-sky-400'>
-              {search
-                ? 'No URLs match your search'
-                : 'No URLs yet. Create your first one!'}
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-8 text-center">
+            <div className="text-sky-600 dark:text-sky-400">
+              {search ? 'No URLs match your search' : 'No URLs yet. Create your first one!'}
             </div>
           </div>
         )}

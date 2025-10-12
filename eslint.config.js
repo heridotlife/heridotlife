@@ -20,12 +20,6 @@ export default [
     },
   },
   {
-    ignores: [
-      'dist/',
-      '.astro/',
-      'node_modules/',
-      '.wrangler/',
-      'public/',
-    ],
+    ignores: ['dist/', '.astro/', 'node_modules/', '.wrangler/', 'public/'],
   },
 ];

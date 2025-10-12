@@ -11,10 +11,12 @@ The project uses GitHub Actions for continuous integration, security analysis, d
 ### 1. CI Workflow (`.github/workflows/ci.yml`)
 
 **Triggers:**
+
 - Push to `main` branch
 - Pull requests to `main` branch
 
 **Jobs:**
+
 - **Lint and Type Check**: Runs ESLint, Prettier, and TypeScript type checking
 - **Build**: Builds the project and uploads artifacts
 
@@ -23,6 +25,7 @@ The project uses GitHub Actions for continuous integration, security analysis, d
 ### 2. CodeQL Security Analysis (`.github/workflows/codeql.yml`)
 
 **Triggers:**
+
 - Push to `main` branch
 - Pull requests to `main` branch
 - Weekly schedule (Mondays at 02:00 UTC)
@@ -30,6 +33,7 @@ The project uses GitHub Actions for continuous integration, security analysis, d
 **Purpose:** Automatically scans code for security vulnerabilities and code quality issues using GitHub's CodeQL engine.
 
 **Features:**
+
 - Analyzes JavaScript/TypeScript code
 - Runs security-extended and quality queries
 - Creates security alerts for vulnerabilities
@@ -39,6 +43,7 @@ The project uses GitHub Actions for continuous integration, security analysis, d
 **Schedule:** Weekly on Mondays at 09:00 UTC
 
 **Features:**
+
 - Updates npm dependencies automatically
 - Updates GitHub Actions to latest versions
 - Groups related dependencies (Astro packages, dev dependencies, production dependencies)
@@ -49,12 +54,14 @@ The project uses GitHub Actions for continuous integration, security analysis, d
 ### 4. Cloudflare Pages Deployment (`.github/workflows/deploy.yml`)
 
 **Triggers:**
+
 - Push to `main` branch
 - Manual workflow dispatch
 
 **Purpose:** Automatically deploys the application to Cloudflare Pages on every push to main.
 
 **Setup Required:**
+
 1. Go to your repository Settings > Secrets and variables > Actions
 2. Add the following secrets:
    - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token (create at https://dash.cloudflare.com/profile/api-tokens)
@@ -84,11 +91,13 @@ pnpm db:setup          # Setup local database with sample data
 ## Code Quality Standards
 
 ### ESLint Configuration
+
 - Uses recommended ESLint and TypeScript ESLint rules
 - Includes Astro-specific linting rules
 - Warns on unused variables and explicit `any` types
 
 ### Prettier Configuration
+
 - Single quotes
 - 2-space indentation
 - 100 character line length
@@ -96,6 +105,7 @@ pnpm db:setup          # Setup local database with sample data
 - Supports Astro file formatting
 
 ### EditorConfig
+
 - UTF-8 encoding
 - LF line endings
 - Trim trailing whitespace
@@ -105,6 +115,7 @@ pnpm db:setup          # Setup local database with sample data
 ## Best Practices
 
 1. **Before Committing:**
+
    ```bash
    pnpm lint:fix      # Fix formatting and linting issues
    pnpm type-check    # Verify types are correct
@@ -131,6 +142,7 @@ pnpm db:setup          # Setup local database with sample data
 ### CI Build Failures
 
 If the CI build fails:
+
 1. Check the error logs in the GitHub Actions tab
 2. Run the same commands locally to reproduce the issue
 3. Fix the issues and push again
@@ -138,6 +150,7 @@ If the CI build fails:
 ### Dependabot Issues
 
 If Dependabot PRs fail:
+
 1. Check if there are breaking changes in the dependency update
 2. Update code to be compatible with new versions
 3. You can close Dependabot PRs that aren't needed
@@ -145,6 +158,7 @@ If Dependabot PRs fail:
 ### Deployment Failures
 
 If deployment to Cloudflare Pages fails:
+
 1. Verify your Cloudflare API token and Account ID are correct
 2. Check that the project name in the workflow matches your Cloudflare Pages project
 3. Review Cloudflare Pages deployment logs
