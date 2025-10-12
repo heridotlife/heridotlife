@@ -1,7 +1,9 @@
 'use client';
 
-import { Edit, ExternalLink, Power, Trash2 } from 'lucide-react';
+import { Edit, ExternalLink, Power, Trash2 } from '../ui/icons';
 import { useEffect, useState } from 'react';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
 
 interface ShortUrl {
   id: number;
@@ -109,12 +111,12 @@ export default function URLsPage() {
 
       {/* Search */}
       <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4'>
-        <input
+        <Input
           type='text'
           placeholder='Search URLs...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='w-full px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-200'
+          fullWidth
         />
       </div>
 
@@ -198,13 +200,14 @@ export default function URLsPage() {
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm'>
                       <div className='flex items-center gap-2'>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleToggle(url.id)}
-                          className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200'
+                          icon={Power}
+                          className='text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200'
                           title={url.isActive ? 'Deactivate' : 'Activate'}
-                        >
-                          <Power className='w-4 h-4' />
-                        </button>
+                        />
                         <a
                           href={`/admin/urls/${url.id}/edit`}
                           className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center'
@@ -212,13 +215,14 @@ export default function URLsPage() {
                         >
                           <Edit className='w-4 h-4' />
                         </a>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDelete(url.id, url.shortUrl)}
-                          className='min-h-[44px] min-w-[44px] p-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-all duration-200'
+                          icon={Trash2}
+                          className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200'
                           title='Delete'
-                        >
-                          <Trash2 className='w-4 h-4' />
-                        </button>
+                        />
                       </div>
                     </td>
                   </tr>
@@ -309,13 +313,14 @@ export default function URLsPage() {
                 
                 {/* Action Buttons */}
                 <div className='flex items-center gap-2'>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleToggle(url.id)}
-                    className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200'
+                    icon={Power}
+                    className='text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200'
                     title={url.isActive ? 'Deactivate' : 'Activate'}
-                  >
-                    <Power className='w-5 h-5' />
-                  </button>
+                  />
                   <a
                     href={`/admin/urls/${url.id}/edit`}
                     className='min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-sky-100 dark:hover:bg-sky-900/50 rounded-lg transition-all duration-200 flex items-center justify-center'
@@ -323,13 +328,14 @@ export default function URLsPage() {
                   >
                     <Edit className='w-5 h-5' />
                   </a>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleDelete(url.id, url.shortUrl)}
-                    className='min-h-[44px] min-w-[44px] p-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-all duration-200'
+                    icon={Trash2}
+                    className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200'
                     title='Delete'
-                  >
-                    <Trash2 className='w-5 h-5' />
-                  </button>
+                  />
                 </div>
               </div>
             </div>

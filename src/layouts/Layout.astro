@@ -47,6 +47,78 @@ const { title } = Astro.props;
                 }
               })();
         </script>
+
+        <!-- Cloudflare Analytics and Performance Monitoring -->
+        <script is:inline>
+          // Simple Core Web Vitals tracking for Cloudflare
+          function sendToAnalytics(metric) {
+            // Log to console in development
+            if (typeof console !== 'undefined') {
+              console.log('[Performance]', metric.name, metric.value, metric);
+            }
+            
+            // Send to Cloudflare Analytics endpoint
+            if (navigator.sendBeacon && window.location.hostname !== 'localhost') {
+              const data = {
+                metric: metric.name,
+                value: metric.value,
+                id: metric.id,
+                timestamp: Date.now(),
+                url: window.location.href
+              };
+              navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(data));
+            }
+          }
+
+          // Basic performance observation without external dependencies
+          if ('PerformanceObserver' in window) {
+            // Largest Contentful Paint (LCP)
+            try {
+              const lcpObserver = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                  if (entry.entryType === 'largest-contentful-paint') {
+                    sendToAnalytics({
+                      name: 'LCP',
+                      value: entry.startTime,
+                      id: crypto.randomUUID?.() || Math.random().toString(36)
+                    });
+                  }
+                }
+              });
+              lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+            } catch (e) {}
+
+            // First Contentful Paint (FCP) and Navigation Timing
+            try {
+              const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                  if (entry.name === 'first-contentful-paint') {
+                    sendToAnalytics({
+                      name: 'FCP',
+                      value: entry.startTime,
+                      id: crypto.randomUUID?.() || Math.random().toString(36)
+                    });
+                  }
+                }
+              });
+              observer.observe({ type: 'paint', buffered: true });
+            } catch (e) {}
+          }
+
+          // Time to First Byte (TTFB) using Navigation Timing
+          window.addEventListener('load', () => {
+            if ('performance' in window && 'getEntriesByType' in performance) {
+              const navEntry = performance.getEntriesByType('navigation')[0];
+              if (navEntry) {
+                sendToAnalytics({
+                  name: 'TTFB',
+                  value: navEntry.responseStart - navEntry.requestStart,
+                  id: crypto.randomUUID?.() || Math.random().toString(36)
+                });
+              }
+            }
+          });
+        </script>
 	</head>
 	<body>
 		<slot />

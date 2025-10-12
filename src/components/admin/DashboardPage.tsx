@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, CheckCircle, Link as LinkIcon, XCircle } from 'lucide-react';
+import { Activity, CheckCircle, LinkIcon, XCircle } from '../ui/icons';
 import { useEffect, useState } from 'react';
 
 import StatsCard from './StatsCard';
