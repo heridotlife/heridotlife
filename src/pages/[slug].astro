@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { D1Helper, toBool, toDate } from '../lib/d1';
+import { createCachedD1Helper } from '../lib/cached-d1';
+import { toBool, toDate } from '../lib/d1';
 import { siteConfig } from '../consts';
 
 const { slug } = Astro.params;
@@ -14,7 +15,11 @@ if (reservedPaths.includes(slug.toLowerCase())) {
     return Astro.redirect('/404');
 }
 
-const db = new D1Helper(Astro.locals.runtime.env.D1_db);
+// Use cached D1 helper for better performance
+const db = createCachedD1Helper(
+    Astro.locals.runtime.env.D1_db,
+    Astro.locals.runtime.env.heridotlife_kv
+);
 
 // Initialize variables for category rendering
 let shortUrls: any[] = [];
@@ -22,11 +27,11 @@ let activeUrls: any[] = [];
 let pageTitle = '';
 let pageDescription = '';
 
-// Check if this is a category first
+// Check if this is a category first (now cached)
 const categoryRecord = await db.getCategoryByName(slug);
 
 if (categoryRecord) {
-    // This is a category - render the category page
+    // This is a category - render the category page (URLs cached)
     shortUrls = await db.getShortUrlsByCategory(categoryRecord.name);
     activeUrls = shortUrls.filter(url => toBool(url.isActive));
     
@@ -36,7 +41,7 @@ if (categoryRecord) {
     // Render category page - no further processing needed
     // The JSX below will handle the category rendering
 } else {
-    // Not a category, check if it's a short URL  
+    // Not a category, check if it's a short URL (now cached)
     const shortUrlRecord = await db.findShortUrl(slug);
 
     if (!shortUrlRecord) {
@@ -54,6 +59,7 @@ if (categoryRecord) {
         return new Response('This short URL has expired', { status: 410 });
     }
 
+    // Update click count (this will invalidate the URL cache)
     await db.incrementClickCount(slug);
     return Astro.redirect(shortUrlRecord.originalUrl, 302);
 }
