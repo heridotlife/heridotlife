@@ -18,7 +18,7 @@ if (reservedPaths.includes(slug.toLowerCase())) {
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
     Astro.locals.runtime.env.D1_db,
-    Astro.locals.runtime.env.heridotlife_kv
+    Astro.locals.runtime.env.heridotlife_kv as any
 );
 
 // Initialize variables for category rendering
