@@ -29,11 +29,11 @@ export default function CacheManagement() {
   const [loading, setLoading] = useState(false);
   const [showTTLConfig, setShowTTLConfig] = useState(false);
   const [ttlConfig, setTTLConfig] = useState<TTLConfig>({
-    shortTerm: 300,    // 5 minutes
-    mediumTerm: 3600,  // 1 hour
-    longTerm: 86400,   // 24 hours
+    shortTerm: 300, // 5 minutes
+    mediumTerm: 3600, // 1 hour
+    longTerm: 86400, // 24 hours
     urlLookup: 86400, // 24 hours
-    adminStats: 1800  // 30 minutes
+    adminStats: 1800, // 30 minutes
   });
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
@@ -82,7 +82,7 @@ export default function CacheManagement() {
 
       const data: CacheResponse = await response.json();
       setSuccessMessage(data.message || `Successfully performed ${action}`);
-      
+
       // Refresh stats after action
       await fetchCacheStats();
     } catch (err) {
@@ -103,9 +103,9 @@ export default function CacheManagement() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action: 'set_ttl_config',
-          ttlConfig 
+          ttlConfig,
         }),
       });
 
@@ -127,7 +127,7 @@ export default function CacheManagement() {
     try {
       const response = await fetch('/api/admin/cache?action=get_ttl_config');
       if (response.ok) {
-        const data = await response.json() as { ttlConfig?: TTLConfig };
+        const data = (await response.json()) as { ttlConfig?: TTLConfig };
         if (data.ttlConfig) {
           setTTLConfig(data.ttlConfig);
         }
@@ -198,12 +198,7 @@ export default function CacheManagement() {
             Monitor and control application cache
           </p>
         </div>
-        <Button
-          onClick={fetchCacheStats}
-          disabled={loading}
-          variant="secondary"
-          size="sm"
-        >
+        <Button onClick={fetchCacheStats} disabled={loading} variant="secondary" size="sm">
           {loading ? 'Refreshing...' : 'Refresh Stats'}
         </Button>
       </div>
@@ -248,7 +243,7 @@ export default function CacheManagement() {
         <h3 className="text-heading-sm font-semibold text-sky-900 dark:text-sky-100 mb-3">
           Cache Actions
         </h3>
-        
+
         {actions.map((action) => (
           <div
             key={action}
@@ -306,7 +301,12 @@ export default function CacheManagement() {
                   <input
                     type="number"
                     value={ttlConfig.shortTerm}
-                    onChange={(e) => setTTLConfig(prev => ({ ...prev, shortTerm: parseInt(e.target.value) || 300 }))}
+                    onChange={(e) =>
+                      setTTLConfig((prev) => ({
+                        ...prev,
+                        shortTerm: parseInt(e.target.value) || 300,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
                     min="60"
                     max="3600"
@@ -323,7 +323,12 @@ export default function CacheManagement() {
                   <input
                     type="number"
                     value={ttlConfig.mediumTerm}
-                    onChange={(e) => setTTLConfig(prev => ({ ...prev, mediumTerm: parseInt(e.target.value) || 3600 }))}
+                    onChange={(e) =>
+                      setTTLConfig((prev) => ({
+                        ...prev,
+                        mediumTerm: parseInt(e.target.value) || 3600,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
                     min="300"
                     max="86400"
@@ -340,7 +345,12 @@ export default function CacheManagement() {
                   <input
                     type="number"
                     value={ttlConfig.longTerm}
-                    onChange={(e) => setTTLConfig(prev => ({ ...prev, longTerm: parseInt(e.target.value) || 86400 }))}
+                    onChange={(e) =>
+                      setTTLConfig((prev) => ({
+                        ...prev,
+                        longTerm: parseInt(e.target.value) || 86400,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
                     min="3600"
                     max="604800"
@@ -357,7 +367,12 @@ export default function CacheManagement() {
                   <input
                     type="number"
                     value={ttlConfig.urlLookup}
-                    onChange={(e) => setTTLConfig(prev => ({ ...prev, urlLookup: parseInt(e.target.value) || 86400 }))}
+                    onChange={(e) =>
+                      setTTLConfig((prev) => ({
+                        ...prev,
+                        urlLookup: parseInt(e.target.value) || 86400,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
                     min="3600"
                     max="604800"
@@ -374,7 +389,12 @@ export default function CacheManagement() {
                   <input
                     type="number"
                     value={ttlConfig.adminStats}
-                    onChange={(e) => setTTLConfig(prev => ({ ...prev, adminStats: parseInt(e.target.value) || 1800 }))}
+                    onChange={(e) =>
+                      setTTLConfig((prev) => ({
+                        ...prev,
+                        adminStats: parseInt(e.target.value) || 1800,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
                     min="60"
                     max="3600"
@@ -386,11 +406,7 @@ export default function CacheManagement() {
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-sky-200 dark:border-sky-700">
-                <Button
-                  onClick={() => setShowTTLConfig(false)}
-                  variant="secondary"
-                  size="sm"
-                >
+                <Button onClick={() => setShowTTLConfig(false)} variant="secondary" size="sm">
                   Cancel
                 </Button>
                 <Button

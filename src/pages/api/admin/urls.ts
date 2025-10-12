@@ -17,7 +17,7 @@ export const GET: APIRoute = async (context) => {
       context.locals.runtime.env.D1_db,
       context.locals.runtime.env.heridotlife_kv as any
     );
-    
+
     const urls = await db.getAllShortUrls();
 
     // Get categories for each URL
@@ -69,7 +69,7 @@ export const POST: APIRoute = async (context) => {
       context.locals.runtime.env.D1_db,
       context.locals.runtime.env.heridotlife_kv as any
     );
-    
+
     const existing = await db.findShortUrl(slug);
 
     if (existing) {

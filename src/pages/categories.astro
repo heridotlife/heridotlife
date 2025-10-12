@@ -5,8 +5,8 @@ import { siteConfig } from '../consts';
 
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
-    Astro.locals.runtime.env.D1_db,
-    Astro.locals.runtime.env.heridotlife_kv as any
+  Astro.locals.runtime.env.D1_db,
+  Astro.locals.runtime.env.heridotlife_kv as any
 );
 
 // Get all categories with their short URL counts (now cached)

@@ -5,7 +5,7 @@ import { validateHostMiddleware } from './lib/security';
 export const onRequest = defineMiddleware(async (context, next) => {
   // Validate host headers to prevent Host Header Injection attacks
   const hostValidation = validateHostMiddleware(context.request, context.locals?.runtime?.env);
-  
+
   if (!hostValidation.valid && hostValidation.response) {
     return hostValidation.response;
   }

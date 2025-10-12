@@ -81,11 +81,11 @@ export class CachedD1Helper extends D1Helper {
     expiresAt?: Date | null;
   }): Promise<ShortUrl> {
     const result = await super.createShortUrl(data);
-    
+
     // Invalidate relevant caches
     await this.invalidateUrlCaches();
     await this.cache.adminStats.delete(CacheKeys.adminStats());
-    
+
     return result;
   }
 
@@ -102,22 +102,22 @@ export class CachedD1Helper extends D1Helper {
   ): Promise<ShortUrl> {
     // Get the current URL to invalidate its cache
     const currentUrl = await super.findShortUrlById(id);
-    
+
     const result = await super.updateShortUrl(id, data);
-    
+
     // Invalidate caches
     if (currentUrl) {
       await this.cache.urlLookup.delete(CacheKeys.url(currentUrl.shortUrl));
       await this.cache.urlLookup.delete(CacheKeys.urlById(id));
     }
-    
+
     // If shortUrl changed, also invalidate the new one
     if (data.shortUrl && currentUrl && data.shortUrl !== currentUrl.shortUrl) {
       await this.cache.urlLookup.delete(CacheKeys.url(data.shortUrl));
     }
-    
+
     await this.invalidateRelatedCaches(id);
-    
+
     return result;
   }
 
@@ -125,24 +125,24 @@ export class CachedD1Helper extends D1Helper {
   async deleteShortUrl(id: number): Promise<void> {
     // Get the URL before deletion to invalidate its cache
     const url = await super.findShortUrlById(id);
-    
+
     await super.deleteShortUrl(id);
-    
+
     if (url) {
       await this.cache.urlLookup.delete(CacheKeys.url(url.shortUrl));
       await this.cache.urlLookup.delete(CacheKeys.urlById(id));
     }
-    
+
     await this.invalidateRelatedCaches(id);
   }
 
   // Override incrementClickCount to update cache
   async incrementClickCount(shortUrl: string): Promise<void> {
     await super.incrementClickCount(shortUrl);
-    
+
     // Invalidate the URL cache to reflect updated click count
     await this.cache.urlLookup.delete(CacheKeys.url(shortUrl));
-    
+
     // Invalidate stats cache since click count changed
     await this.cache.adminStats.delete(CacheKeys.adminStats());
   }
@@ -150,30 +150,30 @@ export class CachedD1Helper extends D1Helper {
   // Override createCategory to invalidate category caches
   async createCategory(name: string): Promise<Category> {
     const result = await super.createCategory(name);
-    
+
     // Invalidate categories cache
     await this.cache.longTerm.delete(CacheKeys.categories());
     await this.cache.adminStats.delete(CacheKeys.adminStats());
-    
+
     return result;
   }
 
   // Override updateCategory to invalidate category caches
   async updateCategory(id: number, name: string): Promise<Category | null> {
     const result = await super.updateCategory(id, name);
-    
+
     // Invalidate categories cache
     await this.cache.longTerm.delete(CacheKeys.categories());
     await this.cache.mediumTerm.clearPrefix('category:name:');
     await this.cache.mediumTerm.delete(CacheKeys.categoryUrls(id));
-    
+
     return result;
   }
 
   // Override deleteCategory to invalidate category caches
   async deleteCategory(id: number): Promise<void> {
     await super.deleteCategory(id);
-    
+
     // Invalidate categories cache
     await this.cache.longTerm.delete(CacheKeys.categories());
     await this.cache.mediumTerm.clearPrefix('category:name:');
@@ -185,18 +185,18 @@ export class CachedD1Helper extends D1Helper {
   async setCategoriesForShortUrl(shortUrlId: number, categoryIds: number[]): Promise<void> {
     // Get existing categories to invalidate their caches
     const existingCategories = await super.getCategoriesForShortUrl(shortUrlId);
-    
+
     await super.setCategoriesForShortUrl(shortUrlId, categoryIds);
-    
+
     // Invalidate category URL caches for old and new categories
     for (const category of existingCategories) {
       await this.cache.mediumTerm.delete(CacheKeys.categoryUrls(category.id));
     }
-    
+
     for (const categoryId of categoryIds) {
       await this.cache.mediumTerm.delete(CacheKeys.categoryUrls(categoryId));
     }
-    
+
     // Invalidate URL cache since categories changed
     await this.cache.urlLookup.delete(CacheKeys.urlById(shortUrlId));
     await this.cache.longTerm.delete(CacheKeys.categories());
@@ -205,25 +205,25 @@ export class CachedD1Helper extends D1Helper {
   // Cache warming functions
   async warmCache() {
     console.log('Warming cache...');
-    
+
     try {
       // Warm categories cache
       await this.getAllCategories();
-      
+
       // Warm popular URLs cache (get URLs via the parent class method)
       const allUrls = await super.getAllShortUrls();
       const popularUrls = allUrls
-        .filter(url => url.isActive === 1)
+        .filter((url) => url.isActive === 1)
         .sort((a, b) => b.clickCount - a.clickCount)
         .slice(0, 50);
-      
+
       for (const url of popularUrls) {
         await this.findShortUrl(url.shortUrl);
       }
-      
+
       // Warm admin stats
       await this.getStats();
-      
+
       console.log(`Cache warmed: ${popularUrls.length} URLs, categories, and stats`);
     } catch (error) {
       console.error('Cache warming failed:', error);
@@ -240,11 +240,11 @@ export class CachedD1Helper extends D1Helper {
   async invalidateRelatedCaches(shortUrlId: number): Promise<void> {
     // Get categories for this URL to invalidate their caches
     const categories = await super.getCategoriesForShortUrl(shortUrlId);
-    
+
     for (const category of categories) {
       await this.cache.mediumTerm.delete(CacheKeys.categoryUrls(category.id));
     }
-    
+
     await this.cache.adminStats.delete(CacheKeys.adminStats());
     await this.cache.longTerm.delete(CacheKeys.categories());
   }
@@ -277,7 +277,7 @@ export class CachedD1Helper extends D1Helper {
 
 // Helper function to create cached D1 helper instance
 export function createCachedD1Helper(
-  db: any, // D1Database 
+  db: any, // D1Database
   kv: KVNamespace
 ): CachedD1Helper {
   return new CachedD1Helper(db, kv);

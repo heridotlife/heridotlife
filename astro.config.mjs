@@ -11,10 +11,10 @@ export default defineConfig({
     functionPerRoute: false,
   }),
   integrations: [
-    tailwind(), 
+    tailwind(),
     react({
       experimentalReactChildren: false,
-    })
+    }),
   ],
   // Configure image service for Cloudflare Pages
   // Use 'compile' service to optimize images with sharp during build time

@@ -71,22 +71,28 @@ export const GET: APIRoute = async ({ url }) => {
             font-size="48" font-weight="700" fill="url(#textGradient)">heri.life</text>
       
       <!-- Content based on type -->
-      ${type === 'category' ? `
+      ${
+        type === 'category'
+          ? `
         <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="36" font-weight="600" fill="${colors.primary}">📂 ${category}</text>
         <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="22" fill="#64748b">${description}</text>
-      ` : type === 'url' ? `
+      `
+          : type === 'url'
+            ? `
         <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="36" font-weight="600" fill="${colors.primary}">🔗 Short URL</text>
         <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="24" font-weight="500" fill="#1e293b">${title}</text>
-      ` : `
+      `
+            : `
         <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="40" font-weight="700" fill="${colors.primary}">${title}</text>
         <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
               font-size="22" fill="#64748b">${description}</text>
-      `}
+      `
+      }
       
       <!-- Footer -->
       <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" 

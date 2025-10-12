@@ -15,7 +15,7 @@ export const GET: APIRoute = async (context) => {
       context.locals.runtime.env.D1_db,
       context.locals.runtime.env.heridotlife_kv as any
     );
-    
+
     // Get stats (now cached for 30 minutes)
     const stats = await db.getStats();
 

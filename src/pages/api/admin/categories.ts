@@ -16,7 +16,7 @@ export const GET: APIRoute = async (context) => {
       context.locals.runtime.env.D1_db,
       context.locals.runtime.env.heridotlife_kv as any
     );
-    
+
     const categories = await db.getAllCategories();
 
     return new Response(JSON.stringify(categories), { status: 200 });
@@ -51,7 +51,7 @@ export const POST: APIRoute = async (context) => {
       context.locals.runtime.env.D1_db,
       context.locals.runtime.env.heridotlife_kv as any
     );
-    
+
     const category = await db.createCategory(name);
 
     return new Response(JSON.stringify(category), { status: 201 });

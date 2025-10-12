@@ -42,7 +42,7 @@ export class KVCache {
 
       if (opts.json !== false) {
         const entry: CacheEntry<T> = JSON.parse(cached);
-        
+
         // Check if entry has expired
         const now = Date.now();
         if (now - entry.timestamp > entry.ttl * 1000) {
@@ -50,7 +50,7 @@ export class KVCache {
           await this.delete(key, options);
           return null;
         }
-        
+
         return entry.data;
       }
 
@@ -64,11 +64,7 @@ export class KVCache {
   /**
    * Set a cached value
    */
-  async set<T = any>(
-    key: string, 
-    value: T, 
-    options: CacheOptions = {}
-  ): Promise<void> {
+  async set<T = any>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
     const opts = { ttl: 3600, json: true, ...this.defaultOptions, ...options };
     const cacheKey = this.generateKey(key, opts.prefix);
 
@@ -143,7 +139,7 @@ export class KVCache {
       // List all keys with prefix (this is limited and may not work for large datasets)
       // For production, consider implementing a more sophisticated approach
       const list = await this.kv.list({ prefix: `${prefix}:` });
-      
+
       for (const key of list.keys) {
         await this.kv.delete(key.name);
       }
@@ -173,16 +169,16 @@ export class KVCache {
 export const createCacheInstances = (kv: KVNamespace) => ({
   // Short-term cache for frequently accessed data
   shortTerm: new KVCache(kv, { ttl: 300, prefix: 'short' }), // 5 minutes
-  
+
   // Medium-term cache for API responses and computed data
   mediumTerm: new KVCache(kv, { ttl: 3600, prefix: 'medium' }), // 1 hour
-  
+
   // Long-term cache for static data
   longTerm: new KVCache(kv, { ttl: 86400, prefix: 'long' }), // 24 hours
-  
+
   // URL lookup cache with extended TTL for better performance
   urlLookup: new KVCache(kv, { ttl: 86400, prefix: 'url' }), // 24 hours
-  
+
   // Admin stats cache (refreshed less frequently)
   adminStats: new KVCache(kv, { ttl: 1800, prefix: 'stats' }), // 30 minutes
 });

@@ -13,7 +13,7 @@ if (typeof MessageChannel === 'undefined') {
 
       const port1 = {
         postMessage: (data) => {
-          listeners2.forEach(listener => {
+          listeners2.forEach((listener) => {
             setTimeout(() => listener({ data }), 0);
           });
         },
@@ -29,7 +29,7 @@ if (typeof MessageChannel === 'undefined') {
 
       const port2 = {
         postMessage: (data) => {
-          listeners1.forEach(listener => {
+          listeners1.forEach((listener) => {
             setTimeout(() => listener({ data }), 0);
           });
         },
