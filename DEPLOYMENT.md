@@ -56,6 +56,7 @@ pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
 ```
 
 Expected output:
+
 ```
 🚣 Executed 15 queries in X.XX seconds
 ```
@@ -87,6 +88,7 @@ pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
 #### A. Connect to GitHub
 
 1. Push your code to GitHub:
+
    ```bash
    git add .
    git commit -m "feat: ready for deployment"
@@ -100,13 +102,13 @@ pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
 
 #### B. Configure Build Settings
 
-| Setting | Value |
-|---------|-------|
-| Production branch | `main` |
-| Framework preset | `Astro` |
-| Build command | `pnpm build` |
-| Build output directory | `dist` |
-| Node version | `18` or higher |
+| Setting                | Value          |
+| ---------------------- | -------------- |
+| Production branch      | `main`         |
+| Framework preset       | `Astro`        |
+| Build command          | `pnpm build`   |
+| Build output directory | `dist`         |
+| Node version           | `18` or higher |
 
 6. Click **Save and Deploy**
 7. Wait for the first deployment (takes 2-3 minutes)
@@ -153,6 +155,7 @@ ADMIN_PASSWORD = your-secure-admin-password
 ```
 
 **Generate AUTH_SECRET:**
+
 ```bash
 openssl rand -base64 32
 ```
@@ -180,6 +183,7 @@ Visit your Cloudflare Pages URL (e.g., `https://astro-heridotlife.pages.dev`)
 ### 2. Test Short URLs
 
 If you imported data, test redirects:
+
 - `https://yourdomain.com/bi` → Should redirect
 - `https://yourdomain.com/li` → Should redirect
 
@@ -215,6 +219,7 @@ Or in Dashboard:
 **Cause**: D1 binding not configured
 
 **Solution**:
+
 1. Go to **Settings > Bindings** in Cloudflare Dashboard
 2. Add D1 Database binding: `D1_db` → `heridotlife`
 3. Redeploy
@@ -224,6 +229,7 @@ Or in Dashboard:
 **Cause**: Environment variables not set
 
 **Solution**:
+
 1. Go to **Settings > Environment Variables**
 2. Add `AUTH_SECRET` and `ADMIN_PASSWORD`
 3. Redeploy
@@ -233,6 +239,7 @@ Or in Dashboard:
 **Cause**: Database schema not created
 
 **Solution**:
+
 ```bash
 pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
 ```
@@ -240,6 +247,7 @@ pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
 ### Issue: Short URLs don't redirect
 
 **Solutions**:
+
 1. Check data exists:
    ```bash
    pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
@@ -250,6 +258,7 @@ pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
 ### Issue: Build fails
 
 **Solutions**:
+
 1. Run locally: `pnpm build`
 2. Check for TypeScript errors: `pnpm typecheck`
 3. Regenerate types: `pnpm astro sync`
@@ -258,6 +267,7 @@ pnpm wrangler d1 execute heridotlife --remote --file=schema.sql
 ### Issue: Admin login fails
 
 **Solutions**:
+
 1. Verify `ADMIN_PASSWORD` is set in environment variables
 2. Check browser console for errors
 3. Clear cookies and try again
@@ -284,11 +294,13 @@ Configure different settings for Preview vs Production:
 ### Monitoring
 
 **Enable Analytics:**
+
 1. Go to your Pages project
 2. Click **Analytics**
 3. View traffic, performance, and error rates
 
 **Set up Alerts:**
+
 1. Go to **Notifications** in Cloudflare
 2. Create alerts for deployment failures or errors
 

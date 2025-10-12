@@ -11,13 +11,9 @@ export const createCategorySchema = z.object({
 const urlRegex = /^[a-zA-Z0-9_-]+$/;
 
 export const createUrlSchema = z.object({
-  slug: z
-    .string()
-    .min(2, { message: 'Slug must be at least 2 characters long.' })
-    .regex(urlRegex, {
-      message:
-        'Slug can only contain letters, numbers, underscores, and hyphens.',
-    }),
+  slug: z.string().min(2, { message: 'Slug must be at least 2 characters long.' }).regex(urlRegex, {
+    message: 'Slug can only contain letters, numbers, underscores, and hyphens.',
+  }),
   originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
   title: z.string().optional(),
   categoryIds: z.array(z.number()).optional(),
@@ -26,13 +22,9 @@ export const createUrlSchema = z.object({
 });
 
 export const updateUrlSchema = z.object({
-  slug: z
-    .string()
-    .min(2, { message: 'Slug must be at least 2 characters long.' })
-    .regex(urlRegex, {
-      message:
-        'Slug can only contain letters, numbers, underscores, and hyphens.',
-    }),
+  slug: z.string().min(1, { message: 'Slug must be at least 1 characters long.' }).regex(urlRegex, {
+    message: 'Slug can only contain letters, numbers, underscores, and hyphens.',
+  }),
   originalUrl: z.string().url({ message: 'Please enter a valid URL.' }),
   title: z.string().optional(),
   categoryIds: z.array(z.number()).optional(),

@@ -1,3 +1,8 @@
+// NOTE: This file is not currently used in the project
+// The project uses Cloudflare D1 database instead of Prisma
+// Keeping this for potential future use
+
+/*
 import PrismaClientPkg from '@prisma/client';
 
 const { PrismaClient } = PrismaClientPkg;
@@ -21,3 +26,6 @@ if (import.meta.env.PROD) {
 }
 
 export default prisma;
+*/
+
+export default {};

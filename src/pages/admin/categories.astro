@@ -4,5 +4,5 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="Categories">
-  <CategoriesPage client:load />
+  <CategoriesPage client:only="react" />
 </AdminLayout>

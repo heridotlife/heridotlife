@@ -49,6 +49,8 @@ export interface ShortUrl {
   shortUrl: string;
   originalUrl: string;
   title: string | null;
+  description: string | null;
+  ogImage: string | null;
   userId: string | null;
   createdAt: number;
   updatedAt: number | null;
@@ -111,10 +113,7 @@ export class D1Helper {
   }
 
   async findShortUrlById(id: number): Promise<ShortUrl | null> {
-    return await this.db
-      .prepare('SELECT * FROM ShortUrl WHERE id = ?')
-      .bind(id)
-      .first<ShortUrl>();
+    return await this.db.prepare('SELECT * FROM ShortUrl WHERE id = ?').bind(id).first<ShortUrl>();
   }
 
   async getAllShortUrls(): Promise<ShortUrl[]> {
@@ -205,10 +204,7 @@ export class D1Helper {
   }
 
   async deleteShortUrl(id: number): Promise<void> {
-    await this.db
-      .prepare('DELETE FROM ShortUrl WHERE id = ?')
-      .bind(id)
-      .run();
+    await this.db.prepare('DELETE FROM ShortUrl WHERE id = ?').bind(id).run();
   }
 
   async incrementClickCount(shortUrl: string): Promise<void> {
@@ -244,16 +240,18 @@ export class D1Helper {
         ORDER BY c.name`
       )
       .all<Category & { shortUrlsCount: number }>();
-    
+
     // Transform to match Prisma's _count structure
-    return result.results.map(cat => ({
+    const categories = result.results.map((cat) => ({
       id: cat.id,
       name: cat.name,
       clickCount: cat.clickCount,
       _count: {
-        shortUrls: cat.shortUrlsCount || 0
-      }
+        shortUrls: cat.shortUrlsCount || 0,
+      },
     }));
+
+    return categories;
   }
 
   async createCategory(name: string): Promise<Category> {
@@ -279,29 +277,17 @@ export class D1Helper {
       throw new Error('Category name already exists');
     }
 
-    await this.db
-      .prepare('UPDATE Category SET name = ? WHERE id = ?')
-      .bind(name, id)
-      .run();
+    await this.db.prepare('UPDATE Category SET name = ? WHERE id = ?').bind(name, id).run();
 
-    return await this.db
-      .prepare('SELECT * FROM Category WHERE id = ?')
-      .bind(id)
-      .first<Category>();
+    return await this.db.prepare('SELECT * FROM Category WHERE id = ?').bind(id).first<Category>();
   }
 
   async deleteCategory(id: number): Promise<void> {
     // Delete category relationships first (cascade)
-    await this.db
-      .prepare('DELETE FROM ShortUrlCategory WHERE categoryId = ?')
-      .bind(id)
-      .run();
+    await this.db.prepare('DELETE FROM ShortUrlCategory WHERE categoryId = ?').bind(id).run();
 
     // Delete category
-    await this.db
-      .prepare('DELETE FROM Category WHERE id = ?')
-      .bind(id)
-      .run();
+    await this.db.prepare('DELETE FROM Category WHERE id = ?').bind(id).run();
   }
 
   async getCategoriesForShortUrl(shortUrlId: number): Promise<Category[]> {
@@ -345,30 +331,61 @@ export class D1Helper {
     }
   }
 
+  async getCategoryByName(name: string): Promise<Category | null> {
+    return await this.db
+      .prepare('SELECT * FROM Category WHERE LOWER(name) = LOWER(?)')
+      .bind(name)
+      .first<Category>();
+  }
+
+  async getShortUrlsByCategory(categoryName: string): Promise<ShortUrl[]> {
+    const result = await this.db
+      .prepare(
+        `SELECT s.* FROM ShortUrl s
+         INNER JOIN ShortUrlCategory suc ON s.id = suc.shortUrlId
+         INNER JOIN Category c ON suc.categoryId = c.id
+         WHERE LOWER(c.name) = LOWER(?) AND s.isActive = 1
+         ORDER BY s.createdAt DESC`
+      )
+      .bind(categoryName)
+      .all<ShortUrl>();
+    return result.results;
+  }
+
   // Stats operations
   async getStats() {
+    // Optimize queries by selecting only needed fields and using efficient indexes
     const [totalUrls, activeUrls, totalClicks, expiredUrls] = await Promise.all([
       this.db.prepare('SELECT COUNT(*) as count FROM ShortUrl').first<{ count: number }>(),
-      this.db.prepare('SELECT COUNT(*) as count FROM ShortUrl WHERE isActive = 1').first<{ count: number }>(),
-      this.db.prepare('SELECT SUM(clickCount) as total FROM ShortUrl').first<{ total: number | null }>(),
       this.db
-        .prepare('SELECT COUNT(*) as count FROM ShortUrl WHERE expiresAt IS NOT NULL AND expiresAt < ?')
+        .prepare('SELECT COUNT(*) as count FROM ShortUrl WHERE isActive = 1')
+        .first<{ count: number }>(),
+      this.db
+        .prepare('SELECT COALESCE(SUM(clickCount), 0) as total FROM ShortUrl')
+        .first<{ total: number }>(),
+      this.db
+        .prepare(
+          'SELECT COUNT(*) as count FROM ShortUrl WHERE expiresAt IS NOT NULL AND expiresAt < ?'
+        )
         .bind(Math.floor(Date.now() / 1000))
         .first<{ count: number }>(),
     ]);
 
+    // Only select required fields for recent clicks to reduce transfer size
     const recentClicks = await this.db
       .prepare(
-        'SELECT * FROM ShortUrl WHERE latestClick IS NOT NULL ORDER BY latestClick DESC LIMIT 10'
+        'SELECT id, shortUrl, title, latestClick FROM ShortUrl WHERE latestClick IS NOT NULL ORDER BY latestClick DESC LIMIT 10'
       )
-      .all<ShortUrl>();
+      .all<Pick<ShortUrl, 'id' | 'shortUrl' | 'title' | 'latestClick'>>();
 
-    return {
+    const stats = {
       totalUrls: totalUrls?.count || 0,
       activeUrls: activeUrls?.count || 0,
       totalClicks: totalClicks?.total || 0,
       expiredUrls: expiredUrls?.count || 0,
       recentClicks: recentClicks.results,
     };
+
+    return stats;
   }
 }

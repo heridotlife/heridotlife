@@ -4,5 +4,5 @@ import AdminLayout from '../../../layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="URLs">
-  <URLsPage client:load />
+  <URLsPage client:only="react" />
 </AdminLayout>

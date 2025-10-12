@@ -19,7 +19,7 @@ export const GET: APIRoute = async (context) => {
     console.error('Error fetching categories', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
+};
 
 // POST create category
 export const POST: APIRoute = async (context) => {
@@ -33,10 +33,10 @@ export const POST: APIRoute = async (context) => {
     const validation = createCategorySchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(
-        validation.error.flatten().fieldErrors,
-      )[0]?.[0];
-      return new Response(JSON.stringify({ error: errorMessage || 'Invalid input.' }), { status: 400 });
+      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      return new Response(JSON.stringify({ error: errorMessage || 'Invalid input.' }), {
+        status: 400,
+      });
     }
 
     const { name } = validation.data;
@@ -49,4 +49,4 @@ export const POST: APIRoute = async (context) => {
     console.error('Error creating category', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
+};

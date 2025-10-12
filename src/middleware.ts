@@ -2,9 +2,8 @@ import { defineMiddleware } from 'astro:middleware';
 import { getSession } from './lib/auth';
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // Initialize runtime env for Cloudflare
-  // In production, context.locals.runtime is provided by Cloudflare
-  // In development, we need to mock it
+  // Initialize runtime env for development
+  // In production, context.locals.runtime should be provided by Cloudflare
   if (!context.locals.runtime) {
     context.locals.runtime = {
       env: {

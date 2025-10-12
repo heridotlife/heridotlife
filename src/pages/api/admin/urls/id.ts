@@ -66,10 +66,11 @@ export const PUT: APIRoute = async (context) => {
     const validation = updateUrlSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(
-        validation.error.flatten().fieldErrors,
-      )[0]?.[0];
-      return new Response(JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }), { status: 400 });
+      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      return new Response(
+        JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }),
+        { status: 400 }
+      );
     }
 
     const { slug, originalUrl, title, categoryIds, expiresAt } = validation.data;
