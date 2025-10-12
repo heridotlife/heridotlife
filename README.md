@@ -49,14 +49,15 @@ A modern personal website featuring:
 
 ### Development Features
 
-- 🔧 **ESLint** - Code quality and linting with TypeScript support
-- 💅 **Prettier** - Consistent code formatting
-- 📝 **EditorConfig** - Consistent editor settings across IDEs
-- ✅ **TypeScript** - Full type safety with strict mode
-- 🤖 **GitHub Actions** - Automated CI/CD pipeline
-- 🔒 **CodeQL** - Automated security scanning
-- 📦 **Dependabot** - Automated dependency updates
+- 📈 Absolute imports with `@/` prefix
+- 📏 ESLint with auto-sort imports
+- 💖 Prettier code formatting
+- 🐶 Husky pre-commit hooks
+- 🤖 Conventional commit linting
+- 🗺️ Automatic sitemap generation
 - 🎯 Type-safe API routes
+- 🔒 Type-safe environment variables validated with Zod
+- ⚙️ Centralized API response handling
 - 📝 Comprehensive error logging
 
 ## Quick Start
@@ -88,7 +89,6 @@ pnpm wrangler d1 create heridotlife
 ```
 
 Update `wrangler.toml`:
-
 ```toml
 [[d1_databases]]
 binding = "D1_db"
@@ -109,7 +109,6 @@ pnpm wrangler d1 execute heridotlife --remote --file=migrate_data.sql
 ### 4. Configure Environment Variables
 
 Create `.env`:
-
 ```bash
 AUTH_SECRET=your-random-secret-at-least-32-characters
 ADMIN_PASSWORD=your-secure-password
@@ -120,19 +119,15 @@ ADMIN_PASSWORD=your-secure-password
 ### 5. Run Development Server
 
 **Option 1: Regular Astro dev (no D1 database access)**
-
 ```bash
 pnpm dev
 ```
-
 Open [http://localhost:4321](http://localhost:4321)
 
 **Option 2: With D1 database access (recommended for admin features)**
-
 ```bash
 pnpm dev:d1
 ```
-
 Open [http://localhost:8788](http://localhost:8788)
 
 This uses Wrangler to proxy the built app with D1 bindings. Any code changes require rebuilding.
@@ -164,7 +159,6 @@ The URL shortener now includes public category pages that allow visitors to brow
 ### Example Usage
 
 If you have a category named "General":
-
 1. Users can visit `/categories` to see all available categories
 2. Click on "General" to navigate to `/general`
 3. See all short URLs tagged with the "General" category
@@ -178,7 +172,6 @@ If you have a category named "General":
 ### How It Works
 
 The system intelligently distinguishes between category pages and short URL redirects:
-
 1. When a user visits `/{slug}`, the system first checks if it matches a category name
 2. If it's a category, it displays the category page with all links
 3. If not, it checks if it's a short URL and redirects accordingly
@@ -189,7 +182,6 @@ The system intelligently distinguishes between category pages and short URL redi
 ### Reserved Paths
 
 The following paths are reserved and cannot be used as short URL slugs:
-
 - `/admin`, `/api`, `/c`, `/categories`, `/category`, `/urls`
 
 These are automatically blocked when creating new short URLs.
@@ -283,27 +275,9 @@ pnpm wrangler pages deploy dist
 ```
 
 **Post-deployment setup:**
-
 1. Add D1 binding in Cloudflare Dashboard: `D1_db` → `heridotlife`
 2. Add environment variables: `AUTH_SECRET`, `ADMIN_PASSWORD`
 3. Redeploy
-
-## GitHub Actions & CI/CD
-
-See [GITHUB_ACTIONS.md](./GITHUB_ACTIONS.md) for complete documentation.
-
-This project includes automated workflows for:
-
-- **🔄 CI Pipeline**: Runs linting, type-checking, and builds on every push/PR
-- **🔒 Security Scanning**: CodeQL analysis runs weekly and on every push
-- **📦 Dependency Updates**: Dependabot keeps dependencies up-to-date
-- **🚀 Auto Deployment**: Deploy to Cloudflare Pages on every push to main
-
-**Setup for auto-deployment:**
-
-1. Go to repository Settings > Secrets and variables > Actions
-2. Add secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
-3. Pushes to main will automatically deploy
 
 ## Development Commands
 
@@ -317,9 +291,10 @@ pnpm build        # Build for production
 pnpm preview      # Preview production build with D1
 
 # Code quality
-pnpm type-check   # TypeScript type checking
-pnpm lint         # Run ESLint and Prettier checks
-pnpm lint:fix     # Auto-fix linting and formatting issues
+pnpm astro sync   # Regenerate TypeScript types
+pnpm typecheck    # TypeScript type checking
+pnpm lint         # ESLint checks
+pnpm format       # Format code with Prettier
 ```
 
 ### Database Commands
@@ -367,13 +342,11 @@ heridotlife/
 ## API Routes
 
 ### Public
-
 - `GET /[slug]` - Redirect short URL or display category page
 - `GET /categories` - List all public categories
 - `GET /{category-name}` - View all links in a category (if category exists)
 
 ### Admin (Protected)
-
 - `POST /api/admin/login` - Admin login
 - `POST /api/admin/logout` - Admin logout
 - `GET /api/admin/urls` - List all URLs
