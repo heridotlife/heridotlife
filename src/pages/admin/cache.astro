@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import CachePage from '../../components/admin/CachePage.tsx';
+---
+
+<AdminLayout title="Cache Management">
+  <CachePage client:load />
+</AdminLayout>
