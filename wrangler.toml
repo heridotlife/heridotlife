@@ -22,5 +22,10 @@ id = "65a1d9021c3142c0b9aaf6539c5a017d"
 
 # Environment variables
 [vars]
+# Security: Trusted hosts for preventing Host Header Injection
+# Supports wildcards (e.g., *.domain.com) for subdomain matching
+TRUSTED_HOSTS = "heri.life,www.heri.life,*.heridotlife.pages.dev"
+# Default canonical domain
+CANONICAL_DOMAIN = "heri.life"
 # Add your environment variables here
 # Use Cloudflare Dashboard for production secrets
