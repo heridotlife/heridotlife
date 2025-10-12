@@ -16,42 +16,56 @@ if (reservedPaths.includes(slug.toLowerCase())) {
 
 const db = new D1Helper(Astro.locals.runtime.env.D1_db);
 
+// Initialize variables for category rendering
+let shortUrls: any[] = [];
+let activeUrls: any[] = [];
+let pageTitle = '';
+let pageDescription = '';
+
 // Check if this is a category first
 const categoryRecord = await db.getCategoryByName(slug);
 
 if (categoryRecord) {
     // This is a category - render the category page
-    const shortUrls = await db.getShortUrlsByCategory(categoryRecord.name);
-    const activeUrls = shortUrls.filter(url => toBool(url.isActive));
+    shortUrls = await db.getShortUrlsByCategory(categoryRecord.name);
+    activeUrls = shortUrls.filter(url => toBool(url.isActive));
     
-    const pageTitle = `${categoryRecord.name} Links | ${siteConfig.title}`;
-    const pageDescription = `Browse all links in the ${categoryRecord.name} category`;
+    pageTitle = `${categoryRecord.name} Links | ${siteConfig.title}`;
+    pageDescription = `Browse all links in the ${categoryRecord.name} category`;
+    
+    // Render category page - no further processing needed
+    // The JSX below will handle the category rendering
+} else {
+    // Not a category, check if it's a short URL  
+    const shortUrlRecord = await db.findShortUrl(slug);
+
+    if (!shortUrlRecord) {
+        return Astro.redirect('/404');
+    }
+
+    const isActive = toBool(shortUrlRecord.isActive);
+    const expiresAt = shortUrlRecord.expiresAt ? toDate(shortUrlRecord.expiresAt) : null;
+
+    if (!isActive) {
+        return new Response('This short URL has been disabled', { status: 410 });
+    }
+
+    if (expiresAt && expiresAt < new Date()) {
+        return new Response('This short URL has expired', { status: 410 });
+    }
+
+    await db.incrementClickCount(slug);
+    return Astro.redirect(shortUrlRecord.originalUrl, 302);
 }
-
-// Not a category, check if it's a short URL  
-const shortUrlRecord = await db.findShortUrl(slug);
-
-if (!shortUrlRecord) {
-    return Astro.redirect('/404');
-}
-
-const isActive = toBool(shortUrlRecord.isActive);
-const expiresAt = shortUrlRecord.expiresAt ? toDate(shortUrlRecord.expiresAt) : null;
-
-if (!isActive) {
-    return new Response('This short URL has been disabled', { status: 410 });
-}
-
-if (expiresAt && expiresAt < new Date()) {
-    return new Response('This short URL has expired', { status: 410 });
-}
-
-await db.incrementClickCount(slug);
-return Astro.redirect(shortUrlRecord.originalUrl, 302);
 ---
 
 {categoryRecord ? (
-    <Layout title={pageTitle} description={pageDescription}>
+    <Layout 
+        title={pageTitle} 
+        description={pageDescription}
+        ogType="category"
+        ogCategory={categoryRecord.name}
+    >
         <main class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950 transition-colors duration-500">
             <button id="theme-toggle" class="fixed top-6 right-6 min-h-[44px] min-w-[44px] p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border border-sky-200 dark:border-sky-700 group z-50" aria-label="Toggle theme">
                 <svg id="sun-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-amber-500 group-hover:rotate-180 transition-transform duration-500"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m4.93 19.07 1.41-1.41"></path><path d="m17.66 6.34 1.41-1.41"></path></svg>
@@ -93,62 +107,46 @@ return Astro.redirect(shortUrlRecord.originalUrl, 302);
                 ) : (
                     <div class="space-y-4">
                         {activeUrls.map((url) => (
-                            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-sky-100 dark:border-sky-900 p-6 hover:shadow-xl transition-all duration-300">
-                                <div class="flex items-start justify-between gap-4">
+                            <a 
+                                href={`/${url.shortUrl}`}
+                                class="block bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-sky-100 dark:border-sky-900 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                            >
+                                <div class="flex items-start gap-4">
+                                    {/* OG Image if available */}
+                                    {url.ogImage && (
+                                        <div class="flex-shrink-0">
+                                            <img 
+                                                src={url.ogImage} 
+                                                alt={url.title || 'Link thumbnail'}
+                                                class="w-16 h-16 rounded-lg object-cover"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    )}
+                                    
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-3 mb-3">
-                                            <div class="p-2 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-lg">
-                                                <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                                </svg>
-                                            </div>
+                                            {!url.ogImage && (
+                                                <div class="p-2 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-lg">
+                                                    <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                                    </svg>
+                                                </div>
+                                            )}
                                             <div class="flex-1 min-w-0">
-                                                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate-2-lines">
+                                                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate-2-lines mb-1">
                                                     {url.title || 'Untitled Link'}
                                                 </h3>
-                                                <p class="text-sm text-sky-600 dark:text-sky-400 truncate">
-                                                    {siteConfig.url}/{url.slug}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                                </svg>
-                                                <span class="url-display">{url.originalUrl}</span>
-                                            </div>
-                                            <div class="flex items-center gap-4">
-                                                <div class="flex items-center gap-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                    </svg>
-                                                    <span>{url.clickCount || 0} clicks</span>
-                                                </div>
-                                                {url.createdAt && (
-                                                    <div class="flex items-center gap-1">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        <span>Created {new Date(url.createdAt).toLocaleDateString()}</span>
-                                                    </div>
+                                                {url.description && (
+                                                    <p class="text-sm text-slate-600 dark:text-slate-400 truncate-2-lines">
+                                                        {url.description}
+                                                    </p>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <a 
-                                        href={`/${url.slug}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="flex-shrink-0 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
-                                    >
-                                        Visit
-                                    </a>
                                 </div>
-                            </div>
+                            </a>
                         ))}
                     </div>
                 )}
