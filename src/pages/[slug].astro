@@ -40,7 +40,7 @@ if (categoryRecord) {
     const shortUrlRecord = await db.findShortUrl(slug);
 
     if (!shortUrlRecord) {
-        return Astro.redirect('/404');
+        return Astro.redirect('/categories');
     }
 
     const isActive = toBool(shortUrlRecord.isActive);
