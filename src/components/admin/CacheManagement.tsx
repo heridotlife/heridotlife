@@ -1,7 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+
+interface TTLConfig {
+  shortTerm: number;
+  mediumTerm: number;
+  longTerm: number;
+  urlLookup: number;
+  adminStats: number;
+}
 
 interface CacheStats {
   hits: number;
@@ -19,6 +27,14 @@ interface CacheResponse {
 export default function CacheManagement() {
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showTTLConfig, setShowTTLConfig] = useState(false);
+  const [ttlConfig, setTTLConfig] = useState<TTLConfig>({
+    shortTerm: 300,    // 5 minutes
+    mediumTerm: 3600,  // 1 hour
+    longTerm: 86400,   // 24 hours
+    urlLookup: 86400, // 24 hours
+    adminStats: 1800  // 30 minutes
+  });
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -74,6 +90,56 @@ export default function CacheManagement() {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const updateTTLConfig = async () => {
+    try {
+      setActionLoading('set_ttl_config');
+      setError(null);
+      setSuccessMessage(null);
+
+      const response = await fetch('/api/admin/cache', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'set_ttl_config',
+          ttlConfig 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update TTL configuration');
+      }
+
+      const data: CacheResponse = await response.json();
+      setSuccessMessage(data.message || 'TTL configuration updated successfully');
+      setShowTTLConfig(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update TTL configuration');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const loadCurrentTTLConfig = async () => {
+    try {
+      const response = await fetch('/api/admin/cache?action=get_ttl_config');
+      if (response.ok) {
+        const data = await response.json() as { ttlConfig?: TTLConfig };
+        if (data.ttlConfig) {
+          setTTLConfig(data.ttlConfig);
+        }
+      }
+    } catch (err) {
+      console.warn('Could not load current TTL config:', err);
+    }
+  };
+
+  const handleTTLConfigShow = () => {
+    setShowTTLConfig(true);
+    loadCurrentTTLConfig();
   };
 
   const getActionLabel = (action: string): string => {
@@ -207,6 +273,138 @@ export default function CacheManagement() {
             </Button>
           </div>
         ))}
+
+        {/* TTL Configuration Section */}
+        <div className="p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg border border-sky-100 dark:border-sky-800">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="text-body-md font-medium text-sky-900 dark:text-sky-100">
+                TTL Configuration
+              </div>
+              <div className="text-body-sm text-sky-600 dark:text-sky-400 mt-1">
+                Configure cache time-to-live settings for different cache layers
+              </div>
+            </div>
+            <Button
+              onClick={handleTTLConfigShow}
+              disabled={showTTLConfig}
+              variant="secondary"
+              size="sm"
+              className="ml-4"
+            >
+              {showTTLConfig ? 'Editing...' : 'Configure TTL'}
+            </Button>
+          </div>
+
+          {showTTLConfig && (
+            <div className="mt-4 space-y-4 border-t border-sky-200 dark:border-sky-700 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                    Short Cache (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    value={ttlConfig.shortTerm}
+                    onChange={(e) => setTTLConfig(prev => ({ ...prev, shortTerm: parseInt(e.target.value) || 300 }))}
+                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    min="60"
+                    max="3600"
+                  />
+                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                    For frequently changing data (60s - 1hr)
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                    Medium Cache (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    value={ttlConfig.mediumTerm}
+                    onChange={(e) => setTTLConfig(prev => ({ ...prev, mediumTerm: parseInt(e.target.value) || 3600 }))}
+                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    min="300"
+                    max="86400"
+                  />
+                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                    For moderately changing data (5min - 24hr)
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                    Long Cache (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    value={ttlConfig.longTerm}
+                    onChange={(e) => setTTLConfig(prev => ({ ...prev, longTerm: parseInt(e.target.value) || 86400 }))}
+                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    min="3600"
+                    max="604800"
+                  />
+                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                    For stable data (1hr - 7 days)
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                    URL Lookup Cache (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    value={ttlConfig.urlLookup}
+                    onChange={(e) => setTTLConfig(prev => ({ ...prev, urlLookup: parseInt(e.target.value) || 86400 }))}
+                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    min="3600"
+                    max="604800"
+                  />
+                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                    For URL slug lookups (1hr - 7 days)
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                    Admin Stats Cache (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    value={ttlConfig.adminStats}
+                    onChange={(e) => setTTLConfig(prev => ({ ...prev, adminStats: parseInt(e.target.value) || 1800 }))}
+                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    min="60"
+                    max="3600"
+                  />
+                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                    For admin dashboard statistics (1min - 1hr)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4 border-t border-sky-200 dark:border-sky-700">
+                <Button
+                  onClick={() => setShowTTLConfig(false)}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={updateTTLConfig}
+                  disabled={actionLoading === 'set_ttl_config'}
+                  variant="primary"
+                  size="sm"
+                >
+                  {actionLoading === 'set_ttl_config' ? 'Updating...' : 'Update TTL Config'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Last Updated */}

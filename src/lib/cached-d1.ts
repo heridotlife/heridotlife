@@ -18,7 +18,7 @@ export class CachedD1Helper extends D1Helper {
     return await this.cache.urlLookup.getOrSet(
       CacheKeys.url(shortUrl),
       () => super.findShortUrl(shortUrl),
-      { ttl: 7200 } // 2 hours TTL for URL lookups
+      { ttl: 86400 } // 24 hours TTL for URL lookups
     );
   }
 
@@ -36,16 +36,16 @@ export class CachedD1Helper extends D1Helper {
     return await this.cache.longTerm.getOrSet(
       CacheKeys.categories(),
       () => super.getAllCategories(),
-      { ttl: 3600 } // 1 hour TTL for categories
+      { ttl: 86400 } // 24 hours TTL for categories
     );
   }
 
   // Override getCategoryByName with caching
   async getCategoryByName(name: string): Promise<Category | null> {
-    return await this.cache.mediumTerm.getOrSet(
+    return await this.cache.longTerm.getOrSet(
       `category:name:${name.toLowerCase()}`,
       () => super.getCategoryByName(name),
-      { ttl: 3600 } // 1 hour TTL
+      { ttl: 86400 } // 24 hours TTL for individual categories
     );
   }
 
@@ -55,10 +55,10 @@ export class CachedD1Helper extends D1Helper {
     const category = await this.getCategoryByName(categoryName);
     if (!category) return [];
 
-    return await this.cache.mediumTerm.getOrSet(
+    return await this.cache.longTerm.getOrSet(
       CacheKeys.categoryUrls(category.id),
       () => super.getShortUrlsByCategory(categoryName),
-      { ttl: 1800 } // 30 minutes TTL for category URLs
+      { ttl: 86400 } // 24 hours TTL for category URLs
     );
   }
 

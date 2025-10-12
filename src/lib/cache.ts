@@ -180,8 +180,8 @@ export const createCacheInstances = (kv: KVNamespace) => ({
   // Long-term cache for static data
   longTerm: new KVCache(kv, { ttl: 86400, prefix: 'long' }), // 24 hours
   
-  // URL lookup cache with optimized TTL
-  urlLookup: new KVCache(kv, { ttl: 7200, prefix: 'url' }), // 2 hours
+  // URL lookup cache with extended TTL for better performance
+  urlLookup: new KVCache(kv, { ttl: 86400, prefix: 'url' }), // 24 hours
   
   // Admin stats cache (refreshed less frequently)
   adminStats: new KVCache(kv, { ttl: 1800, prefix: 'stats' }), // 30 minutes
