@@ -9,6 +9,11 @@ export interface HostValidationOptions {
   strictMode: boolean;
 }
 
+interface CloudflareEnv {
+  DEFAULT_ALLOWED_HOSTS?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Default trusted hosts - fallback when environment variables are not available
  * In production, these should be overridden by TRUSTED_HOSTS environment variable
@@ -47,7 +52,7 @@ function matchesHostPattern(host: string, pattern: string): boolean {
 /**
  * Get the list of allowed/trusted hosts from environment or defaults
  */
-function getAllowedHosts(env?: any): string[] {
+function getAllowedHosts(env?: CloudflareEnv): string[] {
   let allowedHosts = [...DEFAULT_ALLOWED_HOSTS];
 
   // Try to load from environment variables (Cloudflare secrets or .env)
@@ -55,7 +60,7 @@ function getAllowedHosts(env?: any): string[] {
   const trustedHostsEnv =
     env?.TRUSTED_HOSTS || (typeof process !== 'undefined' ? process.env?.TRUSTED_HOSTS : null);
 
-  if (trustedHostsEnv) {
+  if (trustedHostsEnv && typeof trustedHostsEnv === 'string') {
     const envHosts = trustedHostsEnv
       .split(',')
       .map((host: string) => host.trim())
@@ -74,7 +79,7 @@ function getAllowedHosts(env?: any): string[] {
 /**
  * Validate if a host is in the allowed list (supports wildcards)
  */
-export function isHostAllowed(host: string, env?: any): boolean {
+export function isHostAllowed(host: string, env?: CloudflareEnv): boolean {
   const allowedHosts = getAllowedHosts(env);
   const normalizedHost = host.toLowerCase().trim();
 
@@ -90,20 +95,24 @@ export function sanitizeHost(
   hostHeader: string | null,
   xForwardedHost: string | null,
   defaultHost: string = 'heri.life',
-  env?: any
+  env?: CloudflareEnv
 ): string {
   // Use canonical domain from environment if available
-  const canonicalDomain = env?.CANONICAL_DOMAIN || defaultHost;
+  const canonicalDomain =
+    typeof env?.CANONICAL_DOMAIN === 'string' ? env.CANONICAL_DOMAIN : defaultHost;
 
   // Priority: Host header, then X-Forwarded-Host, then default
   const candidateHost = hostHeader || xForwardedHost || canonicalDomain;
 
   // Remove any potentially malicious characters
-  const cleanHost = candidateHost
-    .split(',')[0] // Take first host if comma-separated
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9.-:]/g, ''); // Only allow valid hostname characters
+  const cleanHost =
+    typeof candidateHost === 'string'
+      ? candidateHost
+          .split(',')[0] // Take first host if comma-separated
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9.-:]/g, '') // Only allow valid hostname characters
+      : '';
 
   // Validate against allowed hosts
   if (isHostAllowed(cleanHost, env)) {
@@ -124,10 +133,11 @@ export function sanitizeHost(
 /**
  * Create a safe URL using validated host
  */
-export function createSafeUrl(request: Request, pathname: string = '', env?: any): URL {
+export function createSafeUrl(request: Request, pathname: string = '', env?: CloudflareEnv): URL {
   const hostHeader = request.headers.get('host');
   const xForwardedHost = request.headers.get('x-forwarded-host');
-  const defaultHost = env?.CANONICAL_DOMAIN || 'heri.life';
+  const defaultHost =
+    typeof env?.CANONICAL_DOMAIN === 'string' ? env.CANONICAL_DOMAIN : 'heri.life';
 
   const safeHost = sanitizeHost(hostHeader, xForwardedHost, defaultHost, env);
 
@@ -141,7 +151,11 @@ export function createSafeUrl(request: Request, pathname: string = '', env?: any
 /**
  * Get safe canonical URL for SEO meta tags
  */
-export function getSafeCanonicalUrl(request: Request, pathname: string, env?: any): string {
+export function getSafeCanonicalUrl(
+  request: Request,
+  pathname: string,
+  env?: CloudflareEnv
+): string {
   const safeUrl = createSafeUrl(request, pathname, env);
   return safeUrl.href;
 }
@@ -151,7 +165,7 @@ export function getSafeCanonicalUrl(request: Request, pathname: string, env?: an
  */
 export function validateHostMiddleware(
   request: Request,
-  env?: any
+  env?: CloudflareEnv
 ): { valid: boolean; response?: Response } {
   const hostHeader = request.headers.get('host');
   const xForwardedHost = request.headers.get('x-forwarded-host');
@@ -191,7 +205,7 @@ export function validateHostMiddleware(
 /**
  * Extract and validate origin for CORS checks
  */
-export function validateOrigin(request: Request, env?: any): string | null {
+export function validateOrigin(request: Request, env?: CloudflareEnv): string | null {
   const origin = request.headers.get('origin');
   if (!origin) return null;
 
@@ -200,7 +214,7 @@ export function validateOrigin(request: Request, env?: any): string | null {
     if (isHostAllowed(url.host, env)) {
       return origin;
     }
-  } catch (e) {
+  } catch {
     console.warn('[Security] Invalid origin header:', origin);
   }
 

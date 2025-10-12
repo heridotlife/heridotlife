@@ -4,16 +4,27 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'monday'
+      interval: 'daily' # Check daily for security updates
       time: '09:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 15
+    # Prioritize security updates
+    allow:
+      - dependency-type: 'all'
     groups:
+      # Group security updates with high priority
+      security-updates:
+        patterns:
+          - '*'
+        update-types:
+          - 'security'
       # Group Astro and related packages
       astro:
         patterns:
           - 'astro*'
           - '@astrojs/*'
+        update-types:
+          - 'minor'
+          - 'patch'
       # Group dev dependencies
       dev-dependencies:
         dependency-type: 'development'
@@ -29,6 +40,13 @@ updates:
     labels:
       - 'dependencies'
       - 'automated'
+    # Auto-approve security patches for known safe packages
+    reviewers:
+      - 'heridotlife'
+    commit-message:
+      prefix: 'chore'
+      prefix-development: 'chore'
+      include: 'scope'
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: 'github-actions'
@@ -41,3 +59,6 @@ updates:
       - 'dependencies'
       - 'github-actions'
       - 'automated'
+    commit-message:
+      prefix: 'ci'
+      include: 'scope'

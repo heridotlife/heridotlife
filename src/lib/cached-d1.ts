@@ -1,14 +1,14 @@
 import { D1Helper, type ShortUrl, type Category } from './d1';
 import { createCacheInstances, CacheKeys, type CacheInstances } from './cache';
-import type { KVNamespace } from '@cloudflare/workers-types';
+import type { KVNamespace, D1Database } from '@cloudflare/workers-types';
+
+// Re-export types for convenience
+export type { ShortUrl, Category };
 
 export class CachedD1Helper extends D1Helper {
   private cache: CacheInstances;
 
-  constructor(
-    db: any, // D1Database
-    kv: KVNamespace
-  ) {
+  constructor(db: D1Database, kv: KVNamespace) {
     super(db);
     this.cache = createCacheInstances(kv);
   }
@@ -276,9 +276,6 @@ export class CachedD1Helper extends D1Helper {
 }
 
 // Helper function to create cached D1 helper instance
-export function createCachedD1Helper(
-  db: any, // D1Database
-  kv: KVNamespace
-): CachedD1Helper {
+export function createCachedD1Helper(db: D1Database, kv: KVNamespace): CachedD1Helper {
   return new CachedD1Helper(db, kv);
 }

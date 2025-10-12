@@ -14,6 +14,7 @@ export const GET: APIRoute = async (context) => {
     // Use cached D1 helper for better performance
     const db = createCachedD1Helper(
       context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.runtime.env.heridotlife_kv as any
     );
 
@@ -49,6 +50,7 @@ export const POST: APIRoute = async (context) => {
     // Use cached D1 helper (will auto-invalidate category caches)
     const db = createCachedD1Helper(
       context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.runtime.env.heridotlife_kv as any
     );
 

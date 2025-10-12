@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { createCachedD1Helper } from '../lib/cached-d1';
+import { createCachedD1Helper, type ShortUrl } from '../lib/cached-d1';
 import { toBool, toDate } from '../lib/d1';
 import { siteConfig } from '../consts';
 
@@ -18,12 +18,13 @@ if (reservedPaths.includes(slug.toLowerCase())) {
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
     Astro.locals.runtime.env.D1_db,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Astro.locals.runtime.env.heridotlife_kv as any
 );
 
 // Initialize variables for category rendering
-let shortUrls: any[] = [];
-let activeUrls: any[] = [];
+let shortUrls: ShortUrl[] = [];
+let activeUrls: ShortUrl[] = [];
 let pageTitle = '';
 let pageDescription = '';
 

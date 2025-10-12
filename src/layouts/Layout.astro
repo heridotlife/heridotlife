@@ -127,7 +127,7 @@ const ogImageUrl =
             }
           });
           lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (_e) {
+        } catch {
           // Performance API not available
         }
 
@@ -145,7 +145,7 @@ const ogImageUrl =
             }
           });
           observer.observe({ type: 'paint', buffered: true });
-        } catch (_e) {
+        } catch {
           // Performance API not available
         }
       }

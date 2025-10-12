@@ -22,6 +22,7 @@ const DEFAULT_TTL_CONFIG: TTLConfig = {
 // Store TTL config in KV (with a special key)
 const TTL_CONFIG_KEY = 'admin:cache:ttl_config';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getTTLConfig(kv: any): Promise<TTLConfig> {
   try {
     const cached = await kv.get(TTL_CONFIG_KEY);
@@ -32,6 +33,7 @@ async function getTTLConfig(kv: any): Promise<TTLConfig> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function setTTLConfig(kv: any, config: TTLConfig): Promise<void> {
   try {
     await kv.put(TTL_CONFIG_KEY, JSON.stringify(config));
@@ -50,6 +52,7 @@ export const POST: APIRoute = async (context) => {
 
     const db = createCachedD1Helper(
       context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.runtime.env.heridotlife_kv as any
     );
 
@@ -87,7 +90,7 @@ export const POST: APIRoute = async (context) => {
           { status: 200 }
         );
 
-      case 'get_stats':
+      case 'get_stats': {
         const stats = await db.getCacheStats();
         return new Response(
           JSON.stringify({
@@ -96,8 +99,9 @@ export const POST: APIRoute = async (context) => {
           }),
           { status: 200 }
         );
+      }
 
-      case 'get_ttl_config':
+      case 'get_ttl_config': {
         const ttlConfig = await getTTLConfig(context.locals.runtime.env.heridotlife_kv);
         return new Response(
           JSON.stringify({
@@ -106,8 +110,9 @@ export const POST: APIRoute = async (context) => {
           }),
           { status: 200 }
         );
+      }
 
-      case 'set_ttl_config':
+      case 'set_ttl_config': {
         const requestWithTTL = requestBody as { action: string; ttlConfig?: TTLConfig };
         const { ttlConfig: newTTLConfig } = requestWithTTL;
 
@@ -155,6 +160,7 @@ export const POST: APIRoute = async (context) => {
           }),
           { status: 200 }
         );
+      }
 
       default:
         return new Response(
@@ -189,6 +195,7 @@ export const GET: APIRoute = async (context) => {
 
     const db = createCachedD1Helper(
       context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       context.locals.runtime.env.heridotlife_kv as any
     );
 

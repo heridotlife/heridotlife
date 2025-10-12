@@ -1,0 +1,87 @@
+name: 'CodeQL Security Configuration'
+
+queries:
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+
+paths:
+  - src/
+  - lib/
+
+paths-ignore:
+  - node_modules/
+  - dist/
+  - build/
+  - .next/
+  - coverage/
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - '**/*.d.ts'
+  - '**/tests/'
+  - '**/__tests__/'
+
+# Include additional security-focused queries
+query-filters:
+  - include:
+      kind:
+        - problem
+        - path-problem
+      severity:
+        - error
+        - warning
+        - note
+      security-severity:
+        - critical
+        - high
+        - medium
+        - low
+
+# Custom security rules configuration
+disable-default-queries: false
+
+# Language-specific configurations
+languages:
+  javascript-typescript:
+    # Enable all security-related queries
+    queries:
+      - security-extended
+      - security-and-quality
+
+    # Additional configuration for TypeScript/JavaScript
+    config:
+      # Enable strict mode analysis
+      strict: true
+
+      # Security-focused analysis
+      security:
+        # SQL injection detection
+        sql-injection: true
+        # XSS detection
+        xss: true
+        # Command injection detection
+        command-injection: true
+        # Path traversal detection
+        path-traversal: true
+        # Insecure random detection
+        insecure-randomness: true
+        # Hardcoded credentials detection
+        hardcoded-credentials: true
+        # Unsafe deserialization detection
+        unsafe-deserialization: true
+
+# Performance tuning
+timeout: 120
+
+# Exclude common false positives for this project type
+exclude:
+  # Astro framework specific exclusions
+  - 'astro:*'
+  # Development dependencies
+  - '**/dev-dependencies/*'
+  # Build artifacts
+  - '**/dist/*'
+  - '**/build/*'

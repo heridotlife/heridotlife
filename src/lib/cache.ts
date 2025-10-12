@@ -9,7 +9,7 @@ export interface CacheOptions {
   prefix?: string;
 }
 
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   data: T;
   timestamp: number;
   ttl: number;
@@ -32,7 +32,7 @@ export class KVCache {
   /**
    * Get a cached value
    */
-  async get<T = any>(key: string, options: CacheOptions = {}): Promise<T | null> {
+  async get<T = unknown>(key: string, options: CacheOptions = {}): Promise<T | null> {
     const opts = { ...this.defaultOptions, ...options };
     const cacheKey = this.generateKey(key, opts.prefix);
 
@@ -64,7 +64,7 @@ export class KVCache {
   /**
    * Set a cached value
    */
-  async set<T = any>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
+  async set<T = unknown>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
     const opts = { ttl: 3600, json: true, ...this.defaultOptions, ...options };
     const cacheKey = this.generateKey(key, opts.prefix);
 
@@ -109,7 +109,7 @@ export class KVCache {
   /**
    * Get or set pattern - fetch from cache or execute function and cache result
    */
-  async getOrSet<T = any>(
+  async getOrSet<T = unknown>(
     key: string,
     fetchFunction: () => Promise<T>,
     options: CacheOptions = {}
