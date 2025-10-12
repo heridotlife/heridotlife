@@ -15,7 +15,7 @@ export const GET: APIRoute = async (context) => {
     // Convert timestamps to Date objects for recentClicks
     const statsWithDates = {
       ...stats,
-      recentClicks: stats.recentClicks.map(click => ({
+      recentClicks: stats.recentClicks.map((click) => ({
         ...click,
         latestClick: click.latestClick ? toDate(click.latestClick) : null,
       })),
@@ -26,4 +26,4 @@ export const GET: APIRoute = async (context) => {
     console.error('Error fetching admin stats', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
+};

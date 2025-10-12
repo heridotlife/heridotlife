@@ -20,10 +20,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
-    const baseClasses = [
-      'rounded-xl',
-      'transition-all duration-300',
-    ];
+    const baseClasses = ['rounded-xl', 'transition-all duration-300'];
 
     // Variant styles
     const variantClasses = {
@@ -60,7 +57,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 
     // Interactive states
     const interactiveClasses = [];
-    
+
     if (hoverable || clickable) {
       interactiveClasses.push(
         'hover:shadow-xl',
@@ -93,7 +90,11 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 
     if (clickable) {
       return (
-        <button ref={ref as React.ForwardedRef<HTMLButtonElement>} className={classes} {...props as React.ButtonHTMLAttributes<HTMLButtonElement>}>
+        <button
+          ref={ref as React.ForwardedRef<HTMLButtonElement>}
+          className={classes}
+          {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        >
           {children}
         </button>
       );
@@ -112,11 +113,7 @@ Card.displayName = 'Card';
 // Card sub-components for better structure
 const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className = '', children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={`mb-4 ${className}`}
-      {...props}
-    >
+    <div ref={ref} className={`mb-4 ${className}`} {...props}>
       {children}
     </div>
   )
@@ -140,11 +137,7 @@ CardTitle.displayName = 'CardTitle';
 
 const CardContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className = '', children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={`text-slate-600 dark:text-slate-400 ${className}`}
-      {...props}
-    >
+    <div ref={ref} className={`text-slate-600 dark:text-slate-400 ${className}`} {...props}>
       {children}
     </div>
   )

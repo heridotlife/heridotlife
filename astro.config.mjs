@@ -7,19 +7,22 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
-    mode: 'directory'
+    mode: 'directory',
   }),
   integrations: [tailwind(), react()],
   // Note: Image optimization is disabled in server mode on Cloudflare Pages
   // The adapter automatically switches to 'noop' service for compatibility
   image: {
     service: {
-      entrypoint: 'astro/assets/services/noop'
-    }
+      entrypoint: 'astro/assets/services/noop',
+    },
   },
   vite: {
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      'process.env.NODE_ENV': JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.NODE_ENV ?? 'development'
+      ),
     },
     build: {
       cssCodeSplit: true,
@@ -32,11 +35,11 @@ export default defineConfig({
             'ui-components': [
               './src/components/ui/Button.tsx',
               './src/components/ui/Input.tsx',
-              './src/components/ui/Card.tsx'
-            ]
-          }
-        }
-      }
-    }
-  }
+              './src/components/ui/Card.tsx',
+            ],
+          },
+        },
+      },
+    },
+  },
 });

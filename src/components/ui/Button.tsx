@@ -103,12 +103,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }[size];
 
     return (
-      <button
-        ref={ref}
-        className={classes}
-        disabled={disabled || loading}
-        {...props}
-      >
+      <button ref={ref} className={classes} disabled={disabled || loading} {...props}>
         {loading ? (
           <>
             <svg

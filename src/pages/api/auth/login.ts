@@ -8,10 +8,10 @@ export const POST: APIRoute = async (context) => {
     const validation = loginSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(
-        validation.error.flatten().fieldErrors,
-      )[0]?.[0];
-      return new Response(JSON.stringify({ error: errorMessage || 'Invalid input.' }), { status: 400 });
+      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      return new Response(JSON.stringify({ error: errorMessage || 'Invalid input.' }), {
+        status: 400,
+      });
     }
 
     const { password } = validation.data;
@@ -23,7 +23,6 @@ export const POST: APIRoute = async (context) => {
     await createSession(context);
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
-
   } catch (error) {
     console.error('Admin login failed', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
