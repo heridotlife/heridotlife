@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
 
 interface Category {
   id: number;
@@ -116,64 +118,45 @@ export default function URLForm({ urlId }: URLFormProps) {
       )}
 
       <div>
-        <label
-          htmlFor='slug'
-          className='block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2'
-        >
-          Short URL Slug *
-        </label>
-        <div className='flex items-center'>
-          <span className='text-sky-600 dark:text-sky-400 mr-1'>/</span>
-          <input
+        <div className='flex items-center gap-2'>
+          <span className='text-sky-600 dark:text-sky-400'>/</span>
+          <Input
             id='slug'
+            label='Short URL Slug'
             type='text'
             value={formData.slug}
             onChange={(e) =>
               setFormData({ ...formData, slug: e.target.value })
             }
-            className='flex-1 px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
             placeholder='my-link'
             required
+            fullWidth
           />
         </div>
       </div>
 
-      <div>
-        <label
-          htmlFor='originalUrl'
-          className='block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2'
-        >
-          Original URL *
-        </label>
-        <input
-          id='originalUrl'
-          type='url'
-          value={formData.originalUrl}
-          onChange={(e) =>
-            setFormData({ ...formData, originalUrl: e.target.value })
-          }
-          className='w-full px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
-          placeholder='https://example.com'
-          required
-        />
-      </div>
+      <Input
+        id='originalUrl'
+        label='Original URL'
+        type='url'
+        value={formData.originalUrl}
+        onChange={(e) =>
+          setFormData({ ...formData, originalUrl: e.target.value })
+        }
+        placeholder='https://example.com'
+        required
+        fullWidth
+      />
 
-      <div>
-        <label
-          htmlFor='title'
-          className='block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2'
-        >
-          Title (Optional)
-        </label>
-        <input
-          id='title'
-          type='text'
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className='w-full px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
-          placeholder='Descriptive title'
-        />
-      </div>
+      <Input
+        id='title'
+        label='Title (Optional)'
+        type='text'
+        value={formData.title}
+        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        placeholder='Descriptive title'
+        fullWidth
+      />
 
       {categories.length > 0 && (
         <div>
@@ -182,18 +165,15 @@ export default function URLForm({ urlId }: URLFormProps) {
           </label>
           <div className='flex flex-wrap gap-2'>
             {categories.map((category) => (
-              <button
+              <Button
                 key={category.id}
                 type='button'
+                variant={formData.categoryIds.includes(category.id) ? 'primary' : 'secondary'}
+                size='sm'
                 onClick={() => handleCategoryToggle(category.id)}
-                className={`min-h-[44px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.categoryIds.includes(category.id)
-                    ? 'bg-sky-500 dark:bg-sky-600 text-white'
-                    : 'bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800'
-                }`}
               >
                 {category.name}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -206,14 +186,14 @@ export default function URLForm({ urlId }: URLFormProps) {
         >
           Expires At (Optional)
         </label>
-        <input
+        <Input
           id='expiresAt'
           type='datetime-local'
           value={formData.expiresAt}
           onChange={(e) =>
             setFormData({ ...formData, expiresAt: e.target.value })
           }
-          className='w-full px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
+          fullWidth
         />
       </div>
 
@@ -236,20 +216,24 @@ export default function URLForm({ urlId }: URLFormProps) {
       </div>
 
       <div className='flex gap-4'>
-        <button
+        <Button
           type='submit'
-          disabled={loading}
-          className='flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
+          variant='primary'
+          size='lg'
+          loading={loading}
+          fullWidth
         >
-          {loading ? 'Saving...' : urlId ? 'Update URL' : 'Create URL'}
-        </button>
-        <button
+          {urlId ? 'Update URL' : 'Create URL'}
+        </Button>
+        <Button
           type='button'
+          variant='outline'
+          size='lg'
           onClick={() => (window.location.href = '/admin/urls')}
-          className='flex-1 px-6 py-3 rounded-lg border border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 font-medium hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors duration-200'
+          fullWidth
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

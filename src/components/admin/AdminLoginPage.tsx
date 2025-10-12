@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
@@ -65,15 +67,15 @@ export default function AdminLoginPage() {
                 >
                   Password
                 </label>
-                <input
+                <Input
                   id='password'
                   type='password'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='w-full px-4 py-3 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors duration-200'
                   placeholder='Enter admin password'
                   required
                   autoFocus
+                  fullWidth
                 />
               </div>
 
@@ -83,13 +85,17 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              <button
+              <Button
                 type='submit'
                 disabled={loading}
-                className='w-full px-6 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
+                variant='primary'
+                size='lg'
+                className='bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
+                fullWidth
+                loading={loading}
               >
                 {loading ? 'Signing in...' : 'Sign In'}
-              </button>
+              </Button>
             </form>
           </div>
 

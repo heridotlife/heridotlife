@@ -31,6 +31,7 @@ A modern personal website featuring:
 - 🔗 Custom short URL slugs
 - 📊 Click tracking and analytics
 - 🏷️ Category organization
+- 🌐 Public category pages (browse links by category)
 - ⏰ Optional URL expiration
 - 🔄 Active/Inactive URL toggle
 - 📈 Click count per URL and category
@@ -136,6 +137,54 @@ This uses Wrangler to proxy the built app with D1 bindings. Any code changes req
 ### 6. Access Admin Dashboard
 
 Navigate to [http://localhost:4321/admin](http://localhost:4321/admin) and login with your `ADMIN_PASSWORD`.
+
+## Public Category Pages
+
+The URL shortener now includes public category pages that allow visitors to browse links by category without authentication.
+
+### Available Routes
+
+- **All Categories**: `/categories` - Lists all categories that have active links
+- **Category Links**: `/{category-name}` - Shows all links in a specific category (e.g., `/general`, `/social`)
+
+### Features
+
+- 🏷️ Browse links organized by category
+- 📊 View click counts for each link
+- 🔗 Direct access to short URLs
+- 🌙 Dark mode support
+- 📱 Fully responsive design
+- 👁️ Only shows active (non-expired) links
+
+### Example Usage
+
+If you have a category named "General":
+1. Users can visit `/categories` to see all available categories
+2. Click on "General" to navigate to `/general`
+3. See all short URLs tagged with the "General" category
+4. Each link displays:
+   - Title (if provided)
+   - Short URL (e.g., `heri.life/gh`)
+   - Original URL destination
+   - Number of clicks
+   - Creation date
+
+### How It Works
+
+The system intelligently distinguishes between category pages and short URL redirects:
+1. When a user visits `/{slug}`, the system first checks if it matches a category name
+2. If it's a category, it displays the category page with all links
+3. If not, it checks if it's a short URL and redirects accordingly
+4. This means categories take precedence over short URLs with the same name
+
+**Best Practice**: Avoid creating short URLs with the same slug as your category names to prevent conflicts.
+
+### Reserved Paths
+
+The following paths are reserved and cannot be used as short URL slugs:
+- `/admin`, `/api`, `/c`, `/categories`, `/category`, `/urls`
+
+These are automatically blocked when creating new short URLs.
 
 ## Database Schema
 
@@ -293,7 +342,9 @@ heridotlife/
 ## API Routes
 
 ### Public
-- `GET /[slug]` - Redirect short URL
+- `GET /[slug]` - Redirect short URL or display category page
+- `GET /categories` - List all public categories
+- `GET /{category-name}` - View all links in a category (if category exists)
 
 ### Admin (Protected)
 - `POST /api/admin/login` - Admin login

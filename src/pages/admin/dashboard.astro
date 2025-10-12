@@ -4,5 +4,5 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="Dashboard">
-  <DashboardPage client:load />
+  <DashboardPage client:only="react" />
 </AdminLayout>

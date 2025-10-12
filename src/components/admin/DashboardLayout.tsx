@@ -1,7 +1,8 @@
 'use client';
 
-import { LogOut, Menu, Moon, Sun, X } from 'lucide-react';
+import { LogOut, Menu, Moon, Sun, X } from '../ui/icons';
 import { useEffect, useState } from 'react';
+import Button from '../ui/Button';
 
 function DashboardLayout({ children, pathname }: { children: React.ReactNode, pathname: string }) {
   const [isDark, setIsDark] = useState(false);
@@ -109,17 +110,14 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
             {/* Right Side - Desktop Actions */}
             <div className='hidden md:flex items-center space-x-4'>
               {/* Theme Toggle */}
-              <button
+              <Button
                 onClick={toggleTheme}
-                className='min-h-[44px] min-w-[44px] p-2 rounded-full bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 transition-colors duration-200'
-                aria-label='Toggle theme'
-              >
-                {isDark ? (
-                  <Sun className='w-5 h-5 text-amber-500' />
-                ) : (
-                  <Moon className='w-5 h-5 text-sky-600' />
-                )}
-              </button>
+                variant='ghost'
+                size='md'
+                icon={isDark ? Sun : Moon}
+                className='min-h-[44px] min-w-[44px] p-2 text-amber-500 dark:text-sky-600'
+                title='Toggle theme'
+              />
 
               {/* User Info */}
               <div className='text-sm text-sky-700 dark:text-sky-300'>
@@ -127,42 +125,38 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
               </div>
 
               {/* Logout Button */}
-              <button
+              <Button
                 onClick={handleLogout}
-                className='flex items-center space-x-2 min-h-[44px] px-4 py-2 rounded-md bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg'
+                variant='primary'
+                size='md'
+                icon={LogOut}
+                className='min-h-[44px] bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 shadow-md hover:shadow-lg'
               >
-                <LogOut className='w-4 h-4' />
-                <span>Logout</span>
-              </button>
+                Logout
+              </Button>
             </div>
 
             {/* Mobile Menu Button */}
             <div className='md:hidden flex items-center space-x-2'>
               {/* Mobile Theme Toggle */}
-              <button
+              <Button
                 onClick={toggleTheme}
-                className='min-h-[44px] min-w-[44px] p-2 rounded-full bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 transition-colors duration-200'
-                aria-label='Toggle theme'
-              >
-                {isDark ? (
-                  <Sun className='w-5 h-5 text-amber-500' />
-                ) : (
-                  <Moon className='w-5 h-5 text-sky-600' />
-                )}
-              </button>
+                variant='ghost'
+                size='md'
+                icon={isDark ? Sun : Moon}
+                className='min-h-[44px] min-w-[44px] p-2 text-amber-500 dark:text-sky-600'
+                title='Toggle theme'
+              />
 
               {/* Hamburger Menu Button */}
-              <button
+              <Button
                 onClick={toggleMobileMenu}
-                className='mobile-menu-button min-h-[44px] min-w-[44px] p-2 rounded-md text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors duration-200'
-                aria-label='Toggle menu'
-              >
-                {isMobileMenuOpen ? (
-                  <X className='w-6 h-6' />
-                ) : (
-                  <Menu className='w-6 h-6' />
-                )}
-              </button>
+                variant='ghost'
+                size='md'
+                icon={isMobileMenuOpen ? X : Menu}
+                className='mobile-menu-button min-h-[44px] min-w-[44px] p-2 text-sky-600 dark:text-sky-400'
+                title='Toggle menu'
+              />
             </div>
           </div>
         </div>
@@ -194,16 +188,19 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode, pa
             </div>
             
             {/* Mobile Logout Button */}
-            <button
+            <Button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 handleLogout();
               }}
-              className='w-full flex items-center justify-center space-x-2 min-h-[44px] px-4 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg'
+              variant='primary'
+              size='md'
+              icon={LogOut}
+              className='min-h-[44px] bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 shadow-md hover:shadow-lg'
+              fullWidth
             >
-              <LogOut className='w-4 h-4' />
-              <span>Logout</span>
-            </button>
+              Logout
+            </Button>
           </div>
         </div>
       </nav>

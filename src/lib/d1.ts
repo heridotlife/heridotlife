@@ -1,6 +1,8 @@
 // D1 Database Helper for heridotlife
 // Replaces Prisma ORM with direct D1 SQL queries
 
+import { cache } from './cache';
+
 export interface D1Database {
   prepare(query: string): D1PreparedStatement;
   dump(): Promise<ArrayBuffer>;
@@ -154,6 +156,9 @@ export class D1Helper {
       throw new Error('Failed to create short URL');
     }
 
+    // Invalidate stats cache when new URL is created
+    cache.delete('dashboard-stats');
+
     return (await this.findShortUrlById(result.meta.last_row_id))!;
   }
 
@@ -231,6 +236,14 @@ export class D1Helper {
 
   // Category operations
   async getAllCategories(): Promise<Array<Category & { _count: { shortUrls: number } }>> {
+    const cacheKey = 'all-categories';
+    
+    // Try to get cached categories first
+    const cachedCategories = cache.get<Array<Category & { _count: { shortUrls: number } }>>(cacheKey);
+    if (cachedCategories) {
+      return cachedCategories;
+    }
+
     const result = await this.db
       .prepare(
         `SELECT 
@@ -246,7 +259,7 @@ export class D1Helper {
       .all<Category & { shortUrlsCount: number }>();
     
     // Transform to match Prisma's _count structure
-    return result.results.map(cat => ({
+    const categories = result.results.map(cat => ({
       id: cat.id,
       name: cat.name,
       clickCount: cat.clickCount,
@@ -254,6 +267,11 @@ export class D1Helper {
         shortUrls: cat.shortUrlsCount || 0
       }
     }));
+
+    // Cache categories for 5 minutes (they don't change often)
+    cache.set(cacheKey, categories, 5 * 60 * 1000);
+    
+    return categories;
   }
 
   async createCategory(name: string): Promise<Category> {
@@ -261,6 +279,9 @@ export class D1Helper {
       .prepare('INSERT INTO Category (name, clickCount) VALUES (?, 0)')
       .bind(name)
       .run();
+
+    // Invalidate categories cache when new category is created
+    cache.delete('all-categories');
 
     return (await this.db
       .prepare('SELECT * FROM Category WHERE id = ?')
@@ -368,28 +389,43 @@ export class D1Helper {
 
   // Stats operations
   async getStats() {
+    const cacheKey = 'dashboard-stats';
+    
+    // Try to get cached stats first
+    const cachedStats = cache.get(cacheKey);
+    if (cachedStats) {
+      return cachedStats;
+    }
+
+    // Optimize queries by selecting only needed fields and using efficient indexes
     const [totalUrls, activeUrls, totalClicks, expiredUrls] = await Promise.all([
       this.db.prepare('SELECT COUNT(*) as count FROM ShortUrl').first<{ count: number }>(),
       this.db.prepare('SELECT COUNT(*) as count FROM ShortUrl WHERE isActive = 1').first<{ count: number }>(),
-      this.db.prepare('SELECT SUM(clickCount) as total FROM ShortUrl').first<{ total: number | null }>(),
+      this.db.prepare('SELECT COALESCE(SUM(clickCount), 0) as total FROM ShortUrl').first<{ total: number }>(),
       this.db
         .prepare('SELECT COUNT(*) as count FROM ShortUrl WHERE expiresAt IS NOT NULL AND expiresAt < ?')
         .bind(Math.floor(Date.now() / 1000))
         .first<{ count: number }>(),
     ]);
 
+    // Only select required fields for recent clicks to reduce transfer size
     const recentClicks = await this.db
       .prepare(
-        'SELECT * FROM ShortUrl WHERE latestClick IS NOT NULL ORDER BY latestClick DESC LIMIT 10'
+        'SELECT id, shortUrl, title, latestClick FROM ShortUrl WHERE latestClick IS NOT NULL ORDER BY latestClick DESC LIMIT 10'
       )
-      .all<ShortUrl>();
+      .all<Pick<ShortUrl, 'id' | 'shortUrl' | 'title' | 'latestClick'>>();
 
-    return {
+    const stats = {
       totalUrls: totalUrls?.count || 0,
       activeUrls: activeUrls?.count || 0,
       totalClicks: totalClicks?.total || 0,
       expiredUrls: expiredUrls?.count || 0,
       recentClicks: recentClicks.results,
     };
+
+    // Cache stats for 2 minutes
+    cache.set(cacheKey, stats, 2 * 60 * 1000);
+    
+    return stats;
   }
 }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, Trash2, X, Check } from 'lucide-react';
+import { Pencil, Trash2, X, Check } from '../ui/icons';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
 
 interface Category {
   id: number;
@@ -157,21 +159,22 @@ export default function CategoriesPage() {
       {/* Add Category */}
       <div className='bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4'>
         <div className='flex gap-4'>
-          <input
+          <Input
             type='text'
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             placeholder='New category name...'
-            className='flex-1 px-4 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
+            fullWidth
           />
-          <button
+          <Button
             onClick={handleCreate}
             disabled={creating || !newCategory.trim()}
-            className='px-6 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
+            variant='primary'
+            loading={creating}
           >
-            {creating ? 'Creating...' : 'Add Category'}
-          </button>
+            Add Category
+          </Button>
         </div>
       </div>
 
@@ -186,7 +189,7 @@ export default function CategoriesPage() {
               {editingId === category.id ? (
                 // Edit mode
                 <div className='space-y-4'>
-                  <input
+                  <Input
                     type='text'
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
@@ -194,24 +197,30 @@ export default function CategoriesPage() {
                       if (e.key === 'Enter') handleSaveEdit(category.id);
                       if (e.key === 'Escape') handleCancelEdit();
                     }}
-                    className='w-full px-3 py-2 rounded-lg border border-sky-200 dark:border-sky-700 bg-white dark:bg-slate-900 text-sky-900 dark:text-sky-100 focus:ring-2 focus:ring-sky-500 focus:border-transparent'
+                    fullWidth
                     autoFocus
                   />
                   <div className='flex gap-2'>
-                    <button
+                    <Button
                       onClick={() => handleSaveEdit(category.id)}
-                      className='flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300'
+                      variant='primary'
+                      size='sm'
+                      icon={Check}
+                      iconPosition='left'
+                      fullWidth
                     >
-                      <Check className='w-4 h-4' />
                       Save
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleCancelEdit}
-                      className='flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-500 text-white font-medium shadow-lg hover:shadow-xl hover:bg-gray-600 transition-all duration-300'
+                      variant='secondary'
+                      size='sm'
+                      icon={X}
+                      iconPosition='left'
+                      fullWidth
                     >
-                      <X className='w-4 h-4' />
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -222,21 +231,22 @@ export default function CategoriesPage() {
                       {category.name}
                     </h3>
                     <div className='flex gap-2'>
-                      <button
+                      <Button
                         onClick={() => handleEdit(category)}
-                        className='p-2 rounded-lg text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900 transition-colors'
+                        variant='ghost'
+                        size='sm'
+                        icon={Pencil}
                         title='Edit category'
-                      >
-                        <Pencil className='w-4 h-4' />
-                      </button>
-                      <button
+                      />
+                      <Button
                         onClick={() => handleDelete(category.id, category.name)}
                         disabled={deleting === category.id}
-                        className='p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 transition-colors disabled:opacity-50'
+                        variant='ghost'
+                        size='sm'
+                        icon={Trash2}
+                        className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200'
                         title='Delete category'
-                      >
-                        <Trash2 className='w-4 h-4' />
-                      </button>
+                      />
                     </div>
                   </div>
                   <div className='space-y-2'>
