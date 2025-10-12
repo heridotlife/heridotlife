@@ -33,7 +33,7 @@ export default function CategoriesPage() {
       setLoading(true);
       const response = await fetch('/api/admin/categories');
       if (!response.ok) throw new Error('Failed to fetch categories');
-      const data = await response.json();
+      const data = await response.json() as Category[];
       setCategories(data);
     } catch (err) {
       setError(
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { error?: string };
         throw new Error(data.error || 'Failed to create category');
       }
 
@@ -90,7 +90,7 @@ export default function CategoriesPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { error?: string };
         throw new Error(data.error || 'Failed to update category');
       }
 
@@ -114,7 +114,7 @@ export default function CategoriesPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { error?: string };
         throw new Error(data.error || 'Failed to delete category');
       }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ password }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
 
       if (response.ok) {
         window.location.href = '/admin/dashboard';

@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
@@ -11,6 +11,15 @@ interface Category {
 
 interface URLFormProps {
   urlId?: number;
+}
+
+interface ShortUrlData {
+  shortUrl: string;
+  originalUrl: string;
+  title?: string | null;
+  categories: Category[];
+  expiresAt?: number | null;
+  isActive: boolean;
 }
 
 export default function URLForm({ urlId }: URLFormProps) {
@@ -38,7 +47,7 @@ export default function URLForm({ urlId }: URLFormProps) {
     try {
       const response = await fetch('/api/admin/categories');
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as Category[];
         setCategories(data);
       }
     } catch {
@@ -50,7 +59,7 @@ export default function URLForm({ urlId }: URLFormProps) {
     try {
       const response = await fetch(`/api/admin/urls/id?id=${urlId}`);
       if (!response.ok) throw new Error('Failed to fetch URL');
-      const data = await response.json();
+      const data = await response.json() as ShortUrlData;
       setFormData({
         slug: data.shortUrl,
         originalUrl: data.originalUrl,
@@ -86,7 +95,7 @@ export default function URLForm({ urlId }: URLFormProps) {
         },
       );
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
 
       if (response.ok) {
         window.location.href = '/admin/urls';

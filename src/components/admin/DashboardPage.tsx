@@ -39,7 +39,7 @@ export default function DashboardPage() {
       if (!response.ok) {
         throw new Error('Failed to fetch stats');
       }
-      const data = await response.json();
+      const data = await response.json() as Stats;
       setStats(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load stats');

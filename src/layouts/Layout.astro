@@ -116,7 +116,9 @@ const ogImageUrl = ogImage || (() => {
                 }
               });
               lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-            } catch (e) {}
+            } catch (_e) {
+              // Performance API not available
+            }
 
             // First Contentful Paint (FCP) and Navigation Timing
             try {
@@ -132,7 +134,9 @@ const ogImageUrl = ogImage || (() => {
                 }
               });
               observer.observe({ type: 'paint', buffered: true });
-            } catch (e) {}
+            } catch (_e) {
+              // Performance API not available
+            }
           }
 
           // Time to First Byte (TTFB) using Navigation Timing
