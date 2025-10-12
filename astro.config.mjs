@@ -7,14 +7,24 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
-    mode: 'directory',
+    mode: 'advanced',
+    functionPerRoute: false,
   }),
-  integrations: [tailwind(), react()],
-  // Note: Image optimization is disabled in server mode on Cloudflare Pages
-  // The adapter automatically switches to 'noop' service for compatibility
+  integrations: [
+    tailwind(),
+    react({
+      experimentalReactChildren: false,
+    }),
+  ],
+  // Configure image service for Cloudflare Pages
+  // Use 'compile' service to optimize images with sharp during build time
+  // This suppresses the runtime Sharp warning for Cloudflare
   image: {
     service: {
-      entrypoint: 'astro/assets/services/noop',
+      entrypoint: 'astro/assets/services/compile',
+      config: {
+        limitInputPixels: false,
+      },
     },
   },
   vite: {

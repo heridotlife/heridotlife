@@ -8,7 +8,7 @@ export const POST: APIRoute = async (context) => {
     const validation = loginSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      const errorMessage = validation.error.issues[0]?.message;
       return new Response(JSON.stringify({ error: errorMessage || 'Invalid input.' }), {
         status: 400,
       });

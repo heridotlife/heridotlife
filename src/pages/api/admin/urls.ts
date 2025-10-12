@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
-import { D1Helper, toBool, toDate } from '../../../lib/d1';
+import { createCachedD1Helper } from '../../../lib/cached-d1';
+import { toBool, toDate } from '../../../lib/d1';
 import { createUrlSchema } from '../../../lib/validations';
 
 // GET all URLs
@@ -11,7 +12,13 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    // Use cached D1 helper for better performance
+    const db = createCachedD1Helper(
+      context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      context.locals.runtime.env.heridotlife_kv as any
+    );
+
     const urls = await db.getAllShortUrls();
 
     // Get categories for each URL
@@ -49,7 +56,7 @@ export const POST: APIRoute = async (context) => {
     const validation = createUrlSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessage = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
+      const errorMessage = validation.error.issues[0]?.message;
       return new Response(
         JSON.stringify({ error: `Invalid input: ${errorMessage || 'Unknown error.'}` }),
         { status: 400 }
@@ -58,7 +65,13 @@ export const POST: APIRoute = async (context) => {
 
     const { slug, originalUrl, title, categoryIds, expiresAt, active } = validation.data;
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    // Use cached D1 helper (will auto-invalidate caches on create)
+    const db = createCachedD1Helper(
+      context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      context.locals.runtime.env.heridotlife_kv as any
+    );
+
     const existing = await db.findShortUrl(slug);
 
     if (existing) {
@@ -73,7 +86,7 @@ export const POST: APIRoute = async (context) => {
       expiresAt: expiresAt ? new Date(expiresAt) : null,
     });
 
-    // Add categories if provided
+    // Add categories if provided (will auto-invalidate category caches)
     if (categoryIds && categoryIds.length > 0) {
       await db.setCategoriesForShortUrl(url.id, categoryIds);
     }

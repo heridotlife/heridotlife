@@ -1,6 +1,6 @@
 # Deployment Guide
 
-Complete guide for deploying heridotlife to Cloudflare Pages with D1 database.
+Complete guide for deploying heridotlife to Cloudflare Workers with D1 database.
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ Complete guide for deploying heridotlife to Cloudflare Pages with D1 database.
 ## Table of Contents
 
 1. [Database Setup](#database-setup)
-2. [Cloudflare Pages Deployment](#cloudflare-pages-deployment)
+2. [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
 3. [Configuration](#configuration)
 4. [Testing](#testing)
 5. [Troubleshooting](#troubleshooting)
@@ -35,15 +35,20 @@ pnpm wrangler d1 create heridotlife
 
 **Copy the `database_id` from the output!**
 
-### 2. Update wrangler.toml
+### 2. Update wrangler.json
 
-Edit `wrangler.toml` and replace the `database_id`:
+Edit `wrangler.json` and replace the `database_id`:
 
-```toml
-[[d1_databases]]
-binding = "D1_db"
-database_name = "heridotlife"
-database_id = "your-actual-database-id-here"  # ← Paste your ID
+```json
+{
+  "d1_databases": [
+    {
+      "binding": "D1_db",
+      "database_name": "heridotlife",
+      "database_id": "your-actual-database-id-here"
+    }
+  ]
+}
 ```
 
 **Note**: Database ID is safe to commit to Git. It's just an identifier, not a secret.
@@ -81,7 +86,7 @@ pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
 
 ---
 
-## Cloudflare Pages Deployment
+## Cloudflare Workers Deployment
 
 ### Option 1: Git-Based Deployment (Recommended)
 
@@ -97,18 +102,16 @@ pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
 
 2. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
 3. Navigate to **Workers & Pages**
-4. Click **Create application** > **Pages** > **Connect to Git**
+4. Click **Create application** > **Workers** > **Connect to Git**
 5. Select your GitHub repository
 
 #### B. Configure Build Settings
 
-| Setting                | Value          |
-| ---------------------- | -------------- |
-| Production branch      | `main`         |
-| Framework preset       | `Astro`        |
-| Build command          | `pnpm build`   |
-| Build output directory | `dist`         |
-| Node version           | `18` or higher |
+| Setting           | Value        |
+| ----------------- | ------------ |
+| Production branch | `main`       |
+| Framework preset  | `Astro`      |
+| Build command     | `pnpm build` |
 
 6. Click **Save and Deploy**
 7. Wait for the first deployment (takes 2-3 minutes)
@@ -119,10 +122,11 @@ pnpm wrangler d1 execute heridotlife --remote --command "SELECT * FROM ShortUrl"
 # Build locally
 pnpm build
 
-# Deploy to Cloudflare
-pnpm wrangler pages deploy dist --project-name=astro-heridotlife
+# Deploy to Cloudflare Workers
+pnpm deploy
 
-# Follow the prompts to create a new project if needed
+# Or use wrangler directly
+pnpm wrangler deploy
 ```
 
 ---
@@ -131,7 +135,9 @@ pnpm wrangler pages deploy dist --project-name=astro-heridotlife
 
 ### 1. Add D1 Database Binding
 
-**In Cloudflare Dashboard:**
+**Note**: Bindings are now configured in `wrangler.json` and automatically applied during deployment.
+
+**In Cloudflare Dashboard (if needed):**
 
 1. Go to **Workers & Pages** > Your Project
 2. Click **Settings** > **Bindings**
@@ -204,7 +210,7 @@ If you imported data, test redirects:
 Monitor real-time logs:
 
 ```bash
-pnpm wrangler pages deployment tail
+pnpm wrangler tail
 ```
 
 Or in Dashboard:
@@ -220,9 +226,11 @@ Or in Dashboard:
 
 **Solution**:
 
-1. Go to **Settings > Bindings** in Cloudflare Dashboard
-2. Add D1 Database binding: `D1_db` → `heridotlife`
-3. Redeploy
+Bindings are now configured in `wrangler.json` and should be automatically applied. If the issue persists:
+
+1. Check that `wrangler.json` has the correct `d1_databases` configuration
+2. Ensure the `database_id` matches your D1 database
+3. Redeploy with `pnpm deploy`
 
 ### Issue: "AUTH_SECRET is not defined"
 
@@ -230,7 +238,7 @@ Or in Dashboard:
 
 **Solution**:
 
-1. Go to **Settings > Environment Variables**
+1. Go to **Cloudflare Dashboard > Workers & Pages > Your Worker > Settings > Environment Variables**
 2. Add `AUTH_SECRET` and `ADMIN_PASSWORD`
 3. Redeploy
 

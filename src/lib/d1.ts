@@ -9,6 +9,7 @@ export interface D1Database {
 }
 
 export interface D1PreparedStatement {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bind(...values: any[]): D1PreparedStatement;
   first<T = unknown>(colName?: string): Promise<T | null>;
   run(): Promise<D1Response>;
@@ -168,6 +169,7 @@ export class D1Helper {
   ): Promise<ShortUrl> {
     const now = Math.floor(Date.now() / 1000);
     const fields: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const values: any[] = [];
 
     if (data.shortUrl !== undefined) {

@@ -1,17 +1,31 @@
 name = "astro-heridotlife"
-compatibility_date = "2024-04-05"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration
 pages_build_output_dir = "dist"
 
 # D1 Database binding
 [[d1_databases]]
 binding = "D1_db"
 database_name = "heridotlife"
-database_id = "55bf671e-d7c3-43a2-ad26-0c3fa2a3d1da" # Get this from: wrangler d1 list
+database_id = "55bf671e-d7c3-43a2-ad26-0c3fa2a3d1da"
 
-# Bind environment variables for Cloudflare Workers
-# Add your actual values in Cloudflare Dashboard > Workers & Pages > Settings > Environment Variables
-# These are just placeholders for local development with `wrangler pages dev`
+# KV Namespace bindings
+[[kv_namespaces]]
+binding = "heridotlife_kv"
+id = "65a1d9021c3142c0b9aaf6539c5a017d"
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "65a1d9021c3142c0b9aaf6539c5a017d"
+
+# Environment variables
 [vars]
-# Do not put real secrets here - use Cloudflare Dashboard for production
-# AUTH_SECRET = "your-local-auth-secret"
-# ADMIN_PASSWORD = "your-local-admin-password"
+# Security: Trusted hosts for preventing Host Header Injection
+# Supports wildcards (e.g., *.domain.com) for subdomain matching
+TRUSTED_HOSTS = "heri.life,www.heri.life,*.heridotlife.pages.dev"
+# Default canonical domain
+CANONICAL_DOMAIN = "heri.life"
+# Add your environment variables here
+# Use Cloudflare Dashboard for production secrets

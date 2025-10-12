@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
-import { D1Helper, toDate } from '../../../lib/d1';
+import { createCachedD1Helper } from '../../../lib/cached-d1';
+import { toDate } from '../../../lib/d1';
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -9,7 +10,14 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    // Use cached D1 helper for better performance
+    const db = createCachedD1Helper(
+      context.locals.runtime.env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      context.locals.runtime.env.heridotlife_kv as any
+    );
+
+    // Get stats (now cached for 30 minutes)
     const stats = await db.getStats();
 
     // Convert timestamps to Date objects for recentClicks
