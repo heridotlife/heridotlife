@@ -22,4 +22,16 @@ export default [
   {
     ignores: ['dist/', '.astro/', 'node_modules/', '.wrangler/', 'public/'],
   },
+  {
+    files: ['scripts/**/*.mjs', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+  },
 ];
