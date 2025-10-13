@@ -18,6 +18,7 @@ I'm a passionate full-stack developer with expertise in modern web technologies.
 ### 🔧 Tech Stack
 
 **Frontend:**
+
 - ⚛️ React / Next.js
 - 🌟 Astro
 - 📝 TypeScript
@@ -25,6 +26,7 @@ I'm a passionate full-stack developer with expertise in modern web technologies.
 - 📱 React Native
 
 **Backend:**
+
 - 🟢 Node.js
 - 🐍 Python
 - 🦀 Rust
@@ -32,6 +34,7 @@ I'm a passionate full-stack developer with expertise in modern web technologies.
 - 🗄️ Databases (PostgreSQL, SQLite, D1)
 
 **Cloud & DevOps:**
+
 - ☁️ Cloudflare
 - 🐳 Docker
 - 🔄 CI/CD (GitHub Actions)
@@ -93,6 +96,6 @@ I'm always interested in new opportunities and collaborations. Feel free to reac
   
 **"Code is poetry written in logic"** ✨
 
-*Thanks for visiting my profile! Feel free to explore my repositories and don't hesitate to get in touch.*
+_Thanks for visiting my profile! Feel free to explore my repositories and don't hesitate to get in touch._
 
 </div>

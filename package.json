@@ -7,6 +7,7 @@
     "dev:wrangler": "./setup_db.sh && pnpm build && wrangler dev --persist-to=.wrangler/state --live-reload",
     "dev:wrangler:skip-build": "./setup_db.sh && wrangler dev --persist-to=.wrangler/state --live-reload",
     "start": "astro dev",
+    "prebuild": "node scripts/generate-seo-files.mjs",
     "build": "astro build",
     "preview": "wrangler dev",
     "deploy": "wrangler deploy",

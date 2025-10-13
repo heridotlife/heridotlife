@@ -37,7 +37,9 @@ import_remote_data.sql
 # IDEs
 .idea/
 
-# Sitemap (can be auto-generated, but good to ignore if manual)
+# Generated SEO files (auto-generated during build)
 robots.txt
 sitemap.xml
 sitemap-*.xml
+public/robots.txt
+public/sitemap.xml
