@@ -1,5 +1,7 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
 import { logSecurityEvent } from './cache-security';
+import { createRateLimiters, type RateLimiters } from './rate-limiter';
+import { detectHoneypot, createHoneypotTrap, getHoneypotSeverity } from './honeypot';
 
 export interface CacheOptions {
   /** Time to live in seconds. Default: 3600 (1 hour) */
@@ -85,10 +87,14 @@ function validateCacheKey(key: string): void {
 }
 
 export class KVCache {
+  private rateLimiters: RateLimiters;
+
   constructor(
     private kv: KVNamespace,
     private defaultOptions: CacheOptions = {}
-  ) {}
+  ) {
+    this.rateLimiters = createRateLimiters();
+  }
 
   /**
    * Generate a cache key with optional prefix
@@ -128,9 +134,65 @@ export class KVCache {
   /**
    * Get a cached value
    * Validates data integrity when reading from KV
+   * Detects honeypot access attempts
    */
   async get<T = unknown>(key: string, options: CacheOptions = {}): Promise<T | null> {
     const opts = { ...this.defaultOptions, ...options };
+
+    // Check for honeypot access BEFORE generating key
+    const honeypotDetection = detectHoneypot(key);
+
+    if (honeypotDetection.isHoneypot || honeypotDetection.isSuspicious) {
+      const severity = getHoneypotSeverity(honeypotDetection);
+
+      // Log the security event
+      logSecurityEvent(
+        honeypotDetection.isHoneypot ? 'honeypot_triggered' : 'suspicious_pattern_detected',
+        {
+          key,
+          prefix: opts.prefix || '',
+          severity,
+          reason: honeypotDetection.reason,
+          matchedPattern: honeypotDetection.matchedPattern,
+          operation: 'read',
+        }
+      );
+
+      // For honeypots, check rate limiting
+      if (honeypotDetection.isHoneypot) {
+        const identifier = `honeypot:${key}`;
+        if (this.rateLimiters.suspicious.isRateLimited(identifier)) {
+          logSecurityEvent('rate_limit_exceeded', {
+            key,
+            identifier,
+            reason: 'Excessive honeypot access attempts',
+          });
+        }
+
+        // Return honeypot trap data to waste attacker's time
+        const trapData = createHoneypotTrap();
+        return JSON.parse(trapData) as T;
+      }
+
+      // For suspicious patterns, continue but log
+      // Fall through to normal processing
+    }
+
+    // Rate limiting for reads
+    const readIdentifier = `read:${key}`;
+    if (this.rateLimiters.cacheRead.isRateLimited(readIdentifier)) {
+      logSecurityEvent('rate_limit_exceeded', {
+        key,
+        prefix: opts.prefix || '',
+        operation: 'read',
+        remaining: this.rateLimiters.cacheRead.getRemainingRequests(readIdentifier),
+        resetTime: this.rateLimiters.cacheRead.getResetTime(readIdentifier),
+      });
+
+      // Still allow the read, but log it
+      // In production, you might want to throw an error or return null
+    }
+
     const cacheKey = this.generateKey(key, opts.prefix);
 
     try {
@@ -210,11 +272,71 @@ export class KVCache {
   /**
    * Set a cached value
    * Validates key format and data size before writing to KV
+   * Enforces rate limiting and detects honeypot access
    */
   async set<T = unknown>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
     const opts = { ttl: 3600, json: true, ...this.defaultOptions, ...options };
 
     try {
+      // Check for honeypot access BEFORE any processing
+      const honeypotDetection = detectHoneypot(key);
+
+      if (honeypotDetection.isHoneypot || honeypotDetection.isSuspicious) {
+        const severity = getHoneypotSeverity(honeypotDetection);
+
+        // Log the security event
+        logSecurityEvent(
+          honeypotDetection.isHoneypot ? 'honeypot_triggered' : 'suspicious_pattern_detected',
+          {
+            key,
+            prefix: opts.prefix || '',
+            severity,
+            reason: honeypotDetection.reason,
+            matchedPattern: honeypotDetection.matchedPattern,
+            operation: 'write',
+          }
+        );
+
+        // Block honeypot writes entirely
+        if (honeypotDetection.isHoneypot) {
+          const identifier = `honeypot:${key}`;
+          if (this.rateLimiters.suspicious.isRateLimited(identifier)) {
+            logSecurityEvent('rate_limit_exceeded', {
+              key,
+              identifier,
+              reason: 'Excessive honeypot write attempts',
+            });
+          }
+
+          const error = new Error('Access to honeypot key is forbidden');
+          logSecurityEvent('blocked_write', {
+            key,
+            prefix: opts.prefix || '',
+            reason: 'honeypot_access_attempt',
+            error: error.message,
+          });
+          throw error;
+        }
+
+        // For suspicious patterns, log but continue (unless you want to block)
+        // You can uncomment below to block suspicious writes:
+        // throw new Error('Suspicious pattern detected in cache key');
+      }
+
+      // Rate limiting for writes
+      const writeIdentifier = `write:${key}`;
+      if (this.rateLimiters.cacheWrite.isRateLimited(writeIdentifier)) {
+        const error = new Error('Rate limit exceeded for cache writes');
+        logSecurityEvent('rate_limit_exceeded', {
+          key,
+          prefix: opts.prefix || '',
+          operation: 'write',
+          remaining: this.rateLimiters.cacheWrite.getRemainingRequests(writeIdentifier),
+          resetTime: this.rateLimiters.cacheWrite.getResetTime(writeIdentifier),
+        });
+        throw error;
+      }
+
       // Validate that value is not null or undefined
       if (value === null || value === undefined) {
         const error = new Error('Cannot cache null or undefined values');
@@ -370,6 +492,55 @@ export class KVCache {
       }
     } catch (error) {
       console.error(`Cache clearPrefix error for prefix ${prefix}:`, error);
+    }
+  }
+
+  /**
+   * Clear ALL entries in the KV namespace (including non-prefixed entries)
+   * WARNING: This will delete EVERYTHING in the KV namespace
+   */
+  async clearAll(): Promise<{ deleted: number; errors: number }> {
+    let deleted = 0;
+    let errors = 0;
+    let cursor: string | undefined = undefined;
+
+    try {
+      console.log('[KVCache] Starting complete KV namespace clearance...');
+
+      do {
+        // List all keys in batches
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const list: any = await this.kv.list({ cursor, limit: 1000 });
+
+        console.log(`[KVCache] Batch: ${list.keys.length} keys found`);
+
+        // Delete all keys in this batch
+        for (const key of list.keys) {
+          try {
+            await this.kv.delete(key.name);
+            deleted++;
+
+            // Log progress every 100 deletions
+            if (deleted % 100 === 0) {
+              console.log(`[KVCache] Progress: ${deleted} keys deleted`);
+            }
+          } catch (error) {
+            console.error(`[KVCache] Failed to delete key ${key.name}:`, error);
+            errors++;
+          }
+        }
+
+        cursor = list.list_complete ? undefined : list.cursor;
+      } while (cursor);
+
+      console.log(
+        `[KVCache] Complete clearance finished: ${deleted} keys deleted, ${errors} errors`
+      );
+
+      return { deleted, errors };
+    } catch (error) {
+      console.error('[KVCache] Fatal error during complete clearance:', error);
+      return { deleted, errors: errors + 1 };
     }
   }
 

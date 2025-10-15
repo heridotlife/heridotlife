@@ -249,14 +249,17 @@ export class CachedD1Helper extends D1Helper {
     await this.cache.longTerm.delete(CacheKeys.categories());
   }
 
-  async clearAllCaches(): Promise<void> {
-    await Promise.all([
-      this.cache.shortTerm.clearPrefix('short'),
-      this.cache.mediumTerm.clearPrefix('medium'),
-      this.cache.longTerm.clearPrefix('long'),
-      this.cache.urlLookup.clearPrefix('url'),
-      this.cache.adminStats.clearPrefix('stats'),
-    ]);
+  async clearAllCaches(): Promise<{ deleted: number; errors: number }> {
+    console.log('[CachedD1Helper] Clearing ALL entries from KV namespace...');
+
+    // Use the clearAll method from any cache instance (they all share the same KV)
+    const result = await this.cache.shortTerm.clearAll();
+
+    console.log(
+      `[CachedD1Helper] KV namespace cleared: ${result.deleted} entries deleted, ${result.errors} errors`
+    );
+
+    return result;
   }
 
   // Get cache statistics

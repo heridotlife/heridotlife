@@ -10,7 +10,6 @@ declare namespace App {
         ADMIN_PASSWORD: string;
         D1_db: D1Database;
         heridotlife_kv: KVNamespace;
-        SESSION: KVNamespace;
       };
       cf: CfProperties;
       ctx: {
