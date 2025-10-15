@@ -1,11 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth';
 import { D1Helper } from '../../../../lib/d1';
-import { z } from 'zod';
-
-const updateCategorySchema = z.object({
-  name: z.string().min(1).max(50),
-});
+import { updateCategorySchema } from '../../../../lib/validations';
 
 // PUT - Update category
 export const PUT: APIRoute = async (context) => {
