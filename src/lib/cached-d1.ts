@@ -76,6 +76,8 @@ export class CachedD1Helper extends D1Helper {
     shortUrl: string;
     originalUrl: string;
     title?: string | null;
+    description?: string | null;
+    ogImage?: string | null;
     userId?: string | null;
     isActive?: boolean;
     expiresAt?: Date | null;
@@ -96,6 +98,8 @@ export class CachedD1Helper extends D1Helper {
       shortUrl?: string;
       originalUrl?: string;
       title?: string | null;
+      description?: string | null;
+      ogImage?: string | null;
       isActive?: boolean;
       expiresAt?: Date | null;
     }

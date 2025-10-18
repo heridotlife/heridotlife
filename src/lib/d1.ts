@@ -128,6 +128,8 @@ export class D1Helper {
     shortUrl: string;
     originalUrl: string;
     title?: string | null;
+    description?: string | null;
+    ogImage?: string | null;
     userId?: string | null;
     isActive?: boolean;
     expiresAt?: Date | null;
@@ -135,13 +137,15 @@ export class D1Helper {
     const now = Math.floor(Date.now() / 1000);
     const result = await this.db
       .prepare(
-        `INSERT INTO ShortUrl (shortUrl, originalUrl, title, userId, createdAt, updatedAt, isActive, expiresAt, clickCount)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`
+        `INSERT INTO ShortUrl (shortUrl, originalUrl, title, description, ogImage, userId, createdAt, updatedAt, isActive, expiresAt, clickCount)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`
       )
       .bind(
         data.shortUrl,
         data.originalUrl,
         data.title || null,
+        data.description || null,
+        data.ogImage || null,
         data.userId || null,
         now,
         now,
@@ -163,6 +167,8 @@ export class D1Helper {
       shortUrl?: string;
       originalUrl?: string;
       title?: string | null;
+      description?: string | null;
+      ogImage?: string | null;
       isActive?: boolean;
       expiresAt?: Date | null;
     }
@@ -183,6 +189,14 @@ export class D1Helper {
     if (data.title !== undefined) {
       fields.push('title = ?');
       values.push(data.title);
+    }
+    if (data.description !== undefined) {
+      fields.push('description = ?');
+      values.push(data.description);
+    }
+    if (data.ogImage !== undefined) {
+      fields.push('ogImage = ?');
+      values.push(data.ogImage);
     }
     if (data.isActive !== undefined) {
       fields.push('isActive = ?');
