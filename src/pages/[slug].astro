@@ -146,13 +146,14 @@ if (categoryRecord) {
                             >
                                 <div class="p-6 flex items-center gap-4 min-h-[100px]">
                                     {/* OG Image or Icon */}
-                                    {url.ogImage ? (
+                                    {url.ogImage && url.ogImage.trim() !== '' ? (
                                         <div class="flex-shrink-0">
                                             <img 
                                                 src={url.ogImage} 
                                                 alt={url.title || 'Link thumbnail'}
                                                 class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
                                                 loading="lazy"
+                                                onerror="this.parentElement.innerHTML='<div class=\'flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center\'><svg class=\'w-6 h-6 text-sky-600 dark:text-sky-400\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1\'></path></svg></div>'"
                                             />
                                         </div>
                                     ) : (
