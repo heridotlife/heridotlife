@@ -60,15 +60,18 @@ export const POST: APIRoute = async (context) => {
     const { action } = requestBody;
 
     switch (action) {
-      case 'clear_all':
-        await db.clearAllCaches();
+      case 'clear_all': {
+        const result = await db.clearAllCaches();
         return new Response(
           JSON.stringify({
-            message: 'All caches cleared successfully',
+            message: 'All KV entries cleared successfully',
+            deleted: result.deleted,
+            errors: result.errors,
             timestamp: new Date().toISOString(),
           }),
           { status: 200 }
         );
+      }
 
       case 'warm_cache':
         await db.warmCache();
@@ -150,12 +153,14 @@ export const POST: APIRoute = async (context) => {
         await setTTLConfig(context.locals.runtime.env.heridotlife_kv, newTTLConfig);
 
         // Clear all caches since TTL changed
-        await db.clearAllCaches();
+        const clearResult = await db.clearAllCaches();
 
         return new Response(
           JSON.stringify({
-            message: 'TTL configuration updated successfully. All caches cleared.',
+            message: 'TTL configuration updated successfully. All KV entries cleared.',
             ttlConfig: newTTLConfig,
+            deleted: clearResult.deleted,
+            errors: clearResult.errors,
             timestamp: new Date().toISOString(),
           }),
           { status: 200 }

@@ -20,8 +20,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
         D1_db: import.meta.env.D1_db || null, // D1 binding from Cloudflare
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         heridotlife_kv: null as any, // KV binding will be available in production
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        SESSION: null as any, // Session KV binding
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cf: {} as any,
