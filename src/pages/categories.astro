@@ -18,49 +18,47 @@ const activeCategories = categories.filter((cat) => cat._count.shortUrls > 0);
 
 const pageTitle = `Categories | ${siteConfig.title}`;
 const pageDescription = `Browse all link categories on ${siteConfig.title}`;
+
+// SVG paths as constants to avoid repetition
+const tagIcon =
+  'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z';
+const arrowIcon = 'M9 5l7 7-7 7';
+const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
   <main
-    class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950 transition-colors duration-500"
+    class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950"
   >
     <button
       id="theme-toggle"
-      class="fixed top-6 right-6 min-h-[44px] min-w-[44px] p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border border-sky-200 dark:border-sky-700 group z-50"
+      class="fixed top-6 right-6 w-11 h-11 p-2.5 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-slate-200 dark:border-slate-700 z-50"
       aria-label="Toggle theme"
     >
       <svg
         id="sun-icon"
         style="display: none;"
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-5 h-5 text-amber-500 group-hover:rotate-180 transition-transform duration-500"
-        ><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"
-        ></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path
-          d="M2 12h2"></path><path d="M20 12h2"></path><path d="m4.93 19.07 1.41-1.41"></path><path
-          d="m17.66 6.34 1.41-1.41"></path></svg
+        class="w-6 h-6 text-amber-500"
+        ><circle cx="12" cy="12" r="4"></circle><path
+          d="M12 2v2M12 20v2m-8.93-9.07 1.41 1.41m12.02 0 1.41-1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m12.02 0l1.41 1.41"
+        ></path></svg
       >
       <svg
         id="moon-icon"
         style="display: none;"
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-5 h-5 text-sky-600 group-hover:-rotate-12 transition-transform duration-300"
-        ><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg
+        class="w-6 h-6 text-sky-600"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg
       >
     </button>
 
@@ -71,27 +69,15 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
           href="/"
           class="inline-flex items-center justify-center mb-6 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors text-sm font-medium"
         >
-          <svg
-            class="w-4 h-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={backIcon}
+            ></path>
           </svg>
           Back to Home
         </a>
 
-        <!-- Profile Avatar -->
+        <!-- Profile Avatar - Simplified -->
         <div class="relative inline-block mb-6">
-          <div
-            class="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 rounded-full blur-md opacity-50 dark:opacity-30"
-          >
-          </div>
           <div
             class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
           >
@@ -102,15 +88,14 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
                 alt="Heri Rusmanto"
                 width="112"
                 height="112"
-                loading="eager"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>
         </div>
 
-        <h1
-          class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-3"
-        >
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-3">
           @heridotlife
         </h1>
         <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 mb-6">
@@ -118,7 +103,7 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
         </p>
       </div>
 
-      <!-- Categories List - Linktree Style -->
+      <!-- Categories List - Optimized -->
       <div class="w-full max-w-2xl mx-auto space-y-4 mb-12">
         {
           activeCategories.length === 0 ? (
@@ -129,12 +114,7 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tagIcon} />
               </svg>
               <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 No Categories Yet
@@ -147,10 +127,10 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
             activeCategories.map((category) => (
               <a
                 href={`/${category.name.toLowerCase()}`}
-                class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 p-6 min-h-[80px] flex items-center justify-between"
+                class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 p-6 min-h-[80px]"
               >
-                <div class="flex items-center gap-4 flex-1 min-w-0">
-                  <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <div class="flex items-center gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center">
                     <svg
                       class="w-6 h-6 text-sky-600 dark:text-sky-400"
                       fill="none"
@@ -161,7 +141,7 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                        d={tagIcon}
                       />
                     </svg>
                   </div>
@@ -174,20 +154,20 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
                       {category._count.shortUrls === 1 ? 'link' : 'links'}
                     </p>
                   </div>
+                  <svg
+                    class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d={arrowIcon}
+                    />
+                  </svg>
                 </div>
-                <svg
-                  class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
               </a>
             ))
           )
@@ -210,29 +190,25 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
 </Layout>
 
 <script is:inline>
-  const themeToggleButton = document.getElementById('theme-toggle');
-  const sunIcon = document.getElementById('sun-icon');
-  const moonIcon = document.getElementById('moon-icon');
+  (function () {
+    const btn = document.getElementById('theme-toggle');
+    const sun = document.getElementById('sun-icon');
+    const moon = document.getElementById('moon-icon');
 
-  function updateIcons() {
-    if (document.documentElement.classList.contains('dark')) {
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
-    } else {
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
+    function update() {
+      const isDark = document.documentElement.classList.contains('dark');
+      sun.style.display = isDark ? 'block' : 'none';
+      moon.style.display = isDark ? 'none' : 'block';
     }
-  }
 
-  // Set initial icon state
-  updateIcons();
-
-  themeToggleButton.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem(
-      'theme',
-      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    );
-    updateIcons();
-  });
+    update();
+    btn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem(
+        'theme',
+        document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      );
+      update();
+    });
+  })();
 </script>
