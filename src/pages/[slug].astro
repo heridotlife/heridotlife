@@ -79,97 +79,137 @@ if (categoryRecord) {
                 <svg id="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-sky-600 group-hover:-rotate-12 transition-transform duration-300"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
             </button>
 
-            <div class="container mx-auto px-4 py-12 max-w-5xl">
-                <!-- Header -->
-                <div class="mb-12 text-center">
-                    <div class="flex justify-center items-center gap-4 mb-6">
-                        <a href="/categories" class="inline-block text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
-                            <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
+                <!-- Profile Header Section -->
+                <div class="w-full max-w-2xl mx-auto mb-8 text-center">
+                    <div class="flex justify-center items-center gap-3 mb-6">
+                        <a href="/categories" class="inline-flex items-center text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors text-sm font-medium">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
-                            Back to Categories
+                            Categories
                         </a>
-                        <span class="text-sky-400 dark:text-sky-500">|</span>
-                        <a href="/" class="inline-block text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
+                        <span class="text-slate-400 dark:text-slate-500">|</span>
+                        <a href="/" class="inline-flex items-center text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors text-sm font-medium">
                             Home
                         </a>
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-4">
+
+                    <!-- Profile Avatar -->
+                    <div class="relative inline-block mb-6">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 rounded-full blur-md opacity-50 dark:opacity-30"
+                        >
+                        </div>
+                        <div
+                            class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
+                        >
+                            <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
+                                <img
+                                    class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
+                                    src="/profile_picture.jpg"
+                                    alt="Heri Rusmanto"
+                                    width="112"
+                                    height="112"
+                                    loading="eager"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                         {categoryRecord.name}
                     </h1>
-                    <p class="text-lg text-sky-700 dark:text-sky-300">
-                        {activeUrls.length} {activeUrls.length === 1 ? 'link' : 'links'} in this category
+                    <p class="text-base text-slate-500 dark:text-slate-400 mb-1">
+                        @heridotlife
+                    </p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        {activeUrls.length} {activeUrls.length === 1 ? 'link' : 'links'}
                     </p>
                 </div>
 
-                <!-- Links List -->
-                {activeUrls.length === 0 ? (
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-12 text-center">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                        </svg>
-                        <h2 class="text-2xl font-semibold text-slate-700 dark:text-slate-300 mb-2">No Links Yet</h2>
-                        <p class="text-slate-600 dark:text-slate-400">There are no active links in this category at the moment.</p>
-                    </div>
-                ) : (
-                    <div class="space-y-4">
-                        {activeUrls.map((url) => (
+                <!-- Links List - Linktree Style -->
+                <div class="w-full max-w-2xl mx-auto space-y-4 mb-12">
+                    {activeUrls.length === 0 ? (
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 text-center border border-slate-200 dark:border-slate-700">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                            <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">No Links Yet</h2>
+                            <p class="text-slate-600 dark:text-slate-400">There are no active links in this category at the moment.</p>
+                        </div>
+                    ) : (
+                        activeUrls.map((url) => (
                             <a 
                                 href={`/${url.shortUrl}`}
-                                class="block bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-sky-100 dark:border-sky-900 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                                class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 overflow-hidden"
                             >
-                                <div class="flex items-start gap-4">
+                                <div class="p-6 flex items-center gap-4 min-h-[100px]">
                                     {/* OG Image if available */}
                                     {url.ogImage && (
                                         <div class="flex-shrink-0">
                                             <img 
                                                 src={url.ogImage} 
                                                 alt={url.title || 'Link thumbnail'}
-                                                class="w-16 h-16 rounded-lg object-cover"
+                                                class="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
                                                 loading="lazy"
                                             />
                                         </div>
                                     )}
                                     
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-3 mb-3">
+                                        <div class="flex items-start gap-3">
                                             {!url.ogImage && (
-                                                <div class="p-2 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-lg">
-                                                    <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                    <svg class="w-6 h-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                                                     </svg>
                                                 </div>
                                             )}
                                             <div class="flex-1 min-w-0">
-                                                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate-2-lines mb-1">
+                                                <h3 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1 line-clamp-2">
                                                     {url.title || 'Untitled Link'}
                                                 </h3>
                                                 {url.description && (
-                                                    <p class="text-sm text-slate-600 dark:text-slate-400 truncate-2-lines">
+                                                    <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
                                                         {url.description}
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <svg
+                                        class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 5l7 7-7 7"
+                                        />
+                                    </svg>
                                 </div>
                             </a>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        ))
+                    )}
+                </div>
 
-            <footer class="py-8 text-center text-sm text-sky-600 dark:text-sky-400">
-                <p>
-                    &copy; {new Date().getFullYear()}
-                    <a
-                        href="https://heri.life"
-                        class="hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200 font-medium"
-                    >
-                        Heri Rusmanto
-                    </a>
-                </p>
-            </footer>
+                <footer class="text-center text-sm text-slate-500 dark:text-slate-400">
+                    <p>
+                        &copy; {new Date().getFullYear()}
+                        <a
+                            href="https://heri.life"
+                            class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 font-medium ml-1"
+                        >
+                            Heri Rusmanto
+                        </a>
+                    </p>
+                </footer>
+            </div>
         </main>
         
         <script is:inline>
