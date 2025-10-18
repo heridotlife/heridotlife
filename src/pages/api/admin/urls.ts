@@ -3,6 +3,7 @@ import { getSession } from '../../../lib/auth';
 import { createCachedD1Helper } from '../../../lib/cached-d1';
 import { toBool, toDate } from '../../../lib/d1';
 import { createUrlSchema } from '../../../lib/validations';
+import { fetchOGMetadata } from '../../../lib/og-fetcher';
 
 // GET all URLs
 export const GET: APIRoute = async (context) => {
@@ -78,10 +79,27 @@ export const POST: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Short URL already exists' }), { status: 409 });
     }
 
+    // Fetch OG metadata from the original URL if no title provided
+    let ogMetadata: { title: string | null; description: string | null; ogImage: string | null } = {
+      title: null,
+      description: null,
+      ogImage: null,
+    };
+    if (!title) {
+      try {
+        ogMetadata = await fetchOGMetadata(originalUrl);
+      } catch (error) {
+        console.warn('Failed to fetch OG metadata:', error);
+        // Continue without metadata
+      }
+    }
+
     const url = await db.createShortUrl({
       shortUrl: slug,
       originalUrl,
-      title: title || null,
+      title: title || ogMetadata.title || null,
+      description: ogMetadata.description,
+      ogImage: ogMetadata.ogImage,
       isActive: active !== undefined ? active : true,
       expiresAt: expiresAt ? new Date(expiresAt) : null,
     });

@@ -18,137 +18,144 @@ const activeCategories = categories.filter((cat) => cat._count.shortUrls > 0);
 
 const pageTitle = `Categories | ${siteConfig.title}`;
 const pageDescription = `Browse all link categories on ${siteConfig.title}`;
+
+// SVG paths as constants to avoid repetition
+const tagIcon =
+  'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z';
+const arrowIcon = 'M9 5l7 7-7 7';
+const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
   <main
-    class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950 transition-colors duration-500"
+    class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950"
   >
     <button
       id="theme-toggle"
-      class="fixed top-6 right-6 min-h-[44px] min-w-[44px] p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border border-sky-200 dark:border-sky-700 group z-50"
+      class="fixed top-6 right-6 w-11 h-11 p-2.5 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-slate-200 dark:border-slate-700 z-50"
       aria-label="Toggle theme"
     >
       <svg
         id="sun-icon"
         style="display: none;"
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-5 h-5 text-amber-500 group-hover:rotate-180 transition-transform duration-500"
-        ><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"
-        ></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path
-          d="M2 12h2"></path><path d="M20 12h2"></path><path d="m4.93 19.07 1.41-1.41"></path><path
-          d="m17.66 6.34 1.41-1.41"></path></svg
+        class="w-6 h-6 text-amber-500"
+        ><circle cx="12" cy="12" r="4"></circle><path
+          d="M12 2v2M12 20v2m-8.93-9.07 1.41 1.41m12.02 0 1.41-1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m12.02 0l1.41 1.41"
+        ></path></svg
       >
       <svg
         id="moon-icon"
         style="display: none;"
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-5 h-5 text-sky-600 group-hover:-rotate-12 transition-transform duration-300"
-        ><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg
+        class="w-6 h-6 text-sky-600"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg
       >
     </button>
 
-    <div class="container mx-auto px-4 py-12 max-w-5xl">
-      <!-- Header -->
-      <div class="mb-12 text-center">
+    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
+      <!-- Profile Header Section -->
+      <div class="w-full max-w-2xl mx-auto mb-8 text-center">
         <a
           href="/"
-          class="inline-block mb-6 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors"
+          class="inline-flex items-center justify-center mb-6 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors text-sm font-medium"
         >
-          <svg
-            class="w-6 h-6 inline-block mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={backIcon}
+            ></path>
           </svg>
           Back to Home
         </a>
-        <h1
-          class="text-display-md md:text-display-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-4"
-        >
-          Link Categories
+
+        <!-- Profile Avatar - Simplified -->
+        <div class="relative inline-block mb-6">
+          <div
+            class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
+          >
+            <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
+              <img
+                class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
+                src="/profile_picture.jpg"
+                alt="Heri Rusmanto"
+                width="112"
+                height="112"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-3">
+          @heridotlife
         </h1>
-        <p class="text-body-lg text-sky-700 dark:text-sky-300">Browse links by category</p>
+        <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 mb-6">
+          Choose a category to explore my links
+        </p>
       </div>
 
-      <!-- Categories Grid -->
-      {
-        activeCategories.length === 0 ? (
-          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-12 text-center">
-            <svg
-              class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-              />
-            </svg>
-            <h2 class="text-heading-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              No Categories Yet
-            </h2>
-            <p class="text-body-md text-slate-600 dark:text-slate-400">
-              There are no categories with links at the moment.
-            </p>
-          </div>
-        ) : (
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {activeCategories.map((category) => (
+      <!-- Categories List - Optimized -->
+      <div class="w-full max-w-2xl mx-auto space-y-4 mb-12">
+        {
+          activeCategories.length === 0 ? (
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 text-center border border-slate-200 dark:border-slate-700">
+              <svg
+                class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tagIcon} />
+              </svg>
+              <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                No Categories Yet
+              </h2>
+              <p class="text-slate-600 dark:text-slate-400">
+                There are no categories with links at the moment.
+              </p>
+            </div>
+          ) : (
+            activeCategories.map((category) => (
               <a
                 href={`/${category.name.toLowerCase()}`}
-                class="block bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-sky-100 dark:border-sky-900 hover:border-sky-300 dark:hover:border-sky-700 group hover:-translate-y-1"
+                class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 p-6 min-h-[80px]"
               >
-                <div class="flex items-start justify-between mb-4">
-                  <div class="flex items-center gap-3">
-                    <div class="p-3 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        class="w-6 h-6 text-sky-600 dark:text-sky-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 class="text-heading-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                        {category.name}
-                      </h2>
-                    </div>
+                <div class="flex items-center gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center">
+                    <svg
+                      class="w-6 h-6 text-sky-600 dark:text-sky-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d={tagIcon}
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1">
+                      {category.name}
+                    </h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      {category._count.shortUrls}{' '}
+                      {category._count.shortUrls === 1 ? 'link' : 'links'}
+                    </p>
                   </div>
                   <svg
-                    class="w-5 h-5 text-sky-400 dark:text-sky-500 group-hover:translate-x-1 transition-transform duration-300 flex-shrink-0"
+                    class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -157,72 +164,51 @@ const pageDescription = `Browse all link categories on ${siteConfig.title}`;
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M9 5l7 7-7 7"
+                      d={arrowIcon}
                     />
                   </svg>
                 </div>
-
-                <div class="space-y-2 text-body-sm text-slate-600 dark:text-slate-400">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                      />
-                    </svg>
-                    <span>
-                      {category._count.shortUrls}{' '}
-                      {category._count.shortUrls === 1 ? 'link' : 'links'}
-                    </span>
-                  </div>
-                </div>
               </a>
-            ))}
-          </div>
-        )
-      }
-    </div>
+            ))
+          )
+        }
+      </div>
 
-    <footer class="py-8 text-center text-caption text-sky-600 dark:text-sky-400">
-      <p>
-        &copy; {new Date().getFullYear()}
-        <a
-          href="https://heri.life"
-          class="hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200 font-medium"
-        >
-          Heri Rusmanto
-        </a>
-      </p>
-    </footer>
+      <footer class="text-center text-sm text-slate-500 dark:text-slate-400">
+        <p>
+          &copy; {new Date().getFullYear()}
+          <a
+            href="https://heri.life"
+            class="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 font-medium ml-1"
+          >
+            Heri Rusmanto
+          </a>
+        </p>
+      </footer>
+    </div>
   </main>
 </Layout>
 
 <script is:inline>
-  const themeToggleButton = document.getElementById('theme-toggle');
-  const sunIcon = document.getElementById('sun-icon');
-  const moonIcon = document.getElementById('moon-icon');
+  (function () {
+    const btn = document.getElementById('theme-toggle');
+    const sun = document.getElementById('sun-icon');
+    const moon = document.getElementById('moon-icon');
 
-  function updateIcons() {
-    if (document.documentElement.classList.contains('dark')) {
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
-    } else {
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
+    function update() {
+      const isDark = document.documentElement.classList.contains('dark');
+      sun.style.display = isDark ? 'block' : 'none';
+      moon.style.display = isDark ? 'none' : 'block';
     }
-  }
 
-  // Set initial icon state
-  updateIcons();
-
-  themeToggleButton.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem(
-      'theme',
-      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    );
-    updateIcons();
-  });
+    update();
+    btn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem(
+        'theme',
+        document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      );
+      update();
+    });
+  })();
 </script>
