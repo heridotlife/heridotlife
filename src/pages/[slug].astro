@@ -145,40 +145,37 @@ if (categoryRecord) {
                                 class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 overflow-hidden"
                             >
                                 <div class="p-6 flex items-center gap-4 min-h-[100px]">
-                                    {/* OG Image if available */}
-                                    {url.ogImage && (
+                                    {/* OG Image or Icon */}
+                                    {url.ogImage ? (
                                         <div class="flex-shrink-0">
                                             <img 
                                                 src={url.ogImage} 
                                                 alt={url.title || 'Link thumbnail'}
-                                                class="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
+                                                class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
                                                 loading="lazy"
                                             />
                                         </div>
+                                    ) : (
+                                        <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                            <svg class="w-6 h-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                            </svg>
+                                        </div>
                                     )}
                                     
+                                    {/* Content */}
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-start gap-3">
-                                            {!url.ogImage && (
-                                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                                    <svg class="w-6 h-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                                    </svg>
-                                                </div>
-                                            )}
-                                            <div class="flex-1 min-w-0">
-                                                <h3 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1 line-clamp-2">
-                                                    {url.title || 'Untitled Link'}
-                                                </h3>
-                                                {url.description && (
-                                                    <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
-                                                        {url.description}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
+                                        <h3 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1 line-clamp-2">
+                                            {url.title || 'Untitled Link'}
+                                        </h3>
+                                        {url.description && (
+                                            <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                                                {url.description}
+                                            </p>
+                                        )}
                                     </div>
                                     
+                                    {/* Arrow Icon */}
                                     <svg
                                         class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0"
                                         fill="none"
