@@ -59,7 +59,7 @@ export async function getAllPublishedPosts(
     SELECT 
       bp.id, bp.slug, bp.title, bp.excerpt,
       bp.featuredImage, bp.featuredImageAlt,
-      bp.authorId, bp.publishedAt, bp.readTime, bp.viewCount
+      bp.publishedAt, bp.readTime, bp.viewCount
     FROM BlogPost bp
     ${whereClause}
     ${orderByClause}
@@ -213,9 +213,9 @@ export async function createBlogPost(
       INSERT INTO BlogPost (
         slug, title, excerpt, content,
         featuredImage, featuredImageAlt,
-        authorId, metaTitle, metaDescription, ogImage, keywords,
+        metaTitle, metaDescription, ogImage, keywords,
         status, isPublished, publishedAt, readTime, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       input.slug,
@@ -224,7 +224,6 @@ export async function createBlogPost(
       input.content,
       input.featuredImage || null,
       input.featuredImageAlt || null,
-      input.authorId,
       input.metaTitle || null,
       input.metaDescription || null,
       input.ogImage || null,

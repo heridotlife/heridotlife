@@ -1,0 +1,208 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { createCachedD1Helper } from '../../lib/cached-d1';
+import { siteConfig } from '../../consts';
+
+// Get query parameters for pagination and filtering
+const url = new URL(Astro.request.url);
+const page = parseInt(url.searchParams.get('page') || '1');
+const limit = parseInt(url.searchParams.get('limit') || '12');
+const categorySlug = url.searchParams.get('category');
+const tagSlug = url.searchParams.get('tag');
+
+// Use cached D1 helper for better performance
+const db = createCachedD1Helper(
+  Astro.locals.runtime.env.D1_db,
+  Astro.locals.runtime.env.heridotlife_kv as any
+);
+
+// Fetch published blog posts
+const result = await db.getAllPublishedPosts({
+  page,
+  limit,
+  categorySlug: categorySlug || undefined,
+  tagSlug: tagSlug || undefined,
+  sortBy: 'publishedAt',
+  sortOrder: 'desc',
+});
+
+const { posts, pagination } = result;
+
+// Fetch all categories and tags for filters
+const categories = await db.getAllBlogCategories();
+const allTags = await db.getAllTags();
+
+// Page metadata
+const pageTitle = categorySlug 
+  ? `${categorySlug} - Blog | ${siteConfig.title}`
+  : tagSlug
+  ? `#${tagSlug} - Blog | ${siteConfig.title}`
+  : `Blog | ${siteConfig.title}`;
+
+const pageDescription = categorySlug
+  ? `Browse blog posts in ${categorySlug} category`
+  : tagSlug
+  ? `Browse blog posts tagged with ${tagSlug}`
+  : 'Read our latest articles, tutorials, and insights';
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="min-h-screen bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-4">
+          {categorySlug ? categorySlug : tagSlug ? `#${tagSlug}` : 'Blog'}
+        </h1>
+        <p class="text-lg text-sky-600 dark:text-sky-400 max-w-2xl mx-auto">
+          {pageDescription}
+        </p>
+      </div>
+
+      <!-- Filters -->
+      <div class="mb-8 flex flex-wrap gap-4 justify-center items-center">
+        <!-- Categories -->
+        <div class="flex flex-wrap gap-2">
+          <a
+            href="/blog"
+            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              !categorySlug && !tagSlug
+                ? 'bg-sky-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700'
+            }`}
+          >
+            All Posts
+          </a>
+          {categories.slice(0, 5).map((category) => (
+            <a
+              href={`/blog?category=${category.slug}`}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                categorySlug === category.slug
+                  ? 'bg-sky-600 text-white'
+                  : 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              {category.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Blog Posts Grid -->
+      {posts.length === 0 ? (
+        <div class="text-center py-16">
+          <div class="text-6xl mb-4">📝</div>
+          <h2 class="text-2xl font-bold text-sky-700 dark:text-sky-300 mb-2">
+            No posts found
+          </h2>
+          <p class="text-sky-600 dark:text-sky-400">
+            {categorySlug || tagSlug
+              ? 'Try removing filters to see all posts'
+              : 'Check back soon for new content!'}
+          </p>
+        </div>
+      ) : (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {posts.map((post) => (
+            <article class="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <!-- Featured Image -->
+              {post.featuredImage && (
+                <a href={`/blog/${post.slug}`} class="block">
+                  <img
+                    src={post.featuredImage}
+                    alt={post.featuredImageAlt || post.title}
+                    class="w-full h-48 object-cover"
+                  />
+                </a>
+              )}
+
+              <div class="p-6">
+                <!-- Categories -->
+                {post.categories && post.categories.length > 0 && (
+                  <div class="flex flex-wrap gap-2 mb-3">
+                    {post.categories.map((category) => (
+                      <a
+                        href={`/blog?category=${category.slug}`}
+                        class="px-2 py-1 text-xs font-medium rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800"
+                        style={category.color ? `border-left: 3px solid ${category.color}` : ''}
+                      >
+                        {category.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <!-- Title -->
+                <a href={`/blog/${post.slug}`}>
+                  <h2 class="text-xl font-bold text-sky-900 dark:text-sky-100 mb-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                    {post.title}
+                  </h2>
+                </a>
+
+                <!-- Excerpt -->
+                <p class="text-sky-700 dark:text-sky-300 mb-4 line-clamp-3">
+                  {post.excerpt}
+                </p>
+
+                <!-- Meta -->
+                <div class="flex items-center justify-between text-sm text-sky-600 dark:text-sky-400">
+                  <div class="flex items-center gap-4">
+                    {post.readTime && (
+                      <span>📖 {post.readTime} min read</span>
+                    )}
+                    {post.viewCount > 0 && (
+                      <span>👁️ {post.viewCount} views</span>
+                    )}
+                  </div>
+                  <time datetime={new Date(post.publishedAt * 1000).toISOString()}>
+                    {new Date(post.publishedAt * 1000).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </time>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      <!-- Pagination -->
+      {pagination.totalPages > 1 && (
+        <div class="flex justify-center items-center gap-2">
+          {pagination.hasPrev && (
+            <a
+              href={`/blog?page=${page - 1}${categorySlug ? `&category=${categorySlug}` : ''}${tagSlug ? `&tag=${tagSlug}` : ''}`}
+              class="px-4 py-2 bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              ← Previous
+            </a>
+          )}
+
+          <span class="px-4 py-2 text-sky-700 dark:text-sky-300">
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
+
+          {pagination.hasNext && (
+            <a
+              href={`/blog?page=${page + 1}${categorySlug ? `&category=${categorySlug}` : ''}${tagSlug ? `&tag=${tagSlug}` : ''}`}
+              class="px-4 py-2 bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              Next →
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

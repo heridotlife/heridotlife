@@ -15,7 +15,6 @@ export interface BlogPost extends EntityWithId, EntityTimestamps {
   content: string;
   featuredImage: string | null;
   featuredImageAlt: string | null;
-  authorId: string;
   metaTitle: string | null;
   metaDescription: string | null;
   ogImage: string | null;
@@ -58,7 +57,6 @@ export interface BlogPostListItem extends EntityWithId {
   title: string;
   excerpt: string;
   featuredImage: string | null;
-  authorId: string;
   publishedAt: number | null;
   readTime: number;
   viewCount: number;

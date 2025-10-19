@@ -55,8 +55,6 @@ export const createBlogPostSchema = z.object({
 
   featuredImageAlt: z.string().max(200, 'Alt text too long').optional(),
 
-  authorId: z.string().min(1, 'Author ID is required'),
-
   metaTitle: z.string().max(70, 'Meta title should be less than 70 characters').optional(),
 
   metaDescription: z
@@ -90,9 +88,7 @@ export const createBlogPostSchema = z.object({
 /**
  * Blog post update schema (all fields optional)
  */
-export const updateBlogPostSchema = createBlogPostSchema.partial().omit({
-  authorId: true, // Author cannot be changed after creation
-});
+export const updateBlogPostSchema = createBlogPostSchema.partial();
 
 /**
  * Blog category creation schema

@@ -1,0 +1,227 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { createCachedD1Helper } from '../../lib/cached-d1';
+import { siteConfig } from '../../consts';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/blog');
+}
+
+// Use cached D1 helper for better performance
+const db = createCachedD1Helper(
+  Astro.locals.runtime.env.D1_db,
+  Astro.locals.runtime.env.heridotlife_kv as any
+);
+
+// Fetch the blog post
+const post = await db.getPostBySlug(slug);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// Only show published posts
+if (!post.isPublished) {
+  return Astro.redirect('/404');
+}
+
+// Increment view count
+await db.incrementViewCount(post.id);
+
+// Page metadata
+const pageTitle = post.metaTitle || `${post.title} | ${siteConfig.title}`;
+const pageDescription = post.metaDescription || post.excerpt;
+const ogImage = post.ogImage || post.featuredImage;
+
+// Format published date
+const publishedDate = new Date(post.publishedAt * 1000);
+const formattedDate = publishedDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <article class="min-h-screen bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Back to blog -->
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 mb-8 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Blog
+      </a>
+
+      <!-- Post Header -->
+      <header class="mb-8">
+        <!-- Categories -->
+        {post.categories && post.categories.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-4">
+            {post.categories.map((category) => (
+              <a
+                href={`/blog?category=${category.slug}`}
+                class="px-3 py-1 text-sm font-medium rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800"
+                style={category.color ? `border-left: 4px solid ${category.color}` : ''}
+              >
+                {category.name}
+              </a>
+            ))}
+          </div>
+        )}
+
+        <!-- Title -->
+        <h1 class="text-4xl sm:text-5xl font-bold text-sky-900 dark:text-sky-100 mb-4 leading-tight">
+          {post.title}
+        </h1>
+
+        <!-- Meta -->
+        <div class="flex flex-wrap items-center gap-4 text-sky-600 dark:text-sky-400 mb-6">
+          <time datetime={publishedDate.toISOString()}>
+            {formattedDate}
+          </time>
+          {post.readTime && (
+            <span>📖 {post.readTime} min read</span>
+          )}
+          {post.viewCount > 0 && (
+            <span>👁️ {post.viewCount} views</span>
+          )}
+        </div>
+
+        <!-- Featured Image -->
+        {post.featuredImage && (
+          <img
+            src={post.featuredImage}
+            alt={post.featuredImageAlt || post.title}
+            class="w-full h-auto rounded-lg shadow-lg mb-8"
+          />
+        )}
+
+        <!-- Excerpt -->
+        {post.excerpt && (
+          <p class="text-xl text-sky-700 dark:text-sky-300 mb-8 font-medium">
+            {post.excerpt}
+          </p>
+        )}
+      </header>
+
+      <!-- Post Content -->
+      <div 
+        class="prose prose-sky dark:prose-invert max-w-none mb-12"
+        set:html={post.content}
+      />
+
+      <!-- Tags -->
+      {post.tags && post.tags.length > 0 && (
+        <div class="border-t border-sky-200 dark:border-sky-800 pt-8 mb-8">
+          <h3 class="text-lg font-semibold text-sky-900 dark:text-sky-100 mb-4">
+            Tags
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <a
+                href={`/blog?tag=${tag.slug}`}
+                class="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+              >
+                #{tag.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Share Section -->
+      <div class="border-t border-sky-200 dark:border-sky-800 pt-8">
+        <h3 class="text-lg font-semibold text-sky-900 dark:text-sky-100 mb-4">
+          Share this post
+        </h3>
+        <div class="flex gap-4">
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(Astro.url.href)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+          >
+            Share on Twitter
+          </a>
+          <a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(Astro.url.href)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Share on LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  /* Prose styling for blog content */
+  .prose {
+    @apply text-sky-800 dark:text-sky-200;
+  }
+
+  .prose h2 {
+    @apply text-2xl font-bold text-sky-900 dark:text-sky-100 mt-8 mb-4;
+  }
+
+  .prose h3 {
+    @apply text-xl font-bold text-sky-900 dark:text-sky-100 mt-6 mb-3;
+  }
+
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .prose a {
+    @apply text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 underline;
+  }
+
+  .prose ul, .prose ol {
+    @apply mb-4 ml-6;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+
+  .prose code {
+    @apply bg-sky-100 dark:bg-slate-800 text-sky-800 dark:text-sky-200 px-1 py-0.5 rounded text-sm;
+  }
+
+  .prose pre {
+    @apply bg-slate-900 dark:bg-slate-950 text-slate-100 p-4 rounded-lg overflow-x-auto mb-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent text-slate-100 p-0;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-sky-500 pl-4 italic text-sky-700 dark:text-sky-300 my-4;
+  }
+
+  .prose img {
+    @apply rounded-lg shadow-md my-6;
+  }
+
+  .prose table {
+    @apply w-full border-collapse mb-4;
+  }
+
+  .prose th {
+    @apply bg-sky-100 dark:bg-slate-800 text-sky-900 dark:text-sky-100 px-4 py-2 text-left font-semibold;
+  }
+
+  .prose td {
+    @apply border border-sky-200 dark:border-sky-800 px-4 py-2;
+  }
+</style>

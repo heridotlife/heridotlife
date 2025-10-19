@@ -280,6 +280,43 @@ export class CachedD1Helper extends D1Helper {
       hitRate: 0,
     };
   }
+
+  // Blog methods - import and delegate to blog API functions
+  async getAllPublishedPosts(options: any = {}): Promise<any> {
+    const { getAllPublishedPosts } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    return await getAllPublishedPosts(this.db as any, options);
+  }
+
+  async getPostBySlug(slug: string): Promise<any> {
+    const { getPostBySlug } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    return await getPostBySlug(this.db as any, slug);
+  }
+
+  async getPostById(id: number): Promise<any> {
+    const { getPostById } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    return await getPostById(this.db as any, id);
+  }
+
+  async incrementViewCount(postId: number): Promise<void> {
+    const { incrementViewCount } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    await incrementViewCount(this.db as any, postId);
+  }
+
+  async getAllTags(): Promise<any[]> {
+    const { getAllTags } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    return await getAllTags(this.db as any);
+  }
+
+  async getAllBlogCategories(): Promise<any[]> {
+    const { getAllCategories } = await import('./blog/api');
+    // @ts-ignore - accessing private property
+    return await getAllCategories(this.db as any);
+  }
 }
 
 // Helper function to create cached D1 helper instance

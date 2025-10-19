@@ -135,7 +135,6 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
         isPublished: status === 'published',
         publishedAt: status === 'published' ? Math.floor(Date.now() / 1000) : undefined,
         readTime: calculateReadingTime(content),
-        authorId: 'admin', // TODO: Get from session
         metaTitle: metaTitle || undefined,
         metaDescription: metaDescription || undefined,
       };
