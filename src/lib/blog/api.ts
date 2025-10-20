@@ -39,18 +39,23 @@ export async function getAllPublishedPosts(
   const bindings: (string | number)[] = [];
 
   if (categorySlug) {
-    whereClause += ' AND EXISTS (SELECT 1 FROM BlogPostCategory bpc INNER JOIN BlogCategory bc ON bpc.categoryId = bc.id WHERE bpc.blogPostId = bp.id AND bc.slug = ?)';
+    whereClause +=
+      ' AND EXISTS (SELECT 1 FROM BlogPostCategory bpc INNER JOIN BlogCategory bc ON bpc.categoryId = bc.id WHERE bpc.blogPostId = bp.id AND bc.slug = ?)';
     bindings.push(categorySlug);
   }
 
   if (tagSlug) {
-    whereClause += ' AND EXISTS (SELECT 1 FROM BlogPostTag bpt INNER JOIN BlogTag bt ON bpt.tagId = bt.id WHERE bpt.blogPostId = bp.id AND bt.slug = ?)';
+    whereClause +=
+      ' AND EXISTS (SELECT 1 FROM BlogPostTag bpt INNER JOIN BlogTag bt ON bpt.tagId = bt.id WHERE bpt.blogPostId = bp.id AND bt.slug = ?)';
     bindings.push(tagSlug);
   }
 
   // Get total count
   const countQuery = `SELECT COUNT(*) as count FROM BlogPost bp ${whereClause}`;
-  const countResult = await db.prepare(countQuery).bind(...bindings).first<{ count: number }>();
+  const countResult = await db
+    .prepare(countQuery)
+    .bind(...bindings)
+    .first<{ count: number }>();
   const total = countResult?.count || 0;
 
   // Get posts
@@ -76,11 +81,13 @@ export async function getAllPublishedPosts(
   // Fetch categories for each post
   for (const post of posts) {
     const categoriesResult = await db
-      .prepare(`
+      .prepare(
+        `
         SELECT bc.* FROM BlogCategory bc
         INNER JOIN BlogPostCategory bpc ON bc.id = bpc.categoryId
         WHERE bpc.blogPostId = ?
-      `)
+      `
+      )
       .bind(post.id)
       .all<BlogCategory>();
 
@@ -107,10 +114,12 @@ export async function getAllPublishedPosts(
  */
 export async function getPostBySlug(db: D1Database, slug: string): Promise<BlogPost | null> {
   const post = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT * FROM BlogPost 
       WHERE slug = ? AND isPublished = 1
-    `)
+    `
+    )
     .bind(slug)
     .first<BlogPost>();
 
@@ -121,11 +130,13 @@ export async function getPostBySlug(db: D1Database, slug: string): Promise<BlogP
 
   // Get categories
   const categoriesResult = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT bc.* FROM BlogCategory bc
       INNER JOIN BlogPostCategory bpc ON bc.id = bpc.categoryId
       WHERE bpc.blogPostId = ?
-    `)
+    `
+    )
     .bind(post.id)
     .all<BlogCategory>();
 
@@ -133,11 +144,13 @@ export async function getPostBySlug(db: D1Database, slug: string): Promise<BlogP
 
   // Get tags
   const tagsResult = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT bt.* FROM BlogTag bt
       INNER JOIN BlogPostTag bpt ON bt.id = bpt.tagId
       WHERE bpt.blogPostId = ?
-    `)
+    `
+    )
     .bind(post.id)
     .all<BlogTag>();
 
@@ -150,10 +163,7 @@ export async function getPostBySlug(db: D1Database, slug: string): Promise<BlogP
  * Get a blog post by ID (admin)
  */
 export async function getPostById(db: D1Database, id: number): Promise<BlogPost | null> {
-  const post = await db
-    .prepare('SELECT * FROM BlogPost WHERE id = ?')
-    .bind(id)
-    .first<BlogPost>();
+  const post = await db.prepare('SELECT * FROM BlogPost WHERE id = ?').bind(id).first<BlogPost>();
 
   if (!post) return null;
 
@@ -161,22 +171,26 @@ export async function getPostById(db: D1Database, id: number): Promise<BlogPost 
 
   // Get categories and tags (same as getPostBySlug)
   const categoriesResult = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT bc.* FROM BlogCategory bc
       INNER JOIN BlogPostCategory bpc ON bc.id = bpc.categoryId
       WHERE bpc.blogPostId = ?
-    `)
+    `
+    )
     .bind(post.id)
     .all<BlogCategory>();
 
   post.categories = categoriesResult.results || [];
 
   const tagsResult = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT bt.* FROM BlogTag bt
       INNER JOIN BlogPostTag bpt ON bt.id = bpt.tagId
       WHERE bpt.blogPostId = ?
-    `)
+    `
+    )
     .bind(post.id)
     .all<BlogTag>();
 
@@ -190,11 +204,13 @@ export async function getPostById(db: D1Database, id: number): Promise<BlogPost 
  */
 export async function incrementViewCount(db: D1Database, slug: string): Promise<void> {
   await db
-    .prepare(`
+    .prepare(
+      `
       UPDATE BlogPost 
       SET viewCount = viewCount + 1 
       WHERE slug = ? AND isPublished = 1
-    `)
+    `
+    )
     .bind(slug)
     .run();
 }
@@ -209,14 +225,16 @@ export async function createBlogPost(
   const now = Math.floor(Date.now() / 1000);
 
   const result = await db
-    .prepare(`
+    .prepare(
+      `
       INSERT INTO BlogPost (
         slug, title, excerpt, content,
         featuredImage, featuredImageAlt,
         metaTitle, metaDescription, ogImage, keywords,
         status, isPublished, publishedAt, readTime, createdAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
+    `
+    )
     .bind(
       input.slug,
       input.title,
@@ -263,10 +281,7 @@ export async function createBlogPost(
         .run();
 
       // Increment tag use count
-      await db
-        .prepare('UPDATE BlogTag SET useCount = useCount + 1 WHERE id = ?')
-        .bind(tagId)
-        .run();
+      await db.prepare('UPDATE BlogTag SET useCount = useCount + 1 WHERE id = ?').bind(tagId).run();
     }
   }
 
@@ -433,7 +448,9 @@ export async function getBlogStats(db: D1Database): Promise<BlogStats> {
 
   // Top posts by views
   const topPostsResult = await db
-    .prepare('SELECT id, title, slug, viewCount as views FROM BlogPost ORDER BY viewCount DESC LIMIT 5')
+    .prepare(
+      'SELECT id, title, slug, viewCount as views FROM BlogPost ORDER BY viewCount DESC LIMIT 5'
+    )
     .all();
   const topPosts =
     topPostsResult.results?.map((p: any) => ({

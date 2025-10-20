@@ -14,27 +14,30 @@ export const safeTextRegex = /^[a-zA-Z0-9\s\-–—.,!?'"()&:;]+$/;
 /**
  * Validate and sanitize a slug
  */
-export function validateSlugFormat(slug: string, lowercase: boolean = false): {
+export function validateSlugFormat(
+  slug: string,
+  lowercase: boolean = false
+): {
   valid: boolean;
   error?: string;
   sanitized?: string;
 } {
   const trimmed = lowercase ? slug.trim().toLowerCase() : slug.trim();
-  
+
   const regex = lowercase ? blogSlugRegex : slugRegex;
-  
+
   if (!regex.test(trimmed)) {
     return { valid: false, error: 'Invalid slug format' };
   }
-  
+
   if (trimmed.startsWith('-') || trimmed.endsWith('-')) {
     return { valid: false, error: 'Slug cannot start or end with hyphen' };
   }
-  
+
   if (trimmed.includes('--')) {
     return { valid: false, error: 'Slug cannot contain consecutive hyphens' };
   }
-  
+
   return { valid: true, sanitized: trimmed };
 }
 
@@ -43,11 +46,11 @@ export function validateSlugFormat(slug: string, lowercase: boolean = false): {
  */
 export function generateSlugFromText(text: string, lowercase: boolean = true): string {
   let slug = text.trim();
-  
+
   if (lowercase) {
     slug = slug.toLowerCase();
   }
-  
+
   return slug
     .replace(/[^a-zA-Z0-9\s-]/g, '') // Remove special chars
     .replace(/\s+/g, '-') // Spaces to hyphens
@@ -68,8 +71,8 @@ export function containsDangerousPatterns(text: string): boolean {
     /<object/i,
     /<embed/i,
   ];
-  
-  return dangerousPatterns.some(pattern => pattern.test(text));
+
+  return dangerousPatterns.some((pattern) => pattern.test(text));
 }
 
 /**

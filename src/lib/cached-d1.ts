@@ -282,40 +282,42 @@ export class CachedD1Helper extends D1Helper {
   }
 
   // Blog methods - import and delegate to blog API functions
-  async getAllPublishedPosts(options: any = {}): Promise<any> {
+  async getAllPublishedPosts(
+    options: import('./blog/types').BlogQueryOptions = {}
+  ): Promise<import('./blog/types').BlogListResponse> {
     const { getAllPublishedPosts } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    return await getAllPublishedPosts(this.db as any, options);
+    return await getAllPublishedPosts(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      options
+    );
   }
 
-  async getPostBySlug(slug: string): Promise<any> {
+  async getPostBySlug(slug: string): Promise<import('./blog/types').BlogPost | null> {
     const { getPostBySlug } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    return await getPostBySlug(this.db as any, slug);
+    return await getPostBySlug(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      slug
+    );
   }
 
-  async getPostById(id: number): Promise<any> {
+  async getPostById(id: number): Promise<import('./blog/types').BlogPost | null> {
     const { getPostById } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    return await getPostById(this.db as any, id);
+    return await getPostById(this.database as import('@cloudflare/workers-types').D1Database, id);
   }
 
-  async incrementViewCount(postId: number): Promise<void> {
+  async incrementViewCount(slug: string): Promise<void> {
     const { incrementViewCount } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    await incrementViewCount(this.db as any, postId);
+    await incrementViewCount(this.database as import('@cloudflare/workers-types').D1Database, slug);
   }
 
-  async getAllTags(): Promise<any[]> {
+  async getAllTags(): Promise<import('./blog/types').BlogTag[]> {
     const { getAllTags } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    return await getAllTags(this.db as any);
+    return await getAllTags(this.database as import('@cloudflare/workers-types').D1Database);
   }
 
-  async getAllBlogCategories(): Promise<any[]> {
+  async getAllBlogCategories(): Promise<import('./blog/types').BlogCategory[]> {
     const { getAllCategories } = await import('./blog/api');
-    // @ts-ignore - accessing private property
-    return await getAllCategories(this.db as any);
+    return await getAllCategories(this.database as import('@cloudflare/workers-types').D1Database);
   }
 }
 

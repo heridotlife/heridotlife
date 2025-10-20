@@ -1,12 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
 import type { D1Database } from '@cloudflare/workers-types';
-import { createBlogPostSchema, updateBlogPostSchema } from '../../../lib/blog/validations';
-import {
-  getAllPublishedPosts,
-  createBlogPost,
-  getBlogStats,
-} from '../../../lib/blog/api';
+import { createBlogPostSchema } from '../../../lib/blog/validations';
+import { getAllPublishedPosts, createBlogPost } from '../../../lib/blog/api';
 import type { CreateBlogPostInput } from '../../../lib/blog/types';
 
 /**

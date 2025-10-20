@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
 import Button from '../../ui/Button';
 import type { BlogPost } from '../../../lib/blog/types';
 import { formatRelativeTime } from '../../../lib/utils';
@@ -87,7 +87,8 @@ export default function BlogPostsPage() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Blog Posts</h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Manage your blog posts ({filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'})
+            Manage your blog posts ({filteredPosts.length}{' '}
+            {filteredPosts.length === 1 ? 'post' : 'posts'})
           </p>
         </div>
         <Button

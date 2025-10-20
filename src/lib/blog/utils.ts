@@ -51,18 +51,50 @@ export function generateExcerpt(content: string, maxLength: number = 200): strin
 export function generateKeywords(title: string, content: string, maxKeywords: number = 10): string {
   // Combine title and content
   const text = `${title} ${stripHtmlTags(content)}`.toLowerCase();
-  
+
   // Common English stop words to filter out
   const stopWords = new Set([
-    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
-    'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
-    'to', 'was', 'will', 'with', 'this', 'but', 'they', 'have', 'had',
-    'what', 'when', 'where', 'who', 'which', 'why', 'how'
+    'a',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'be',
+    'by',
+    'for',
+    'from',
+    'has',
+    'he',
+    'in',
+    'is',
+    'it',
+    'its',
+    'of',
+    'on',
+    'that',
+    'the',
+    'to',
+    'was',
+    'will',
+    'with',
+    'this',
+    'but',
+    'they',
+    'have',
+    'had',
+    'what',
+    'when',
+    'where',
+    'who',
+    'which',
+    'why',
+    'how',
   ]);
-  
+
   // Extract words (alphanumeric only)
   const words = text.match(/\b[a-z0-9]{3,}\b/g) || [];
-  
+
   // Count word frequency
   const wordCount = new Map<string, number>();
   for (const word of words) {
@@ -70,13 +102,13 @@ export function generateKeywords(title: string, content: string, maxKeywords: nu
       wordCount.set(word, (wordCount.get(word) || 0) + 1);
     }
   }
-  
+
   // Sort by frequency and take top N
   const sortedWords = Array.from(wordCount.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, maxKeywords)
     .map(([word]) => word);
-  
+
   return sortedWords.join(', ');
 }
 
@@ -120,16 +152,16 @@ export interface TOCItem {
 export function generateTableOfContents(html: string): TOCItem[] {
   const headingRegex = /<h([2-4])[^>]*id="([^"]*)"[^>]*>(.*?)<\/h\1>/gi;
   const toc: TOCItem[] = [];
-  
+
   let match;
   while ((match = headingRegex.exec(html)) !== null) {
     const level = parseInt(match[1]);
     const id = match[2];
     const text = stripHtmlTags(match[3]);
-    
+
     toc.push({ id, text, level });
   }
-  
+
   return toc;
 }
 
@@ -138,24 +170,28 @@ export function generateTableOfContents(html: string): TOCItem[] {
  */
 export function highlightSearchTerms(text: string, searchQuery: string): string {
   if (!searchQuery) return text;
-  
+
   const terms = searchQuery.split(/\s+/).filter(Boolean);
   let highlighted = text;
-  
+
   for (const term of terms) {
     const regex = new RegExp(`(${term})`, 'gi');
     highlighted = highlighted.replace(regex, '<mark>$1</mark>');
   }
-  
+
   return highlighted;
 }
 
 /**
  * Get reading progress percentage
  */
-export function getReadingProgress(scrollTop: number, scrollHeight: number, clientHeight: number): number {
+export function getReadingProgress(
+  scrollTop: number,
+  scrollHeight: number,
+  clientHeight: number
+): number {
   if (scrollHeight <= clientHeight) return 100;
-  
+
   const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
   return Math.min(100, Math.max(0, progress));
 }

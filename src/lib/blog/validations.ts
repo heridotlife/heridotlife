@@ -79,10 +79,7 @@ export const createBlogPostSchema = z.object({
     .max(5, 'Maximum 5 categories per post')
     .default([]),
 
-  tagIds: z
-    .array(z.number().int().positive())
-    .max(10, 'Maximum 10 tags per post')
-    .default([]),
+  tagIds: z.array(z.number().int().positive()).max(10, 'Maximum 10 tags per post').default([]),
 });
 
 /**
@@ -146,7 +143,7 @@ export const blogSearchSchema = z.object({
 export const blogQueryOptionsSchema = z.object({
   ...paginationSchema.shape,
   ...sortOptionsSchema.shape,
-  
+
   categorySlug: z.string().regex(blogSlugRegex).optional(),
   tagSlug: z.string().regex(blogSlugRegex).optional(),
   status: z.enum(['draft', 'published', 'archived']).optional(),

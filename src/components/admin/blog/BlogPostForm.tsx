@@ -386,7 +386,8 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
                   alt="Featured image preview"
                   className="w-full rounded-lg"
                   onError={(e) => {
-                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd"/%3E%3Ctext x="50%" y="50%" fill="%23999" text-anchor="middle" dy=".3em"%3EInvalid%3C/text%3E%3C/svg%3E';
+                    e.currentTarget.src =
+                      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd"/%3E%3Ctext x="50%" y="50%" fill="%23999" text-anchor="middle" dy=".3em"%3EInvalid%3C/text%3E%3C/svg%3E';
                   }}
                 />
                 <button
@@ -419,7 +420,9 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
             </label>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {categories.length === 0 ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">No categories available</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No categories available
+                </p>
               ) : (
                 categories.map((category) => (
                   <label key={category.id} className="flex items-center gap-2 cursor-pointer">
