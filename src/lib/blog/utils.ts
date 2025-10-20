@@ -28,12 +28,14 @@ export {
 
 /**
  * Calculate reading time based on word count
- * Average reading speed: 200 words per minute
+ * @param content - The HTML or plain text content to analyze
+ * @param readingSpeed - Words per minute (default: 200 WPM for average readers)
+ * @returns Estimated reading time in minutes (minimum 1 minute)
  */
-export function calculateReadingTime(content: string): number {
+export function calculateReadingTime(content: string, readingSpeed: number = 200): number {
   const plainText = stripHtmlTags(content);
   const words = plainText.trim().split(/\s+/).length;
-  const minutes = Math.ceil(words / 200);
+  const minutes = Math.ceil(words / readingSpeed);
   return Math.max(1, minutes);
 }
 

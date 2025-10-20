@@ -57,6 +57,7 @@ export interface BlogPostListItem extends EntityWithId {
   title: string;
   excerpt: string;
   featuredImage: string | null;
+  featuredImageAlt: string | null;
   publishedAt: number | null;
   readTime: number;
   viewCount: number;

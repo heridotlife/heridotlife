@@ -11,6 +11,8 @@ export interface Pagination {
   limit: number;
   total: number;
   totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 }
 
 export interface PaginationParams {

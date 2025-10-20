@@ -148,12 +148,18 @@ const pageDescription = categorySlug
                       {post.readTime && <span>📖 {post.readTime} min read</span>}
                       {post.viewCount > 0 && <span>👁️ {post.viewCount} views</span>}
                     </div>
-                    <time datetime={new Date(post.publishedAt * 1000).toISOString()}>
-                      {new Date(post.publishedAt * 1000).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                    <time
+                      datetime={
+                        post.publishedAt ? new Date(post.publishedAt * 1000).toISOString() : ''
+                      }
+                    >
+                      {post.publishedAt
+                        ? new Date(post.publishedAt * 1000).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        : 'Not published'}
                     </time>
                   </div>
                 </div>

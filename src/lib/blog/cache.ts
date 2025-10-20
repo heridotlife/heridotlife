@@ -5,7 +5,7 @@
  */
 
 import type { KVNamespace } from '@cloudflare/workers-types';
-import { KVCache, type CacheOptions } from '../cache';
+import { KVCache } from '../cache';
 
 /**
  * Cache key generators for blog entities

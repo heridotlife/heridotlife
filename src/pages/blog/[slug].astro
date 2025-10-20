@@ -18,15 +18,12 @@ const db = createCachedD1Helper(
 // Fetch the blog post
 const post = await db.getPostBySlug(slug);
 
-if (!post) {
-  return Astro.redirect('/404');
+if (!post || !post.isPublished) {
+  return new Response('Not found', { status: 404 });
 }
 
 // Only show published posts
-if (!post.isPublished) {
-  return Astro.redirect('/404');
-}
-
+// (handled above)
 // Increment view count
 await db.incrementViewCount(slug);
 
@@ -35,7 +32,7 @@ const pageTitle = post.metaTitle || `${post.title} | ${siteConfig.title}`;
 const pageDescription = post.metaDescription || post.excerpt;
 
 // Format published date
-const publishedDate = new Date(post.publishedAt * 1000);
+const publishedDate = post.publishedAt ? new Date(post.publishedAt * 1000) : new Date();
 const formattedDate = publishedDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',

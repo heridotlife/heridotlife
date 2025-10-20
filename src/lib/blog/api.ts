@@ -254,7 +254,10 @@ export async function createBlogPost(
     )
     .run();
 
-  const postId = result.meta.last_row_id as number;
+  const postId = result.meta.last_row_id;
+  if (typeof postId !== 'number' || !postId) {
+    throw new Error('Failed to get post ID');
+  }
 
   // Link categories
   if (input.categoryIds && input.categoryIds.length > 0) {
@@ -285,7 +288,11 @@ export async function createBlogPost(
     }
   }
 
-  return (await getPostById(db, postId))!;
+  const post = await getPostById(db, postId);
+  if (!post) {
+    throw new Error('Failed to retrieve the newly created blog post');
+  }
+  return post;
 }
 
 /**
@@ -373,7 +380,11 @@ export async function updateBlogPost(
     }
   }
 
-  return (await getPostById(db, id))!;
+  const updatedPost = await getPostById(db, id);
+  if (!updatedPost) {
+    throw new Error(`Blog post with id ${id} not found after update.`);
+  }
+  return updatedPost;
 }
 
 /**

@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS BlogPost (
   viewCount INTEGER NOT NULL DEFAULT 0,
   readTime INTEGER,
   
-  FOREIGN KEY (authorId) REFERENCES User(id) ON DELETE CASCADE
 );
 
 -- Categories table

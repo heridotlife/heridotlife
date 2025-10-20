@@ -15,9 +15,10 @@ import {
 } from '../validations';
 
 /**
- * Hex color validation
+ * Hex color validation (6-digit format only, e.g., #RRGGBB)
+ * Note: Excludes 3-digit shorthand (#RGB) and 8-digit with alpha (#RRGGBBAA)
  */
-const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
+const HEX_COLOR_6_DIGIT_REGEX = /^#[0-9A-Fa-f]{6}$/;
 
 /**
  * Blog post creation schema
@@ -51,7 +52,7 @@ export const createBlogPostSchema = z.object({
     .min(100, 'Content must be at least 100 characters')
     .max(100000, 'Content must be less than 100KB'),
 
-  featuredImage: z.string().url('Invalid image URL').optional().or(z.literal('')),
+  featuredImage: z.string().url().optional().or(z.literal('')),
 
   featuredImageAlt: z.string().max(200, 'Alt text too long').optional(),
 
@@ -62,7 +63,7 @@ export const createBlogPostSchema = z.object({
     .max(160, 'Meta description should be less than 160 characters')
     .optional(),
 
-  ogImage: z.string().url('Invalid OG image URL').optional().or(z.literal('')),
+  ogImage: z.string().url().optional().or(z.literal('')),
 
   keywords: z.string().max(500, 'Keywords too long').optional(),
 
@@ -103,7 +104,7 @@ export const createBlogCategorySchema = z.object({
 
   icon: z.string().max(50, 'Icon name too long').optional(),
 
-  color: z.string().regex(HEX_COLOR_REGEX, 'Invalid hex color').optional(),
+  color: z.string().regex(HEX_COLOR_6_DIGIT_REGEX, 'Invalid hex color').optional(),
 });
 
 /**
