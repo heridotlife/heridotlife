@@ -470,7 +470,10 @@ export class KVCache {
     // If not in cache, execute function and cache result
     try {
       const result = await fetchFunction();
-      await this.set(key, result, options);
+      // Only cache non-null, non-undefined values
+      if (result !== null && result !== undefined) {
+        await this.set(key, result, options);
+      }
       return result;
     } catch (error) {
       console.error(`Cache getOrSet error for key ${key}:`, error);

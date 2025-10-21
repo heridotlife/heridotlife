@@ -280,6 +280,45 @@ export class CachedD1Helper extends D1Helper {
       hitRate: 0,
     };
   }
+
+  // Blog methods - import and delegate to blog API functions
+  async getAllPublishedPosts(
+    options: import('./blog/types').BlogQueryOptions = {}
+  ): Promise<import('./blog/types').BlogListResponse> {
+    const { getAllPublishedPosts } = await import('./blog/api');
+    return await getAllPublishedPosts(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      options
+    );
+  }
+
+  async getPostBySlug(slug: string): Promise<import('./blog/types').BlogPost | null> {
+    const { getPostBySlug } = await import('./blog/api');
+    return await getPostBySlug(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      slug
+    );
+  }
+
+  async getPostById(id: number): Promise<import('./blog/types').BlogPost | null> {
+    const { getPostById } = await import('./blog/api');
+    return await getPostById(this.database as import('@cloudflare/workers-types').D1Database, id);
+  }
+
+  async incrementViewCount(slug: string): Promise<void> {
+    const { incrementViewCount } = await import('./blog/api');
+    await incrementViewCount(this.database as import('@cloudflare/workers-types').D1Database, slug);
+  }
+
+  async getAllTags(): Promise<import('./blog/types').BlogTag[]> {
+    const { getAllTags } = await import('./blog/api');
+    return await getAllTags(this.database as import('@cloudflare/workers-types').D1Database);
+  }
+
+  async getAllBlogCategories(): Promise<import('./blog/types').BlogCategory[]> {
+    const { getAllCategories } = await import('./blog/api');
+    return await getAllCategories(this.database as import('@cloudflare/workers-types').D1Database);
+  }
 }
 
 // Helper function to create cached D1 helper instance

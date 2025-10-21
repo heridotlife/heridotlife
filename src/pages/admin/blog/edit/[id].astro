@@ -1,0 +1,10 @@
+---
+import BlogPostForm from '../../../../components/admin/blog/BlogPostForm';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const { id } = Astro.params;
+---
+
+<AdminLayout title="Edit Post">
+  <BlogPostForm client:only="react" mode="edit" postId={id} />
+</AdminLayout>

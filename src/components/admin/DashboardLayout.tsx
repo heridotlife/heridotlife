@@ -70,6 +70,7 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode; pa
     { href: '/admin/dashboard', label: 'Dashboard' },
     { href: '/admin/urls', label: 'URLs' },
     { href: '/admin/categories', label: 'Categories' },
+    { href: '/admin/blog', label: 'Blog' },
     { href: '/admin/cache', label: 'Cache' },
   ];
 

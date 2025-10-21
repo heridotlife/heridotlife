@@ -1,0 +1,8 @@
+---
+import BlogPostForm from '../../../components/admin/blog/BlogPostForm';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Create New Post">
+  <BlogPostForm client:only="react" mode="create" />
+</AdminLayout>

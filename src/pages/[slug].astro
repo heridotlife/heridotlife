@@ -10,7 +10,7 @@ if (!slug) {
     return Astro.redirect('/404');
 }
 
-const reservedPaths = ['admin', 'api', 'category', 'urls', 'c', 'categories'];
+const reservedPaths = ['admin', 'api', 'blog', 'category', 'urls', 'c', 'categories'];
 if (reservedPaths.includes(slug.toLowerCase())) {
     return Astro.redirect('/404');
 }
