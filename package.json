@@ -21,11 +21,11 @@
     "type-check": "astro check"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
+    "@astrojs/check": "^0.9.5",
     "@astrojs/cloudflare": "^12.6.10",
     "@astrojs/react": "^4.4.0",
     "@astrojs/tailwind": "^6.0.2",
-    "astro": "^5.14.6",
+    "astro": "^5.14.7",
     "clsx": "^2.1.1",
     "jose": "^6.1.0",
     "lucide-react": "^0.546.0",
