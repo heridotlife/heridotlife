@@ -10,6 +10,10 @@ import { KVCache } from '../cache';
 /**
  * Cache TTL multiplier for popular posts
  */
+/**
+ * Multiplier used to extend the cache TTL for popular posts.
+ * Doubles the cache TTL for frequently accessed posts to improve performance.
+ */
 const POPULAR_POST_TTL_MULTIPLIER = 2;
 
 /**
