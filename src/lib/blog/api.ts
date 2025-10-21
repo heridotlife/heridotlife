@@ -39,14 +39,26 @@ export async function getAllPublishedPosts(
   const bindings: (string | number)[] = [];
 
   if (categorySlug) {
-    whereClause +=
-      ' AND EXISTS (SELECT 1 FROM BlogPostCategory bpc INNER JOIN BlogCategory bc ON bpc.categoryId = bc.id WHERE bpc.blogPostId = bp.id AND bc.slug = ?)';
+    whereClause += `
+      AND EXISTS (
+        SELECT 1
+        FROM BlogPostCategory bpc
+        INNER JOIN BlogCategory bc ON bpc.categoryId = bc.id
+        WHERE bpc.blogPostId = bp.id
+        AND bc.slug = ?
+      )`;
     bindings.push(categorySlug);
   }
 
   if (tagSlug) {
-    whereClause +=
-      ' AND EXISTS (SELECT 1 FROM BlogPostTag bpt INNER JOIN BlogTag bt ON bpt.tagId = bt.id WHERE bpt.blogPostId = bp.id AND bt.slug = ?)';
+    whereClause += `
+      AND EXISTS (
+        SELECT 1
+        FROM BlogPostTag bpt
+        INNER JOIN BlogTag bt ON bpt.tagId = bt.id
+        WHERE bpt.blogPostId = bp.id
+        AND bt.slug = ?
+      )`;
     bindings.push(tagSlug);
   }
 

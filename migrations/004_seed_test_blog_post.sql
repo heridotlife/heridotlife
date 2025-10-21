@@ -44,8 +44,8 @@ INSERT INTO BlogPost (
 
 <p>This blog is built with modern web technologies:</p>
 
-<pre><code>- Astro 5.14.4 (SSR with Cloudflare adapter)
-- React 19 (Admin UI components)
+<pre><code>- Astro (SSR with Cloudflare adapter)
+- React (Admin UI components)
 - Cloudflare D1 (SQLite at the edge)
 - Cloudflare KV (Caching layer)
 - TypeScript (Type safety)

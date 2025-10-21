@@ -22,8 +22,6 @@ if (!post || !post.isPublished) {
   return new Response('Not found', { status: 404 });
 }
 
-// Only show published posts
-// (handled above)
 // Increment view count
 await db.incrementViewCount(slug);
 

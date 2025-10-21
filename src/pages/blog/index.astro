@@ -30,7 +30,7 @@ const { posts, pagination } = result;
 
 // Fetch all categories and tags for filters
 const categories = await db.getAllBlogCategories();
-// const _allTags = await db.getAllTags(); // Reserved for future tag filtering UI
+const allTags = await db.getAllTags();
 
 // Page metadata
 const pageTitle = categorySlug
@@ -64,9 +64,12 @@ const pageDescription = categorySlug
       </div>
 
       <!-- Filters -->
-      <div class="mb-8 flex flex-wrap gap-4 justify-center items-center">
+      <div class="mb-8 space-y-4">
         <!-- Categories -->
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2 justify-center items-center">
+          <span class="text-sm font-semibold text-sky-700 dark:text-sky-300 mr-2">
+            Categories:
+          </span>
           <a
             href="/blog"
             class={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -92,6 +95,27 @@ const pageDescription = categorySlug
             ))
           }
         </div>
+
+        <!-- Tags -->
+        {
+          allTags.length > 0 && (
+            <div class="flex flex-wrap gap-2 justify-center items-center">
+              <span class="text-sm font-semibold text-sky-700 dark:text-sky-300 mr-2">Tags:</span>
+              {allTags.slice(0, 10).map((tag) => (
+                <a
+                  href={`/blog?tag=${tag.slug}`}
+                  class={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
+                    tagSlug === tag.slug
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-slate-700 border border-cyan-200 dark:border-cyan-800'
+                  }`}
+                >
+                  #{tag.name}
+                </a>
+              ))}
+            </div>
+          )
+        }
       </div>
 
       <!-- Blog Posts Grid -->
@@ -142,6 +166,19 @@ const pageDescription = categorySlug
                   </a>
 
                   <p class="text-sky-700 dark:text-sky-300 mb-4 line-clamp-3">{post.excerpt}</p>
+
+                  {post.tags && post.tags.length > 0 && (
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      {post.tags.slice(0, 3).map((tag) => (
+                        <a
+                          href={`/blog?tag=${tag.slug}`}
+                          class="px-2 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300"
+                        >
+                          #{tag.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
 
                   <div class="flex items-center justify-between text-sm text-sky-600 dark:text-sky-400">
                     <div class="flex items-center gap-4">

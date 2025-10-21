@@ -8,6 +8,11 @@ import type { KVNamespace } from '@cloudflare/workers-types';
 import { KVCache } from '../cache';
 
 /**
+ * Cache TTL multiplier for popular posts
+ */
+const POPULAR_POST_TTL_MULTIPLIER = 2;
+
+/**
  * Cache key generators for blog entities
  */
 export const BlogCacheKeys = {
@@ -233,7 +238,7 @@ export class BlogCacheWarmer {
     // Cache each popular post
     const promises = posts.map((post) =>
       this.caches.postCache.set(BlogCacheKeys.post(post.slug), post, {
-        ttl: BlogCacheTTL.post * 2, // Double TTL for popular posts
+        ttl: BlogCacheTTL.post * POPULAR_POST_TTL_MULTIPLIER, // Double TTL for popular posts
       })
     );
 

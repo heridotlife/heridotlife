@@ -15,7 +15,35 @@ import {
 } from '../validations';
 
 /**
+ * URL validation helper for optional URL fields
+ */
+const optionalUrl = () =>
+  z
+    .string()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true;
+        try {
+          new URL(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Invalid URL format' }
+    )
+    .optional()
+    .or(z.literal(''));
+
+/**
  * Hex color validation (6-digit format only, e.g., #RRGGBB)
+ *
+ * Only 6-digit hex colors are allowed to ensure consistency in color representation
+ * across the application. This format is widely supported in CSS and design tools,
+ * whereas 3-digit and 8-digit formats may not be handled correctly or may introduce
+ * unexpected results. Restricting to 6 digits simplifies validation and guarantees
+ * predictable color output.
+ *
  * Note: Excludes 3-digit shorthand (#RGB) and 8-digit with alpha (#RRGGBBAA)
  */
 const HEX_COLOR_6_DIGIT_REGEX = /^#[0-9A-Fa-f]{6}$/;
@@ -52,7 +80,7 @@ export const createBlogPostSchema = z.object({
     .min(100, 'Content must be at least 100 characters')
     .max(100000, 'Content must be less than 100KB'),
 
-  featuredImage: z.string().url().optional().or(z.literal('')),
+  featuredImage: optionalUrl(),
 
   featuredImageAlt: z.string().max(200, 'Alt text too long').optional(),
 
@@ -63,7 +91,7 @@ export const createBlogPostSchema = z.object({
     .max(160, 'Meta description should be less than 160 characters')
     .optional(),
 
-  ogImage: z.string().url().optional().or(z.literal('')),
+  ogImage: optionalUrl(),
 
   keywords: z.string().max(500, 'Keywords too long').optional(),
 
