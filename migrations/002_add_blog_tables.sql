@@ -39,8 +39,7 @@ CREATE TABLE IF NOT EXISTS BlogPost (
   
   -- Analytics
   viewCount INTEGER NOT NULL DEFAULT 0,
-  readTime INTEGER,
-  
+  readTime INTEGER
 );
 
 -- Categories table
