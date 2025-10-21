@@ -1,5 +1,98 @@
 import { z } from 'zod';
 
+/**
+ * Shared validation patterns and utilities
+ */
+
+// Slug validation patterns
+export const slugRegex = /^[a-zA-Z0-9_-]+$/;
+export const blogSlugRegex = /^[a-z0-9-]+$/; // Lowercase only
+
+// Safe text regex (common punctuation allowed)
+export const safeTextRegex = /^[a-zA-Z0-9\s\-–—.,!?'"()&:;]+$/;
+
+/**
+ * Validate and sanitize a slug
+ */
+export function validateSlugFormat(
+  slug: string,
+  lowercase: boolean = false
+): {
+  valid: boolean;
+  error?: string;
+  sanitized?: string;
+} {
+  const trimmed = lowercase ? slug.trim().toLowerCase() : slug.trim();
+
+  const regex = lowercase ? blogSlugRegex : slugRegex;
+
+  if (!regex.test(trimmed)) {
+    return { valid: false, error: 'Invalid slug format' };
+  }
+
+  if (trimmed.startsWith('-') || trimmed.endsWith('-')) {
+    return { valid: false, error: 'Slug cannot start or end with hyphen' };
+  }
+
+  if (trimmed.includes('--')) {
+    return { valid: false, error: 'Slug cannot contain consecutive hyphens' };
+  }
+
+  return { valid: true, sanitized: trimmed };
+}
+
+/**
+ * Generate a URL-safe slug from text
+ */
+export function generateSlugFromText(text: string, lowercase: boolean = true): string {
+  let slug = text.trim();
+
+  if (lowercase) {
+    slug = slug.toLowerCase();
+  }
+
+  return slug
+    .replace(/[^a-zA-Z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-') // Spaces to hyphens
+    .replace(/-+/g, '-') // Remove consecutive hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .substring(0, 100); // Limit length
+}
+
+/**
+ * Check for dangerous patterns (XSS prevention)
+ */
+export function containsDangerousPatterns(text: string): boolean {
+  const dangerousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /on\w+\s*=/i,
+    /<iframe/i,
+    /<object/i,
+    /<embed/i,
+  ];
+
+  return dangerousPatterns.some((pattern) => pattern.test(text));
+}
+
+/**
+ * Shared Zod schemas
+ */
+
+export const paginationSchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+});
+
+export const sortOptionsSchema = z.object({
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+});
+
+/**
+ * Auth schemas
+ */
+
 export const loginSchema = z.object({
   password: z.string().min(1, { message: 'Password is required.' }),
 });

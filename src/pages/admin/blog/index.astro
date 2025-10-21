@@ -1,0 +1,8 @@
+---
+import BlogPostsPage from '../../../components/admin/blog/BlogPostsPage';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Blog Posts">
+  <BlogPostsPage client:only="react" />
+</AdminLayout>

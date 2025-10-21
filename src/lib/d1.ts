@@ -105,6 +105,11 @@ export function toTimestamp(date: Date | null): number | null {
 export class D1Helper {
   constructor(private db: D1Database) {}
 
+  // Protected getter for subclasses to access the database
+  protected get database(): D1Database {
+    return this.db;
+  }
+
   // ShortUrl operations
   async findShortUrl(shortUrl: string): Promise<ShortUrl | null> {
     return await this.db
