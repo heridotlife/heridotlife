@@ -3,6 +3,9 @@ import { logSecurityEvent } from './cache-security';
 import { createRateLimiters, type RateLimiters } from './rate-limiter';
 import { detectHoneypot, createHoneypotTrap, getHoneypotSeverity } from './honeypot';
 
+/**
+ * Cache configuration options
+ */
 export interface CacheOptions {
   /** Time to live in seconds. Default: 3600 (1 hour) */
   ttl?: number;
@@ -12,9 +15,16 @@ export interface CacheOptions {
   prefix?: string;
 }
 
+/**
+ * Cache entry wrapper with metadata
+ * @template T - Type of the cached data
+ */
 export interface CacheEntry<T = unknown> {
+  /** The actual cached data */
   data: T;
+  /** Unix timestamp (milliseconds) when entry was created */
   timestamp: number;
+  /** Time to live in seconds */
   ttl: number;
 }
 

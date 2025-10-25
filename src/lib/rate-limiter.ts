@@ -1,14 +1,24 @@
 /**
- * Rate Limiter for cache operations
+ * Rate Limiter for cache operations and API endpoints
  * Prevents abuse by limiting the number of operations per key/identifier
+ * @module lib/rate-limiter
  */
 
+/**
+ * Internal tracking entry for rate limiting
+ */
 interface RateLimitEntry {
+  /** Number of attempts within current window */
   count: number;
+  /** Timestamp of first attempt in current window */
   firstAttempt: number;
+  /** Timestamp of most recent attempt */
   lastAttempt: number;
 }
 
+/**
+ * Rate limiter configuration options
+ */
 export interface RateLimiterConfig {
   /** Maximum number of requests allowed in the time window */
   maxRequests: number;
@@ -18,10 +28,32 @@ export interface RateLimiterConfig {
   slidingWindow?: boolean;
 }
 
+/**
+ * Rate limit status information
+ */
+export interface RateLimitStatus {
+  /** Whether the limit has been exceeded */
+  limited: boolean;
+  /** Remaining requests in current window */
+  remaining: number;
+  /** Milliseconds until window resets */
+  resetIn: number;
+  /** Current request count */
+  count: number;
+}
+
+/**
+ * Rate limiter implementation using in-memory tracking
+ * Supports both fixed and sliding window rate limiting
+ */
 export class RateLimiter {
   private attempts: Map<string, RateLimitEntry> = new Map();
   private cleanupInterval: number | null = null;
 
+  /**
+   * Create a new rate limiter instance
+   * @param config - Rate limiter configuration
+   */
   constructor(private config: RateLimiterConfig) {
     // Start periodic cleanup to prevent memory leaks
     this.startCleanup();
@@ -111,6 +143,48 @@ export class RateLimiter {
     const remaining = this.config.windowMs - timeElapsed;
 
     return Math.max(0, remaining);
+  }
+
+  /**
+   * Get complete rate limit status for an identifier
+   * @param identifier - Unique identifier
+   * @returns Rate limit status information
+   */
+  getStatus(identifier: string): RateLimitStatus {
+    const entry = this.attempts.get(identifier);
+
+    if (!entry) {
+      return {
+        limited: false,
+        remaining: this.config.maxRequests,
+        resetIn: 0,
+        count: 0,
+      };
+    }
+
+    const now = Date.now();
+    const timeElapsed = now - entry.firstAttempt;
+    const resetIn = Math.max(0, this.config.windowMs - timeElapsed);
+
+    // Check if window has expired
+    if (timeElapsed > this.config.windowMs) {
+      return {
+        limited: false,
+        remaining: this.config.maxRequests,
+        resetIn: 0,
+        count: 0,
+      };
+    }
+
+    const remaining = Math.max(0, this.config.maxRequests - entry.count);
+    const limited = entry.count >= this.config.maxRequests;
+
+    return {
+      limited,
+      remaining,
+      resetIn,
+      count: entry.count,
+    };
   }
 
   /**

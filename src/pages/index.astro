@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import profilePicture from '../assets/profile_picture.jpg';
 ---
 
 <Layout
@@ -145,15 +147,16 @@ import Layout from '../layouts/Layout.astro';
             class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
           >
             <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
-              <img
-                class="rounded-full object-cover w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48"
-                src="/profile_picture.jpg"
+              <Image
+                src={profilePicture}
                 alt="Heri Rusmanto Profile Picture"
-                width="192"
-                height="192"
+                width={192}
+                height={192}
+                quality={80}
+                format="webp"
                 loading="eager"
                 fetchpriority="high"
-                decoding="async"
+                class="rounded-full object-cover w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48"
               />
             </div>
           </div>

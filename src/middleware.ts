@@ -17,9 +17,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       env: {
         AUTH_SECRET: import.meta.env.AUTH_SECRET || '',
         ADMIN_PASSWORD: import.meta.env.ADMIN_PASSWORD || '',
-        D1_db: import.meta.env.D1_db || null, // D1 binding from Cloudflare
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        heridotlife_kv: null as any, // KV binding will be available in production
+        D1_db: import.meta.env.D1_db || (null as never), // D1 binding from Cloudflare
+        heridotlife_kv: null as never, // KV binding will be available in production
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cf: {} as any,
@@ -43,5 +42,40 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return context.redirect('/admin/dashboard');
   }
 
-  return next();
+  const response = await next();
+
+  // Add security headers to all responses
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+
+  // Add HSTS header for HTTPS (only in production)
+  if (import.meta.env.PROD) {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    );
+  }
+
+  // Content Security Policy (CSP)
+  // Security hardened: removed 'unsafe-eval' to prevent eval(), Function(), etc.
+  // Note: 'unsafe-inline' kept for inline scripts - consider nonce-based CSP in future
+  const cspDirectives = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'", // Removed 'unsafe-eval' for security
+    "style-src 'self' 'unsafe-inline'", // Unsafe-inline needed for Tailwind CSS
+    "img-src 'self' data: https:", // Allow external images (OG metadata)
+    "font-src 'self' data:",
+    "connect-src 'self'",
+    "frame-ancestors 'none'", // Prevents clickjacking
+    "base-uri 'self'",
+    "form-action 'self'",
+    'upgrade-insecure-requests', // Force HTTPS in production
+  ].join('; ');
+
+  response.headers.set('Content-Security-Policy', cspDirectives);
+
+  return response;
 });

@@ -79,8 +79,71 @@ const ogImageUrl =
     <link rel="icon" href="/favicon/favicon.ico" />
     <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
 
+    <!-- Resource Hints for Performance Optimization -->
+    <!-- DNS prefetch for external domains -->
+    <link rel="dns-prefetch" href="https://cloudflare.com" />
+
+    <!-- Preconnect for critical external resources -->
+    <link rel="preconnect" href="https://cloudflareinsights.com" crossorigin />
+
     <!-- Preload critical images for LCP optimization -->
     <link rel="preload" as="image" href="/profile_picture.jpg" fetchpriority="high" />
+
+    <!-- Critical CSS: Inline above-the-fold styles for instant rendering -->
+    <style>
+      /* Critical base styles - Immediate render */
+      *,
+      ::before,
+      ::after {
+        box-sizing: border-box;
+        border-width: 0;
+        border-style: solid;
+      }
+
+      html {
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        tab-size: 4;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: inherit;
+        font-display: swap;
+      }
+
+      /* Prevent layout shift during font load */
+      @font-face {
+        font-family: 'Fallback Font';
+        font-display: swap;
+      }
+
+      /* Critical loading states */
+      .loading {
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+      }
+
+      .loaded {
+        opacity: 1;
+      }
+
+      /* Prevent FOUC (Flash of Unstyled Content) */
+      html:not(.loaded) body {
+        visibility: hidden;
+      }
+
+      html.loaded body {
+        visibility: visible;
+      }
+    </style>
+
+    <!-- Mark HTML as loaded immediately -->
+    <script is:inline>
+      document.documentElement.classList.add('loaded');
+    </script>
 
     <script is:inline>
       (function () {
@@ -167,6 +230,40 @@ const ogImageUrl =
           }
         }
       });
+    </script>
+
+    <!-- Service Worker Registration for Offline Support -->
+    <script is:inline>
+      // Register service worker for offline support and caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('[SW] Service Worker registered:', registration.scope);
+
+              // Check for updates periodically
+              setInterval(
+                () => {
+                  registration.update();
+                },
+                60 * 60 * 1000
+              ); // Check every hour
+            })
+            .catch((error) => {
+              console.error('[SW] Service Worker registration failed:', error);
+            });
+
+          // Handle service worker updates
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              refreshing = true;
+              window.location.reload();
+            }
+          });
+        });
+      }
     </script>
   </head>
   <body>

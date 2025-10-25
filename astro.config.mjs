@@ -4,12 +4,22 @@ import react from '@astrojs/react';
 import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
+/**
+ * Deployment Strategy:
+ * - Using Cloudflare adapter in advanced mode
+ * - Deploying as Cloudflare Workers (not Pages) for better control
+ * - The adapter builds successfully in Cloudflare's build environment
+ * - D1 database and KV storage bindings work natively
+ * - wrangler.jsonc configures Workers deployment with assets support
+ */
 export default defineConfig({
   site: 'https://heri.life',
   output: 'server',
   adapter: cloudflare({
     mode: 'advanced',
-    functionPerRoute: false,
+    // Use Cloudflare Image Resizing for dynamic edge optimization
+    // This works for both prerendered and SSR pages
+    imageService: 'cloudflare',
   }),
   integrations: [
     tailwind(),
@@ -17,17 +27,6 @@ export default defineConfig({
       experimentalReactChildren: false,
     }),
   ],
-  // Configure image service for Cloudflare Pages
-  // Use 'compile' service to optimize images with sharp during build time
-  // This suppresses the runtime Sharp warning for Cloudflare
-  image: {
-    service: {
-      entrypoint: 'astro/assets/services/compile',
-      config: {
-        limitInputPixels: false,
-      },
-    },
-  },
   vite: {
     define: {
       'process.env.NODE_ENV': JSON.stringify(
@@ -35,19 +34,50 @@ export default defineConfig({
         process.env.NODE_ENV ?? 'development'
       ),
     },
+    ssr: {
+      // Explicitly externalize Node.js built-in modules for SSR
+      // This prevents Vite warnings about automatic externalization
+      external: ['node:fs/promises', 'node:path', 'node:url', 'node:crypto'],
+    },
     build: {
       cssCodeSplit: true,
       rollupOptions: {
         output: {
-          manualChunks: {
+          manualChunks: (id) => {
             // Separate vendor chunks for better caching
-            'react-vendor': ['react', 'react-dom'],
-            'lucide-icons': ['lucide-react'],
-            'ui-components': [
-              './src/components/ui/Button.tsx',
-              './src/components/ui/Input.tsx',
-              './src/components/ui/Card.tsx',
-            ],
+            if (id.includes('node_modules')) {
+              // Core React libraries
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
+              }
+              // Icon libraries (split separately as they're large)
+              if (id.includes('lucide-react')) {
+                return 'lucide-icons';
+              }
+              if (id.includes('react-icons')) {
+                return 'react-icons';
+              }
+              // Validation and security libraries
+              if (id.includes('jose') || id.includes('zod')) {
+                return 'validation-libs';
+              }
+              // Utility libraries
+              if (id.includes('clsx') || id.includes('tailwind-merge')) {
+                return 'utils';
+              }
+              // All other node_modules
+              return 'vendor';
+            }
+
+            // Admin components - only loaded for admin pages
+            if (id.includes('/components/admin/')) {
+              return 'admin-components';
+            }
+
+            // UI components - shared across the site
+            if (id.includes('/components/ui/')) {
+              return 'ui-components';
+            }
           },
         },
       },

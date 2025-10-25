@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import { createCachedD1Helper } from '../lib/cached-d1';
 import { siteConfig } from '../consts';
+import { Image } from 'astro:assets';
+import profilePicture from '../assets/profile_picture.jpg';
 
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
@@ -82,14 +84,15 @@ const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
             class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
           >
             <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
-              <img
-                class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
-                src="/profile_picture.jpg"
+              <Image
+                src={profilePicture}
                 alt="Heri Rusmanto"
-                width="112"
-                height="112"
+                width={112}
+                height={112}
+                quality={80}
+                format="webp"
                 loading="lazy"
-                decoding="async"
+                class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
               />
             </div>
           </div>

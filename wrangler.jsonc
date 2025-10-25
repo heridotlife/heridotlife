@@ -1,0 +1,80 @@
+{
+  // Project Configuration
+  "name": "heridotlife",
+  "compatibility_date": "2025-10-26",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Workers.dev Subdomain
+  // Enable the heridotlife.workers.dev subdomain
+  "workers_dev": true,
+
+  // Preview URLs
+  // Enable preview URLs for testing deployments
+  "preview_urls": true,
+
+  // Custom Domain Routes
+  // Cloudflare will automatically create DNS records and issue SSL certificates
+  // Custom domains route all paths automatically (no wildcards needed)
+  // NOTE: Any existing DNS records (A, CNAME) must be deleted before enabling
+  // TODO: Delete A records for heri.life (104.21.41.45, 172.67.159.245) then uncomment
+  // "routes": [
+  //   {
+  //     "pattern": "heri.life",
+  //     "custom_domain": true,
+  //   },
+  //   {
+  //     "pattern": "www.heri.life",
+  //     "custom_domain": true,
+  //   },
+  // ],
+
+  // Workers Script Entry Point
+  // The Cloudflare adapter creates _worker.js/index.js in the dist directory
+  "main": "./dist/_worker.js/index.js",
+
+  // Static Assets Configuration
+  // Serves static files from dist directory using Workers Assets
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+  },
+
+  // D1 Database Binding
+  "d1_databases": [
+    {
+      "binding": "D1_db",
+      "database_name": "heridotlife",
+      "database_id": "55bf671e-d7c3-43a2-ad26-0c3fa2a3d1da",
+    },
+  ],
+
+  // KV Namespace Bindings
+  "kv_namespaces": [
+    {
+      "binding": "heridotlife_kv",
+      "id": "65a1d9021c3142c0b9aaf6539c5a017d",
+    },
+    {
+      "binding": "SESSION",
+      "id": "d44e21557a7c4d598c4f298f7032911d",
+      "preview_id": "c693aa7d7393439caf6bf0a77b383317",
+    },
+  ],
+
+  // Environment Variables
+  "vars": {
+    "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.pages.dev",
+    "CANONICAL_DOMAIN": "heri.life",
+  },
+
+  // Observability Configuration
+  // Workers Logs - Persistent logging with invocation details
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true,
+    },
+  },
+}
