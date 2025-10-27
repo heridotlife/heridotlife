@@ -17,16 +17,16 @@
   // Custom domains route all paths automatically (no wildcards needed)
   // NOTE: Any existing DNS records (A, CNAME) must be deleted before enabling
   // TODO: Delete A records for heri.life (104.21.41.45, 172.67.159.245) then uncomment
-  // "routes": [
-  //   {
-  //     "pattern": "heri.life",
-  //     "custom_domain": true,
-  //   },
-  //   {
-  //     "pattern": "www.heri.life",
-  //     "custom_domain": true,
-  //   },
-  // ],
+  "routes": [
+    {
+      "pattern": "heri.life",
+      "custom_domain": true,
+    },
+    {
+      "pattern": "www.heri.life",
+      "custom_domain": true,
+    },
+  ],
 
   // Workers Script Entry Point
   // The Cloudflare adapter creates _worker.js/index.js in the dist directory
