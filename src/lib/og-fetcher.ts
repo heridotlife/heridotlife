@@ -46,7 +46,7 @@ async function validateURL(urlString: string): Promise<void> {
 
   try {
     url = new URL(urlString);
-  } catch (_error) {
+  } catch {
     throw new Error('Invalid URL format');
   }
 

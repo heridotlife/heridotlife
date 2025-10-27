@@ -72,7 +72,7 @@ export class MockD1Database implements D1Database {
     }));
   }
 
-  async exec(query: string): Promise<{ count: number; duration: number }> {
+  async exec(_query: string): Promise<{ count: number; duration: number }> {
     return { count: 1, duration: 1 };
   }
 }

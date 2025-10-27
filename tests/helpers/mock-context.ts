@@ -2,7 +2,7 @@
  * Mock Astro APIContext for testing
  */
 import type { APIContext } from 'astro';
-import { createMockKV } from './mock-kv';
+import { createMockKV as _createMockKV } from './mock-kv';
 
 export function createMockContext(overrides?: Partial<APIContext>): APIContext {
   return {

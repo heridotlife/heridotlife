@@ -11,7 +11,7 @@
  * - Brand colors: Sky blue gradient
  */
 
-/* global URL */
+/* global URL, fetch */
 
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
@@ -27,7 +27,8 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
  */
 async function fetchInterFont() {
   // Fetch Inter font (Regular weight) from Google Fonts
-  const CSS_URL = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap';
+  const CSS_URL =
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap';
 
   try {
     // Get CSS with font URLs

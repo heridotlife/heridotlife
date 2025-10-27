@@ -5,8 +5,8 @@
 
 import type {
   D1Database,
-  D1PreparedStatement,
-  D1Result,
+  D1PreparedStatement as _D1PreparedStatement,
+  D1Result as _D1Result,
   KVNamespace,
 } from '@cloudflare/workers-types';
 import type { APIContext } from 'astro';

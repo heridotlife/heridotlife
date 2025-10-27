@@ -32,7 +32,7 @@ async function convertToJpeg(inputPath, outputPath) {
       .jpeg({
         quality: JPEG_QUALITY,
         progressive: true, // Progressive JPEG for better perceived loading
-        mozjpeg: true,     // Use MozJPEG for better compression
+        mozjpeg: true, // Use MozJPEG for better compression
       })
       .toBuffer();
 
