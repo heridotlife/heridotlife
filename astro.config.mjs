@@ -17,9 +17,9 @@ export default defineConfig({
   output: 'server',
   adapter: cloudflare({
     mode: 'advanced',
-    // Use Cloudflare Image Resizing for dynamic edge optimization
-    // This works for both prerendered and SSR pages
-    imageService: 'cloudflare',
+    // Use compile-time image optimization (works with free tier)
+    // Images are optimized at build time instead of on-demand
+    imageService: 'compile',
   }),
   integrations: [
     tailwind(),

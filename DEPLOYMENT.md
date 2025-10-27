@@ -1,21 +1,23 @@
 # Deployment Guide
 
-Complete guide for deploying heridotlife to Cloudflare Pages with D1 database and KV storage.
+Complete guide for deploying heridotlife to Cloudflare Workers with D1 database and KV storage.
 
 ## Prerequisites
 
 - Cloudflare account (free tier works!)
-- GitHub account (for automatic deployments)
+- Wrangler CLI installed (comes with project dependencies)
 - Local development environment set up (see README.md)
 
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
 2. [Database Setup](#database-setup)
-3. [Cloudflare Pages Deployment](#cloudflare-pages-deployment)
-4. [Configuration](#configuration)
-5. [Testing](#testing)
-6. [Troubleshooting](#troubleshooting)
+3. [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
+4. [Secrets Management](#secrets-management)
+5. [Configuration](#configuration)
+6. [Testing](#testing)
+7. [Troubleshooting](#troubleshooting)
+8. [Alternative: Cloudflare Pages Deployment](#alternative-cloudflare-pages-deployment)
 
 ---
 
@@ -23,29 +25,31 @@ Complete guide for deploying heridotlife to Cloudflare Pages with D1 database an
 
 ### Deployment Strategy
 
-This project uses a **hybrid deployment approach** to work around the ESM loader bug in `@astrojs/cloudflare` adapter:
+This project uses **Cloudflare Workers** for deployment with the following architecture:
 
-1. **Build with Node.js Adapter**: Uses `@astrojs/node` adapter which builds successfully
-2. **Custom Workers Wrapper**: Post-build script creates `_worker.js` that wraps the Node.js output
-3. **Cloudflare Pages Advanced Mode**: Deploys using `_worker.js` as entry point with `nodejs_compat` flag
-4. **Automatic Builds**: Cloudflare Pages automatically builds and deploys on every push to GitHub
+1. **Build with Cloudflare Adapter**: Uses `@astrojs/cloudflare` adapter in advanced mode
+2. **Workers Assets**: Static files served via Cloudflare Workers Assets
+3. **D1 Database**: SQLite database at the edge
+4. **KV Storage**: Key-Value storage for caching and sessions
+5. **Direct Deployment**: Deploy directly using `wrangler deploy` command
 
 ### Build Process
 
 ```bash
 pnpm build
 # 1. prebuild: Generate SEO files (sitemap, robots.txt)
-# 2. build: Astro builds with Node.js adapter
-# 3. postbuild: Creates _worker.js wrapper for Cloudflare Workers runtime
+# 2. build: Astro builds with Cloudflare adapter
+# 3. postbuild: Fix asset paths for Workers Assets
 ```
 
 Output structure:
 
 ```
 dist/
-├── _worker.js          # Cloudflare Workers entry point (auto-generated)
-├── client/             # Client-side assets
-└── server/             # Server-side code (Node.js adapter output)
+├── _worker.js          # Cloudflare Workers entry point
+├── _astro/             # Static assets (CSS, JS)
+├── images/             # Image assets
+└── server/             # Server-side code
 ```
 
 ---
@@ -128,7 +132,187 @@ pnpm wrangler d1 execute D1_db --command "SELECT name FROM sqlite_master WHERE t
 
 ---
 
-## Cloudflare Pages Deployment
+## Cloudflare Workers Deployment
+
+### Quick Start
+
+Deploy your application to Cloudflare Workers in 3 steps:
+
+#### Step 1: Build the Project
+
+```bash
+pnpm build
+```
+
+This will:
+
+- Generate SEO files (sitemap, robots.txt)
+- Build the Astro application
+- Fix asset paths for Workers Assets
+
+#### Step 2: Deploy to Cloudflare
+
+```bash
+pnpm wrangler deploy
+```
+
+Or use the npm script:
+
+```bash
+pnpm deploy
+```
+
+Expected output:
+
+```
+✨ Success! Uploaded 13 files (28 already uploaded)
+Uploaded heridotlife (11.49 sec)
+Deployed heridotlife triggers (5.42 sec)
+  https://heridotlife.heridotlife.workers.dev
+Current Version ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+#### Step 3: Verify Deployment
+
+Visit your Worker URL:
+
+- Production: https://heridotlife.heridotlife.workers.dev
+- Or your custom domain if configured
+
+### View Real-Time Logs
+
+Monitor your Worker in real-time:
+
+```bash
+# Stream logs with pretty formatting
+pnpm logs
+
+# Or use wrangler directly
+pnpm wrangler tail heridotlife --format pretty
+
+# View only errors
+pnpm logs:errors
+
+# View raw JSON logs
+pnpm logs:json
+```
+
+---
+
+## Secrets Management
+
+Secrets are encrypted environment variables that should never be committed to Git. This section covers how to set up AUTH_SECRET and ADMIN_PASSWORD for production.
+
+### Required Secrets
+
+| Secret Name      | Description                           | How to Generate               |
+| ---------------- | ------------------------------------- | ----------------------------- |
+| `AUTH_SECRET`    | JWT secret for session authentication | `openssl rand -base64 32`     |
+| `ADMIN_PASSWORD` | Password for admin dashboard access   | Use a strong, unique password |
+
+### Setting Secrets from .env File
+
+#### Step 1: Ensure You Have a .env File
+
+Your `.env` file should contain:
+
+```bash
+# Authentication
+AUTH_SECRET="your-jwt-secret-at-least-32-characters"
+ADMIN_PASSWORD="your-secure-admin-password"
+
+# Other config (can be in wrangler.jsonc)
+TRUSTED_HOSTS=heri.life,www.heri.life,*.heridotlife.pages.dev
+CANONICAL_DOMAIN=heri.life
+```
+
+**Generate AUTH_SECRET:**
+
+```bash
+openssl rand -base64 32
+```
+
+#### Step 2: Deploy Worker First
+
+Before adding secrets, you must have a deployed Worker version:
+
+```bash
+pnpm build && pnpm deploy
+```
+
+#### Step 3: Set Secrets Using Wrangler
+
+Set secrets from your `.env` file values:
+
+```bash
+# Set AUTH_SECRET
+echo "YOUR_AUTH_SECRET_VALUE" | pnpm wrangler secret put AUTH_SECRET
+
+# Set ADMIN_PASSWORD
+echo "YOUR_ADMIN_PASSWORD_VALUE" | pnpm wrangler secret put ADMIN_PASSWORD
+```
+
+**Alternative: Interactive Mode**
+
+```bash
+# Wrangler will prompt you to paste the secret value
+pnpm wrangler secret put AUTH_SECRET
+# Paste your secret, press Enter, then Ctrl+D (Linux/Mac) or Ctrl+Z (Windows)
+
+pnpm wrangler secret put ADMIN_PASSWORD
+# Paste your password, press Enter, then Ctrl+D (Linux/Mac) or Ctrl+Z (Windows)
+```
+
+### Verify Secrets Are Set
+
+```bash
+pnpm wrangler secret list
+```
+
+Expected output:
+
+```json
+[
+  {
+    "name": "ADMIN_PASSWORD",
+    "type": "secret_text"
+  },
+  {
+    "name": "AUTH_SECRET",
+    "type": "secret_text"
+  }
+]
+```
+
+### Update or Rotate Secrets
+
+To update an existing secret:
+
+```bash
+echo "NEW_VALUE" | pnpm wrangler secret put SECRET_NAME
+```
+
+**Security Best Practices:**
+
+- ✅ Rotate `AUTH_SECRET` periodically (e.g., every 90 days)
+- ✅ Use different passwords for different environments
+- ✅ Never commit secrets to Git
+- ✅ Use strong, unique passwords (minimum 16 characters)
+- ✅ Enable 2FA on your Cloudflare account
+
+### Delete a Secret
+
+If you need to remove a secret:
+
+```bash
+pnpm wrangler secret delete SECRET_NAME
+```
+
+---
+
+## Alternative: Cloudflare Pages Deployment
+
+> **Note:** The primary deployment method is Cloudflare Workers (see above). This section is kept for reference if you prefer Pages deployment with GitHub integration.
 
 ### Automatic Deployment from GitHub (Recommended)
 
@@ -560,6 +744,8 @@ Cloudflare Pages handles deployment automatically:
 
 ---
 
-**Status**: ✅ Production-ready with Cloudflare Pages automatic deployment
+**Status**: ✅ Production-ready with Cloudflare Workers deployment
 
-**Last Updated**: October 26, 2025
+**Deployment URL**: https://heridotlife.heridotlife.workers.dev
+
+**Last Updated**: October 27, 2025
