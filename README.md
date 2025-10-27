@@ -154,8 +154,6 @@ This repository contains my personal website and production-ready URL shortener 
 
 Visit [heri.life](https://heri.life) to see it in action!
 
-**Deployment:** https://heridotlife.heridotlife.workers.dev
-
 ### 🏗️ Architecture Highlights
 
 **Layered Architecture (3-Tier):**
@@ -182,7 +180,6 @@ Visit [heri.life](https://heri.life) to see it in action!
 
 ### 📚 Documentation
 
-- **[CLAUDE.md](./CLAUDE.md)** - Complete technical documentation for developers
 - **[SECURITY.md](./SECURITY.md)** - Security policy and vulnerability reporting
 - **[schema.sql](./schema.sql)** - Database schema with indexes
 

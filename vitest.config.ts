@@ -24,6 +24,12 @@ export default defineWorkersConfig({
         'src/lib/rate-limiter.ts',
         'src/lib/validations.ts',
         'src/lib/d1.ts',
+        'src/lib/security.ts',
+        'src/lib/cache-security.ts',
+        'src/lib/honeypot.ts',
+        'src/lib/utils.ts',
+        'src/lib/og-fetcher.ts',
+        'src/lib/blog/validations.ts',
       ],
       exclude: [
         'node_modules/',

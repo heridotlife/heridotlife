@@ -189,7 +189,7 @@ const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
   </main>
 </Layout>
 
-<script is:inline>
+<script is:inline nonce={Astro.locals.cspNonce}>
   (function () {
     const btn = document.getElementById('theme-toggle');
     const sun = document.getElementById('sun-icon');
