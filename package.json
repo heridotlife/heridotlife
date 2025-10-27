@@ -31,7 +31,9 @@
     "test:integration": "vitest run --project integration",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
-    "type-check": "astro check"
+    "type-check": "astro check",
+    "og:generate": "node scripts/generate-og-image.mjs",
+    "og:convert": "node scripts/convert-og-to-jpeg.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.5",
@@ -57,6 +59,7 @@
     "@cloudflare/vitest-pool-workers": "^0.10.0",
     "@cloudflare/workers-types": "^4.20251014.0",
     "@eslint/js": "^9.38.0",
+    "@fontsource/inter": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -73,6 +76,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-astro": "^0.14.1",
     "satori": "^0.18.3",
+    "sharp": "^0.34.4",
     "typescript-eslint": "^8.46.2",
     "vitest": "2.1.8",
     "wrangler": "^4.45.0"

@@ -21,6 +21,49 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+/**
+ * Fetch Inter font from Google Fonts
+ * @returns {Promise<ArrayBuffer>} Font data
+ */
+async function fetchInterFont() {
+  // Fetch Inter font (Regular weight) from Google Fonts
+  const CSS_URL = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap';
+
+  try {
+    // Get CSS with font URLs
+    const cssResponse = await fetch(CSS_URL, {
+      headers: {
+        // User agent is important to get TTF format
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      },
+    });
+
+    const css = await cssResponse.text();
+
+    // Extract first font URL (should be TTF or OTF)
+    const fontUrlMatch = css.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.(?:ttf|otf))\)/);
+
+    if (!fontUrlMatch) {
+      throw new Error('Could not extract font URL from Google Fonts CSS');
+    }
+
+    const fontUrl = fontUrlMatch[1];
+    console.log(`📥 Fetching font from: ${fontUrl}`);
+
+    // Fetch the actual font file
+    const fontResponse = await fetch(fontUrl);
+
+    if (!fontResponse.ok) {
+      throw new Error(`Failed to fetch font: ${fontResponse.statusText}`);
+    }
+
+    return await fontResponse.arrayBuffer();
+  } catch (error) {
+    console.error('Failed to fetch font from Google Fonts:', error);
+    throw error;
+  }
+}
+
 // OG Image dimensions
 const WIDTH = 1200;
 const HEIGHT = 630;
@@ -38,7 +81,7 @@ const ogImage = {
       alignItems: 'flex-start',
       padding: '80px',
       background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #3b82f6 100%)',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontFamily: 'Inter',
     },
     children: [
       // Name
@@ -144,12 +187,24 @@ async function generateOGImage() {
   console.log('🎨 Generating custom OG image for heridotlife...\n');
 
   try {
+    // Fetch Inter font
+    console.log('📥 Fetching Inter font from Google Fonts...');
+    const fontData = await fetchInterFont();
+    console.log('✅ Font loaded successfully\n');
+
     // Generate SVG using Satori
     console.log('📝 Rendering SVG with Satori...');
     const svg = await satori(ogImage, {
       width: WIDTH,
       height: HEIGHT,
-      fonts: [], // Using system fonts
+      fonts: [
+        {
+          name: 'Inter',
+          data: fontData,
+          weight: 400,
+          style: 'normal',
+        },
+      ],
     });
 
     // Convert SVG to PNG using Resvg
@@ -164,7 +219,7 @@ async function generateOGImage() {
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
 
-    // Save to src/assets/og.jpg (we'll convert to JPEG)
+    // Save to src/assets/og.png
     const outputPath = join(__dirname, '..', 'src', 'assets', 'og.png');
     await writeFile(outputPath, pngBuffer);
 
