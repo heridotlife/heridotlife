@@ -1,83 +1,209 @@
-// D1 Database Helper for heridotlife
-// Replaces Prisma ORM with direct D1 SQL queries
+/**
+ * D1 Database Helper for heridotlife
+ * Replaces Prisma ORM with direct D1 SQL queries
+ * @module lib/d1
+ */
 
+/**
+ * Cloudflare D1 Database interface
+ * Provides SQL query execution capabilities with prepared statements
+ */
 export interface D1Database {
+  /**
+   * Prepare a SQL query with parameter binding support
+   * @param query - SQL query string with optional ? placeholders
+   * @returns Prepared statement for execution
+   */
   prepare(query: string): D1PreparedStatement;
+
+  /**
+   * Dump the entire database as an ArrayBuffer
+   * @returns Binary database dump
+   */
   dump(): Promise<ArrayBuffer>;
+
+  /**
+   * Execute multiple prepared statements in a batch transaction
+   * @param statements - Array of prepared statements to execute
+   * @returns Results from all statements
+   */
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
+
+  /**
+   * Execute raw SQL (for schema operations, migrations)
+   * @param query - Raw SQL query
+   * @returns Execution result
+   */
   exec(query: string): Promise<D1ExecResult>;
 }
 
+/**
+ * Prepared statement for safe SQL query execution
+ * Supports parameter binding to prevent SQL injection
+ */
 export interface D1PreparedStatement {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  bind(...values: any[]): D1PreparedStatement;
+  /**
+   * Bind values to query parameters (? placeholders)
+   * @param values - Values to bind to placeholders
+   * @returns Prepared statement with bound values
+   */
+  bind(...values: unknown[]): D1PreparedStatement;
+
+  /**
+   * Execute query and return first row or specific column
+   * @param colName - Optional column name to extract single value
+   * @returns First row object or column value, null if no results
+   */
   first<T = unknown>(colName?: string): Promise<T | null>;
+
+  /**
+   * Execute query without returning results (INSERT, UPDATE, DELETE)
+   * @returns Execution response with metadata
+   */
   run(): Promise<D1Response>;
+
+  /**
+   * Execute query and return all rows
+   * @returns Result object with rows and metadata
+   */
   all<T = unknown>(): Promise<D1Result<T>>;
+
+  /**
+   * Execute query and return raw array of row arrays
+   * @returns Array of row value arrays
+   */
   raw<T = unknown>(): Promise<T[]>;
 }
 
+/**
+ * Query result with rows and execution metadata
+ */
 export interface D1Result<T = unknown> {
+  /** Array of result rows */
   results: T[];
+  /** Whether query executed successfully */
   success: boolean;
+  /** Query execution metadata */
   meta: {
+    /** Query execution time in milliseconds */
     duration: number;
+    /** Database size after query */
     size_after: number;
+    /** Number of rows read */
     rows_read: number;
+    /** Number of rows written */
     rows_written: number;
   };
 }
 
+/**
+ * Response from non-SELECT queries (INSERT, UPDATE, DELETE)
+ */
 export interface D1Response {
+  /** Whether query executed successfully */
   success: boolean;
+  /** Execution metadata */
   meta: {
+    /** Query execution time in milliseconds */
     duration: number;
+    /** Number of rows affected */
     changes: number;
+    /** ID of last inserted row (for INSERT) */
     last_row_id: number;
+    /** Number of rows read */
     rows_read: number;
+    /** Number of rows written */
     rows_written: number;
   };
 }
 
+/**
+ * Result from raw SQL execution
+ */
 export interface D1ExecResult {
+  /** Number of statements executed */
   count: number;
+  /** Total execution time in milliseconds */
   duration: number;
 }
 
-// Type definitions for our database tables
+/**
+ * Database entity type definitions
+ */
+
+/**
+ * Short URL entity
+ * Represents a shortened URL with metadata and analytics
+ */
 export interface ShortUrl {
+  /** Unique identifier */
   id: number;
+  /** Short URL slug (e.g., 'gh' for github.com/username) */
   shortUrl: string;
+  /** Original full URL to redirect to */
   originalUrl: string;
+  /** Page title from Open Graph metadata */
   title: string | null;
+  /** Page description from Open Graph metadata */
   description: string | null;
+  /** Open Graph image URL */
   ogImage: string | null;
+  /** ID of user who created this URL */
   userId: string | null;
+  /** Unix timestamp of creation */
   createdAt: number;
+  /** Unix timestamp of last update */
   updatedAt: number | null;
+  /** Total number of clicks/redirects */
   clickCount: number;
+  /** Unix timestamp of most recent click */
   latestClick: number | null;
-  isActive: number; // SQLite uses 0/1 for boolean
+  /** Whether URL is active (SQLite uses 0/1 for boolean) */
+  isActive: number;
+  /** Unix timestamp when URL expires (null = never expires) */
   expiresAt: number | null;
 }
 
+/**
+ * Category entity
+ * Used to organize and group short URLs
+ */
 export interface Category {
+  /** Unique identifier */
   id: number;
+  /** Category name (unique) */
   name: string;
+  /** Total clicks across all URLs in this category */
   clickCount: number;
 }
 
+/**
+ * Junction table linking short URLs to categories
+ * Many-to-many relationship
+ */
 export interface ShortUrlCategory {
+  /** Unique identifier */
   id: number;
+  /** Foreign key to ShortUrl */
   shortUrlId: number;
+  /** Foreign key to Category */
   categoryId: number;
 }
 
+/**
+ * User entity
+ * Admin user accounts
+ */
 export interface User {
+  /** Unique identifier (UUID) */
   id: string;
+  /** User's display name */
   name: string | null;
+  /** User's email address */
   email: string | null;
+  /** Profile image URL */
   image: string | null;
+  /** Hashed password */
   password: string;
 }
 
@@ -180,8 +306,7 @@ export class D1Helper {
   ): Promise<ShortUrl> {
     const now = Math.floor(Date.now() / 1000);
     const fields: string[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const values: any[] = [];
+    const values: (string | number | null)[] = [];
 
     if (data.shortUrl !== undefined) {
       fields.push('shortUrl = ?');
@@ -321,6 +446,55 @@ export class D1Helper {
       .bind(shortUrlId)
       .all<Category>();
     return result.results;
+  }
+
+  /**
+   * Batch fetch categories for multiple URLs (prevents N+1 queries)
+   * @param shortUrlIds - Array of ShortUrl IDs
+   * @returns Map of shortUrlId to array of categories
+   */
+  async getCategoriesForShortUrls(shortUrlIds: number[]): Promise<Map<number, Category[]>> {
+    if (shortUrlIds.length === 0) {
+      return new Map();
+    }
+
+    // Build a query with multiple IDs
+    const placeholders = shortUrlIds.map(() => '?').join(',');
+    const result = await this.db
+      .prepare(
+        `SELECT
+          suc.shortUrlId,
+          c.id,
+          c.name,
+          c.clickCount
+        FROM Category c
+        INNER JOIN ShortUrlCategory suc ON c.id = suc.categoryId
+        WHERE suc.shortUrlId IN (${placeholders})
+        ORDER BY suc.shortUrlId, c.name`
+      )
+      .bind(...shortUrlIds)
+      .all<Category & { shortUrlId: number }>();
+
+    // Group categories by shortUrlId
+    const categoriesMap = new Map<number, Category[]>();
+
+    // Initialize empty arrays for all IDs
+    for (const id of shortUrlIds) {
+      categoriesMap.set(id, []);
+    }
+
+    // Populate with results
+    for (const row of result.results) {
+      const categories = categoriesMap.get(row.shortUrlId) || [];
+      categories.push({
+        id: row.id,
+        name: row.name,
+        clickCount: row.clickCount,
+      });
+      categoriesMap.set(row.shortUrlId, categories);
+    }
+
+    return categoriesMap;
   }
 
   async addCategoryToShortUrl(shortUrlId: number, categoryId: number): Promise<void> {

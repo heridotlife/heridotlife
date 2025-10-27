@@ -1,3 +1,9 @@
+/**
+ * Cached D1 Database Helper
+ * Extends D1Helper with Cloudflare KV caching for improved performance
+ * @module lib/cached-d1
+ */
+
 import { D1Helper, type ShortUrl, type Category } from './d1';
 import { createCacheInstances, CacheKeys, type CacheInstances } from './cache';
 import type { KVNamespace, D1Database } from '@cloudflare/workers-types';
@@ -5,15 +11,28 @@ import type { KVNamespace, D1Database } from '@cloudflare/workers-types';
 // Re-export types for convenience
 export type { ShortUrl, Category };
 
+/**
+ * D1 Helper with integrated KV caching
+ * Automatically caches frequently accessed data and invalidates on mutations
+ */
 export class CachedD1Helper extends D1Helper {
   private cache: CacheInstances;
 
+  /**
+   * Create a new cached D1 helper instance
+   * @param db - D1 database instance
+   * @param kv - KV namespace for caching
+   */
   constructor(db: D1Database, kv: KVNamespace) {
     super(db);
     this.cache = createCacheInstances(kv);
   }
 
-  // Override findShortUrl with caching
+  /**
+   * Find short URL by slug with caching (24 hour TTL)
+   * @param shortUrl - Short URL slug
+   * @returns ShortUrl entity or null
+   */
   async findShortUrl(shortUrl: string): Promise<ShortUrl | null> {
     return await this.cache.urlLookup.getOrSet(
       CacheKeys.url(shortUrl),
@@ -22,7 +41,11 @@ export class CachedD1Helper extends D1Helper {
     );
   }
 
-  // Override findShortUrlById with caching
+  /**
+   * Find short URL by ID with caching (1 hour TTL)
+   * @param id - ShortUrl ID
+   * @returns ShortUrl entity or null
+   */
   async findShortUrlById(id: number): Promise<ShortUrl | null> {
     return await this.cache.urlLookup.getOrSet(
       CacheKeys.urlById(id),
@@ -31,7 +54,10 @@ export class CachedD1Helper extends D1Helper {
     );
   }
 
-  // Override getAllCategories with caching
+  /**
+   * Get all categories with URL counts (24 hour TTL)
+   * @returns Array of categories with counts
+   */
   async getAllCategories(): Promise<Array<Category & { _count: { shortUrls: number } }>> {
     return await this.cache.longTerm.getOrSet(
       CacheKeys.categories(),
@@ -206,8 +232,11 @@ export class CachedD1Helper extends D1Helper {
     await this.cache.longTerm.delete(CacheKeys.categories());
   }
 
-  // Cache warming functions
-  async warmCache() {
+  /**
+   * Warm cache with frequently accessed data
+   * Pre-loads popular URLs, categories, and stats into cache
+   */
+  async warmCache(): Promise<void> {
     console.log('Warming cache...');
 
     try {
@@ -234,13 +263,20 @@ export class CachedD1Helper extends D1Helper {
     }
   }
 
-  // Cache management utilities
+  /**
+   * Invalidate all URL-related caches
+   * Clears URL lookup cache, category caches, and category list
+   */
   async invalidateUrlCaches(): Promise<void> {
     await this.cache.urlLookup.clearPrefix('url');
     await this.cache.mediumTerm.clearPrefix('category');
     await this.cache.longTerm.delete(CacheKeys.categories());
   }
 
+  /**
+   * Invalidate caches related to a specific short URL
+   * @param shortUrlId - ID of the short URL
+   */
   async invalidateRelatedCaches(shortUrlId: number): Promise<void> {
     // Get categories for this URL to invalidate their caches
     const categories = await super.getCategoriesForShortUrl(shortUrlId);
@@ -253,6 +289,11 @@ export class CachedD1Helper extends D1Helper {
     await this.cache.longTerm.delete(CacheKeys.categories());
   }
 
+  /**
+   * Clear all entries from the KV namespace
+   * WARNING: This deletes ALL cache data
+   * @returns Object with deletion statistics
+   */
   async clearAllCaches(): Promise<{ deleted: number; errors: number }> {
     console.log('[CachedD1Helper] Clearing ALL entries from KV namespace...');
 
@@ -266,7 +307,11 @@ export class CachedD1Helper extends D1Helper {
     return result;
   }
 
-  // Get cache statistics
+  /**
+   * Get cache hit/miss statistics
+   * @returns Cache statistics object
+   * @todo Implement actual hit/miss tracking
+   */
   async getCacheStats(): Promise<{
     hits: number;
     misses: number;

@@ -43,3 +43,5 @@ sitemap.xml
 sitemap-*.xml
 public/robots.txt
 public/sitemap.xml
+.dev.vars
+.playwright-mcp/*

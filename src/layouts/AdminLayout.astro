@@ -27,6 +27,11 @@ const pathname = Astro.url.pathname;
     <link rel="shortcut icon" href="/favicon/favicon-16x16.png" />
     <link rel="icon" href="/favicon/favicon.ico" />
     <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+
+    <!-- Prefetch critical admin API endpoints -->
+    <link rel="prefetch" href="/api/admin/check-auth" as="fetch" crossorigin />
+    <link rel="prefetch" href="/api/admin/stats" as="fetch" crossorigin />
+
     <script is:inline>
       (function () {
         const savedTheme = localStorage.getItem('theme');

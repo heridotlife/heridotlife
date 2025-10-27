@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - Heri Rusmanto</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 600px;
+      }
+
+      .icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 2rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .status {
+        margin-top: 2rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        display: none;
+      }
+
+      .status.online {
+        background: rgba(76, 175, 80, 0.3);
+        display: block;
+      }
+
+      .status.offline {
+        background: rgba(244, 67, 54, 0.3);
+        display: block;
+      }
+
+      @media (max-width: 640px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+
+        .icon {
+          width: 100px;
+          height: 100px;
+          font-size: 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📡</div>
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection. Don't worry, you can still view some
+        cached content!
+      </p>
+
+      <a href="/" class="btn" id="retry-btn">Try Again</a>
+
+      <div class="status" id="status">
+        <span id="status-text">Checking connection...</span>
+      </div>
+    </div>
+
+    <script>
+      // Check connection status
+      function updateStatus() {
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('status-text');
+
+        if (navigator.onLine) {
+          status.className = 'status online';
+          statusText.textContent = '✓ Connection restored! Click "Try Again" to continue.';
+        } else {
+          status.className = 'status offline';
+          statusText.textContent = '✗ Still offline. Please check your internet connection.';
+        }
+      }
+
+      // Check status on load
+      updateStatus();
+
+      // Listen for online/offline events
+      window.addEventListener('online', updateStatus);
+      window.addEventListener('offline', updateStatus);
+
+      // Auto-reload when back online
+      window.addEventListener('online', () => {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      });
+
+      // Retry button
+      document.getElementById('retry-btn').addEventListener('click', (e) => {
+        if (!navigator.onLine) {
+          e.preventDefault();
+          updateStatus();
+        }
+      });
+    </script>
+  </body>
+</html>

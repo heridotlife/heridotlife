@@ -22,21 +22,23 @@ export const GET: APIRoute = async (context) => {
 
     const urls = await db.getAllShortUrls();
 
-    // Get categories for each URL
-    const urlsWithCategories = await Promise.all(
-      urls.map(async (url) => {
-        const categories = await db.getCategoriesForShortUrl(url.id);
-        return {
-          ...url,
-          isActive: toBool(url.isActive),
-          createdAt: toDate(url.createdAt),
-          updatedAt: toDate(url.updatedAt),
-          latestClick: toDate(url.latestClick),
-          expiresAt: toDate(url.expiresAt),
-          categories: categories.map((c) => ({ id: c.id, name: c.name })),
-        };
-      })
-    );
+    // Batch fetch categories for all URLs (prevents N+1 queries)
+    const urlIds = urls.map((url) => url.id);
+    const categoriesMap = await db.getCategoriesForShortUrls(urlIds);
+
+    // Map URLs with their categories
+    const urlsWithCategories = urls.map((url) => {
+      const categories = categoriesMap.get(url.id) || [];
+      return {
+        ...url,
+        isActive: toBool(url.isActive),
+        createdAt: toDate(url.createdAt),
+        updatedAt: toDate(url.updatedAt),
+        latestClick: toDate(url.latestClick),
+        expiresAt: toDate(url.expiresAt),
+        categories: categories.map((c) => ({ id: c.id, name: c.name })),
+      };
+    });
 
     return new Response(JSON.stringify(urlsWithCategories), { status: 200 });
   } catch (error: unknown) {
