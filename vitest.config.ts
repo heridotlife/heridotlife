@@ -6,6 +6,12 @@ export default defineWorkersConfig({
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
     reporters: ['default', 'junit'],
+    // Security: Restrict API/UI server to localhost only to prevent CSWSH attacks
+    // https://github.com/vitest-dev/vitest/security/advisories (CSWSH vulnerability)
+    api: {
+      host: '127.0.0.1', // Localhost only - prevents remote access
+      strictPort: true, // Fail if port is already in use
+    },
     outputFile: {
       junit: './coverage/junit.xml',
     },
