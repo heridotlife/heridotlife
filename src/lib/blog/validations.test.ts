@@ -3,7 +3,6 @@ import {
   createBlogPostSchema,
   updateBlogPostSchema,
   createBlogCategorySchema,
-  updateBlogCategorySchema,
   createBlogTagSchema,
   blogSearchSchema,
   blogQueryOptionsSchema,

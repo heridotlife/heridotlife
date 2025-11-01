@@ -7,6 +7,9 @@
 import type { APIContext } from 'astro';
 import { jwtVerify, SignJWT } from 'jose';
 
+// Track if we've warned about plain-text passwords to prevent log spam
+let plaintextPasswordWarned = false;
+
 /**
  * Authenticated session payload
  */
@@ -178,7 +181,10 @@ function base64ToUint8Array(base64: string): Uint8Array {
  * @returns Hashed password string in format: pbkdf2:iterations:salt:hash
  */
 export async function hashPassword(password: string): Promise<string> {
-  const iterations = 600000; // OWASP recommended minimum for PBKDF2-SHA256
+  // OWASP Application Security Verification Standard (ASVS) v4.0.2 (2021)
+  // recommends minimum 600,000 iterations for PBKDF2-SHA256
+  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  const iterations = 600000;
   const saltLength = 16; // 128 bits
   const hashLength = 32; // 256 bits
 
@@ -199,7 +205,7 @@ export async function hashPassword(password: string): Promise<string> {
   const hashBuffer = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: salt.buffer as ArrayBuffer,
+      salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength),
       iterations: iterations,
       hash: 'SHA-256',
     },
@@ -246,7 +252,7 @@ async function verifyPasswordHash(password: string, hashedPassword: string): Pro
     const hashBuffer = await crypto.subtle.deriveBits(
       {
         name: 'PBKDF2',
-        salt: salt.buffer as ArrayBuffer,
+        salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength),
         iterations: iterations,
         hash: 'SHA-256',
       },
@@ -291,10 +297,14 @@ export async function verifyPassword(
 
   // Legacy plain-text password support (for migration period)
   // WARNING: Plain-text passwords are insecure and should be migrated to hashed passwords
-  console.warn(
-    '[Security] Plain-text password detected in ADMIN_PASSWORD. ' +
-      'Please migrate to hashed password using the hashPassword utility.'
-  );
+  // Only log warning once per Worker instance to prevent log spam
+  if (!plaintextPasswordWarned) {
+    console.warn(
+      '[Security] Plain-text password detected in ADMIN_PASSWORD. ' +
+        'Please migrate to hashed password using the hashPassword utility.'
+    );
+    plaintextPasswordWarned = true;
+  }
 
   // Simple byte comparison for legacy plain text
   // Still constant-time to prevent timing attacks

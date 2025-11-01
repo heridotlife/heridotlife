@@ -488,7 +488,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         text: async () => mockHtml,
       });
 
-      const result = await fetchOGMetadata('https://example.com/page?param=value');
+      await fetchOGMetadata('https://example.com/page?param=value');
       expect(global.fetch).toHaveBeenCalledWith(
         'https://example.com/page?param=value',
         expect.any(Object)
