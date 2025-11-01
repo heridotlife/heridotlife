@@ -103,7 +103,7 @@ importers:
         specifier: 2.1.9
         version: 2.1.9(vitest@2.1.9)
       esbuild:
-        specifier: ^0.25.11
+        specifier: ^0.25.0
         version: 0.25.11
       eslint:
         specifier: ^9.39.0
