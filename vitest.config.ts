@@ -7,7 +7,7 @@ export default defineWorkersConfig({
     setupFiles: ['./tests/setup.ts'],
     reporters: ['default', 'junit'],
     // Security: Restrict API/UI server to localhost only to prevent CSRF attacks
-    // Reference: https://github.com/vitest-dev/vitest/security/advisories
+    // https://github.com/vitest-dev/vitest/security/advisories (CSRF vulnerability)
     api: {
       host: '127.0.0.1', // Localhost only - prevents remote access
       strictPort: true, // Fail if port is already in use
