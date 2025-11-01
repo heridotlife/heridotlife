@@ -12,6 +12,9 @@
  * in your .env or .dev.vars file.
  */
 
+/* eslint-env node */
+/* global TextEncoder */
+
 import { createInterface } from 'readline';
 import { webcrypto } from 'crypto';
 
@@ -109,7 +112,9 @@ async function main() {
 
     // Validate password strength
     if (password.length < 12) {
-      console.warn('⚠️  Warning: Password is less than 12 characters. Consider using a stronger password.');
+      console.warn(
+        '⚠️  Warning: Password is less than 12 characters. Consider using a stronger password.'
+      );
     }
 
     console.log('\n⏳ Hashing password (this may take a moment)...\n');

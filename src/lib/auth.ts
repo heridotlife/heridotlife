@@ -127,11 +127,11 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   // If lengths differ, still do comparison to maintain constant time
   if (a.length !== b.length) {
     // Do a dummy comparison to prevent timing leaks
-    let diff = 1;
+    let _diff = 1;
     for (let i = 0; i < Math.max(a.length, b.length); i++) {
       const aVal = i < a.length ? a[i] : 0;
       const bVal = i < b.length ? b[i] : 0;
-      diff |= aVal ^ bVal;
+      _diff |= aVal ^ bVal;
     }
     return false;
   }
@@ -145,12 +145,12 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
 }
 
 /**
- * Convert ArrayBuffer to base64 string
+ * Convert ArrayBuffer or Uint8Array to base64 string
  * @param buffer - Buffer to encode
  * @returns Base64 encoded string
  */
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
   let binary = '';
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i]);
@@ -199,7 +199,7 @@ export async function hashPassword(password: string): Promise<string> {
   const hashBuffer = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt.buffer as ArrayBuffer,
       iterations: iterations,
       hash: 'SHA-256',
     },
@@ -246,7 +246,7 @@ async function verifyPasswordHash(password: string, hashedPassword: string): Pro
     const hashBuffer = await crypto.subtle.deriveBits(
       {
         name: 'PBKDF2',
-        salt: salt,
+        salt: salt.buffer as ArrayBuffer,
         iterations: iterations,
         hash: 'SHA-256',
       },

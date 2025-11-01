@@ -19,7 +19,9 @@ describe('Utils', () => {
     });
 
     it('should handle conditional classes', () => {
-      const result = cn('base', true && 'active', false && 'hidden');
+      const isActive = true;
+      const isHidden = false;
+      const result = cn('base', isActive && 'active', isHidden && 'hidden');
       expect(result).toBe('base active');
     });
 

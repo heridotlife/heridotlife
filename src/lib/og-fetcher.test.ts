@@ -112,12 +112,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should reject IPv6 private ranges', async () => {
-      const urls = [
-        'http://[fe80::1]/',
-        'http://[fc00::1]/',
-        'http://[fd00::1]/',
-        'http://[::]/',
-      ];
+      const urls = ['http://[fe80::1]/', 'http://[fc00::1]/', 'http://[fd00::1]/', 'http://[::]/'];
 
       for (const url of urls) {
         const result = await fetchOGMetadata(url);
