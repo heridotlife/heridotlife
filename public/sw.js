@@ -120,8 +120,8 @@ async function cacheFirstStrategy(request, cacheName) {
     // Not in cache, fetch from network
     const networkResponse = await fetch(request);
 
-    // Cache successful responses
-    if (networkResponse && networkResponse.status === 200) {
+    // Cache successful GET responses only (POST/PUT/DELETE can't be cached)
+    if (networkResponse && networkResponse.status === 200 && request.method === 'GET') {
       const cache = await caches.open(cacheName);
       cache.put(request, networkResponse.clone());
     }
@@ -156,8 +156,8 @@ async function networkFirstStrategy(request, cacheName) {
     // Try network first
     const networkResponse = await fetch(request);
 
-    // Cache successful responses
-    if (networkResponse && networkResponse.status === 200) {
+    // Cache successful GET responses only (POST/PUT/DELETE can't be cached)
+    if (networkResponse && networkResponse.status === 200 && request.method === 'GET') {
       const cache = await caches.open(cacheName);
       cache.put(request, networkResponse.clone());
     }

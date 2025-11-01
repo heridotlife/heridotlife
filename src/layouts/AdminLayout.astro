@@ -32,7 +32,7 @@ const pathname = Astro.url.pathname;
     <link rel="prefetch" href="/api/admin/check-auth" as="fetch" crossorigin />
     <link rel="prefetch" href="/api/admin/stats" as="fetch" crossorigin />
 
-    <script is:inline>
+    <script is:inline nonce={Astro.locals.cspNonce}>
       (function () {
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

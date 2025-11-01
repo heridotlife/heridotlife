@@ -109,7 +109,8 @@ const backIcon = "M10 19l-7-7m0 0l7-7m-7 7h18";
                                     alt="Heri Rusmanto"
                                     width="112"
                                     height="112"
-                                    loading="lazy"
+                                    loading="eager"
+                                    fetchpriority="high"
                                     decoding="async"
                                     class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
                                 />
@@ -147,15 +148,24 @@ const backIcon = "M10 19l-7-7m0 0l7-7m-7 7h18";
                                 <div class="p-6 flex items-center gap-4 min-h-[100px]">
                                     {/* OG Image or Icon */}
                                     {url.ogImage && url.ogImage.trim() !== '' ? (
-                                        <div class="flex-shrink-0">
-                                            <img 
-                                                src={url.ogImage} 
+                                        <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 flex items-center justify-center overflow-hidden">
+                                            <img
+                                                src={url.ogImage}
                                                 alt={url.title || 'Link thumbnail'}
-                                                class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
+                                                class="w-full h-full object-cover"
                                                 loading="lazy"
                                                 decoding="async"
-                                                onerror="this.parentElement.innerHTML='<div class=\'flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center\'><svg class=\'w-6 h-6 text-sky-600 dark:text-sky-400\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1\'></path></svg></div>'"
+                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                                             />
+                                            <svg
+                                                class="w-6 h-6 text-sky-600 dark:text-sky-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                style="display: none;"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={linkIcon}></path>
+                                            </svg>
                                         </div>
                                     ) : (
                                         <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center">
@@ -211,18 +221,18 @@ const backIcon = "M10 19l-7-7m0 0l7-7m-7 7h18";
             </div>
         </main>
         
-        <script is:inline>
+        <script is:inline nonce={Astro.locals.cspNonce}>
             (function() {
                 const btn = document.getElementById('theme-toggle');
                 const sun = document.getElementById('sun-icon');
                 const moon = document.getElementById('moon-icon');
-                
+
                 function update() {
                     const isDark = document.documentElement.classList.contains('dark');
                     sun.style.display = isDark ? 'block' : 'none';
                     moon.style.display = isDark ? 'none' : 'block';
                 }
-                
+
                 update();
                 btn.addEventListener('click', () => {
                     document.documentElement.classList.toggle('dark');

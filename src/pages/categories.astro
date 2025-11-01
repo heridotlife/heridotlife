@@ -87,7 +87,8 @@ const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
                 alt="Heri Rusmanto"
                 width="112"
                 height="112"
-                loading="lazy"
+                loading="eager"
+                fetchpriority="high"
                 decoding="async"
                 class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
               />
@@ -189,7 +190,7 @@ const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
   </main>
 </Layout>
 
-<script is:inline>
+<script is:inline nonce={Astro.locals.cspNonce}>
   (function () {
     const btn = document.getElementById('theme-toggle');
     const sun = document.getElementById('sun-icon');

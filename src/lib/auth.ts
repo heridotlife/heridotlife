@@ -7,6 +7,9 @@
 import type { APIContext } from 'astro';
 import { jwtVerify, SignJWT } from 'jose';
 
+// Track if we've warned about plain-text passwords to prevent log spam
+let plaintextPasswordWarned = false;
+
 /**
  * Authenticated session payload
  */
@@ -118,77 +121,162 @@ export function deleteSession(cookies: APIContext['cookies']): void {
 }
 
 /**
- * Constant-time password comparison to prevent timing attacks
- * Uses crypto.subtle for HMAC-based comparison
- * @param a - First string to compare
- * @param b - Second string to compare
- * @returns True if strings are equal, false otherwise
+ * Constant-time buffer comparison to prevent timing attacks
+ * @param a - First buffer to compare
+ * @param b - Second buffer to compare
+ * @returns True if buffers are equal, false otherwise
  */
-async function timingSafeEqual(a: string, b: string): Promise<boolean> {
-  // Convert strings to Uint8Array
-  const encoder = new TextEncoder();
-  const aBytes = encoder.encode(a);
-  const bBytes = encoder.encode(b);
-
-  // If lengths differ, still compare to prevent timing leaks
-  if (aBytes.length !== bBytes.length) {
-    // Do a dummy comparison to maintain constant time
-    const dummyA = new Uint8Array(Math.max(aBytes.length, bBytes.length));
-    const dummyB = new Uint8Array(Math.max(aBytes.length, bBytes.length));
-    dummyA.set(aBytes);
-    dummyB.set(bBytes);
+function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  // If lengths differ, still do comparison to maintain constant time
+  if (a.length !== b.length) {
+    // Do a dummy comparison to prevent timing leaks
+    let _diff = 1;
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const aVal = i < a.length ? a[i] : 0;
+      const bVal = i < b.length ? b[i] : 0;
+      _diff |= aVal ^ bVal;
+    }
     return false;
   }
 
-  // Use crypto.subtle if available (Workers environment)
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    try {
-      // Import both values as keys for comparison
-      const keyA = await crypto.subtle.importKey(
-        'raw',
-        aBytes,
-        { name: 'HMAC', hash: 'SHA-256' },
-        false,
-        ['sign']
-      );
-      const keyB = await crypto.subtle.importKey(
-        'raw',
-        bBytes,
-        { name: 'HMAC', hash: 'SHA-256' },
-        false,
-        ['sign']
-      );
-
-      // Sign a known message with both keys and compare
-      const message = encoder.encode('password-verification');
-      const signA = await crypto.subtle.sign('HMAC', keyA, message);
-      const signB = await crypto.subtle.sign('HMAC', keyB, message);
-
-      // Compare signatures (also constant-time)
-      const sigA = new Uint8Array(signA);
-      const sigB = new Uint8Array(signB);
-
-      let diff = 0;
-      for (let i = 0; i < sigA.length; i++) {
-        diff |= sigA[i] ^ sigB[i];
-      }
-      return diff === 0;
-    } catch {
-      // Fall back to manual constant-time comparison
-    }
-  }
-
-  // Manual constant-time comparison as fallback
+  // Constant-time comparison
   let diff = 0;
-  for (let i = 0; i < aBytes.length; i++) {
-    diff |= aBytes[i] ^ bBytes[i];
+  for (let i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i];
   }
   return diff === 0;
 }
 
 /**
+ * Convert ArrayBuffer or Uint8Array to base64 string
+ * Safe for binary data: byte values (0-255) map directly to Latin-1 characters for btoa()
+ * @param buffer - Buffer to encode
+ * @returns Base64 encoded string
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Convert base64 string to Uint8Array
+ * @param base64 - Base64 encoded string
+ * @returns Uint8Array
+ */
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ * Hash a password using PBKDF2 with a random salt
+ * @param password - Plain text password to hash
+ * @returns Hashed password string in format: pbkdf2:iterations:salt:hash
+ */
+export async function hashPassword(password: string): Promise<string> {
+  // OWASP Application Security Verification Standard (ASVS) v4.0.2 (2021)
+  // recommends minimum 600,000 iterations for PBKDF2-SHA256
+  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  const iterations = 600000;
+  const saltLength = 16; // 128 bits
+  const hashLength = 32; // 256 bits
+
+  // Generate random salt
+  const salt = crypto.getRandomValues(new Uint8Array(saltLength));
+
+  // Import password as key material
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+
+  // Derive key using PBKDF2
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: (salt.buffer as ArrayBuffer).slice(salt.byteOffset, salt.byteOffset + salt.byteLength),
+      iterations: iterations,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    hashLength * 8 // bits
+  );
+
+  // Format: algorithm:iterations:salt:hash (all base64 encoded)
+  const saltBase64 = arrayBufferToBase64(salt);
+  const hashBase64 = arrayBufferToBase64(hashBuffer);
+
+  return `pbkdf2:${iterations}:${saltBase64}:${hashBase64}`;
+}
+
+/**
+ * Verify a password against a hashed password
+ * @param password - Plain text password to verify
+ * @param hashedPassword - Hashed password string (from hashPassword)
+ * @returns True if password matches, false otherwise
+ */
+async function verifyPasswordHash(password: string, hashedPassword: string): Promise<boolean> {
+  try {
+    // Parse the hashed password format: algorithm:iterations:salt:hash
+    const parts = hashedPassword.split(':');
+    if (parts.length !== 4 || parts[0] !== 'pbkdf2') {
+      console.error('Invalid password hash format');
+      return false;
+    }
+
+    const iterations = parseInt(parts[1], 10);
+    const salt = base64ToUint8Array(parts[2]);
+    const storedHash = base64ToUint8Array(parts[3]);
+
+    // Hash the input password with the same salt and iterations
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(password),
+      'PBKDF2',
+      false,
+      ['deriveBits']
+    );
+
+    const hashBuffer = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: (salt.buffer as ArrayBuffer).slice(
+          salt.byteOffset,
+          salt.byteOffset + salt.byteLength
+        ),
+        iterations: iterations,
+        hash: 'SHA-256',
+      },
+      keyMaterial,
+      storedHash.length * 8 // bits
+    );
+
+    const computedHash = new Uint8Array(hashBuffer);
+
+    // Timing-safe comparison of hashes
+    return timingSafeEqual(computedHash, storedHash);
+  } catch (error) {
+    console.error('Password verification error:', error);
+    return false;
+  }
+}
+
+/**
  * Verify a password against the configured admin password
- * Uses constant-time comparison to prevent timing attacks
+ * Supports both hashed passwords (recommended) and plain text (legacy)
  * @param password - Password to verify
  * @param locals - Astro locals with runtime environment
  * @returns True if password matches, false otherwise
@@ -205,6 +293,28 @@ export async function verifyPassword(
     return false;
   }
 
-  // Use constant-time comparison to prevent timing attacks
-  return await timingSafeEqual(password, adminPassword);
+  // Check if password is hashed (format: pbkdf2:iterations:salt:hash)
+  if (adminPassword.startsWith('pbkdf2:')) {
+    // Use secure PBKDF2 verification
+    return await verifyPasswordHash(password, adminPassword);
+  }
+
+  // Legacy plain-text password support (for migration period)
+  // WARNING: Plain-text passwords are insecure and should be migrated to hashed passwords
+  // Only log warning once per Worker instance to prevent log spam
+  if (!plaintextPasswordWarned) {
+    console.warn(
+      '[Security] Plain-text password detected in ADMIN_PASSWORD. ' +
+        'Please migrate to hashed password using the hashPassword utility.'
+    );
+    plaintextPasswordWarned = true;
+  }
+
+  // Simple byte comparison for legacy plain text
+  // Still constant-time to prevent timing attacks
+  const encoder = new TextEncoder();
+  const inputBytes = encoder.encode(password);
+  const storedBytes = encoder.encode(adminPassword);
+
+  return timingSafeEqual(inputBytes, storedBytes);
 }

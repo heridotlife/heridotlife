@@ -6,6 +6,12 @@ export default defineWorkersConfig({
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
     reporters: ['default', 'junit'],
+    // Security: Restrict API/UI server to localhost only to prevent CSRF attacks
+    // https://github.com/vitest-dev/vitest/security/advisories (CSRF vulnerability)
+    api: {
+      host: '127.0.0.1', // Localhost only - prevents remote access
+      strictPort: true, // Fail if port is already in use
+    },
     outputFile: {
       junit: './coverage/junit.xml',
     },
@@ -18,6 +24,12 @@ export default defineWorkersConfig({
         'src/lib/rate-limiter.ts',
         'src/lib/validations.ts',
         'src/lib/d1.ts',
+        'src/lib/security.ts',
+        'src/lib/cache-security.ts',
+        'src/lib/honeypot.ts',
+        'src/lib/utils.ts',
+        'src/lib/og-fetcher.ts',
+        'src/lib/blog/validations.ts',
       ],
       exclude: [
         'node_modules/',

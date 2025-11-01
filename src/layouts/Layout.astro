@@ -141,11 +141,11 @@ const ogImageUrl =
     </style>
 
     <!-- Mark HTML as loaded immediately -->
-    <script is:inline>
+    <script is:inline nonce={Astro.locals.cspNonce}>
       document.documentElement.classList.add('loaded');
     </script>
 
-    <script is:inline>
+    <script is:inline nonce={Astro.locals.cspNonce}>
       (function () {
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -157,7 +157,7 @@ const ogImageUrl =
     </script>
 
     <!-- Cloudflare Analytics and Performance Monitoring -->
-    <script is:inline>
+    <script is:inline nonce={Astro.locals.cspNonce}>
       // Simple Core Web Vitals tracking for Cloudflare
       function sendToAnalytics(metric) {
         // Log to console in development
@@ -233,7 +233,7 @@ const ogImageUrl =
     </script>
 
     <!-- Service Worker Registration for Offline Support -->
-    <script is:inline>
+    <script is:inline nonce={Astro.locals.cspNonce}>
       // Register service worker for offline support and caching
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

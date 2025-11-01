@@ -60,5 +60,7 @@ declare namespace App {
       /** Execution context for worker lifecycle */
       ctx: CloudflareContext;
     };
+    /** CSP nonce for inline scripts (generated per request) */
+    cspNonce: string;
   }
 }
