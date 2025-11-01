@@ -67,13 +67,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Content Security Policy (CSP)
-  // Security hardened with nonce-based CSP to prevent XSS attacks
-  // Nonce is generated per-request and must be added to inline scripts
+  // Note: Nonce is generated but not used in CSP because Astro's React hydration
+  // scripts are auto-generated and can't have nonces added to them.
+  // Per CSP spec: when nonce is present, 'unsafe-inline' is ignored.
+  // TODO: Investigate Astro CSP nonce integration for better security
   const cspDirectives = [
     "default-src 'self'",
-    // Note: unsafe-inline is temporarily needed for Astro React hydration scripts
-    // TODO: Investigate Astro CSP nonce integration for better security
-    `script-src 'self' 'nonce-${cspNonce}' 'unsafe-inline'`,
+    // unsafe-inline needed for Astro React hydration scripts
+    `script-src 'self' 'unsafe-inline'`,
     "style-src 'self' 'unsafe-inline'", // Unsafe-inline needed for Tailwind CSS
     "img-src 'self' data: https:", // Allow external images (OG metadata)
     "font-src 'self' data:",
