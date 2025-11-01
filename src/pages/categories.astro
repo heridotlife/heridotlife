@@ -83,11 +83,15 @@ const backIcon = 'M10 19l-7-7m0 0l7-7m-7 7h18';
           >
             <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
               <img
-                src="/profile_picture.jpg"
+                src="/cdn-cgi/image/width=112,format=auto,quality=85/profile_picture.jpg"
+                srcset="/cdn-cgi/image/width=96,format=auto,quality=85/profile_picture.jpg 96w,
+                        /cdn-cgi/image/width=112,format=auto,quality=85/profile_picture.jpg 112w"
+                sizes="(max-width: 768px) 96px, 112px"
                 alt="Heri Rusmanto"
                 width="112"
                 height="112"
-                loading="lazy"
+                loading="eager"
+                fetchpriority="high"
                 decoding="async"
                 class="rounded-full object-cover w-24 h-24 md:w-28 md:h-28"
               />

@@ -146,7 +146,11 @@ import Layout from '../layouts/Layout.astro';
           >
             <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
               <img
-                src="/profile_picture.jpg"
+                src="/cdn-cgi/image/width=192,format=auto,quality=85/profile_picture.jpg"
+                srcset="/cdn-cgi/image/width=128,format=auto,quality=85/profile_picture.jpg 128w,
+                        /cdn-cgi/image/width=160,format=auto,quality=85/profile_picture.jpg 160w,
+                        /cdn-cgi/image/width=192,format=auto,quality=85/profile_picture.jpg 192w"
+                sizes="(max-width: 768px) 128px, (max-width: 1024px) 160px, 192px"
                 alt="Heri Rusmanto Profile Picture"
                 width="192"
                 height="192"
