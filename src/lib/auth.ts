@@ -149,6 +149,7 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
 
 /**
  * Convert ArrayBuffer or Uint8Array to base64 string
+ * Safe for binary data: byte values (0-255) map directly to Latin-1 characters for btoa()
  * @param buffer - Buffer to encode
  * @returns Base64 encoded string
  */
