@@ -86,15 +86,8 @@ const ogImageUrl =
     <!-- Preconnect for critical external resources -->
     <link rel="preconnect" href="https://cloudflareinsights.com" crossorigin />
 
-    <!-- Preload critical images for LCP optimization with Cloudflare Image Resizing -->
-    <link
-      rel="preload"
-      as="image"
-      href="/cdn-cgi/image/width=192,format=auto,quality=85/profile_picture.jpg"
-      fetchpriority="high"
-      imagesrcset="/cdn-cgi/image/width=128,format=auto,quality=85/profile_picture.jpg 128w, /cdn-cgi/image/width=160,format=auto,quality=85/profile_picture.jpg 160w, /cdn-cgi/image/width=192,format=auto,quality=85/profile_picture.jpg 192w"
-      imagesizes="(max-width: 768px) 128px, (max-width: 1024px) 160px, 192px"
-    />
+    <!-- Preload critical images for LCP optimization -->
+    <link rel="preload" as="image" href="/profile_picture.jpg" fetchpriority="high" />
 
     <!-- Critical CSS: Inline above-the-fold styles for instant rendering -->
     <style>

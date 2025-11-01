@@ -71,7 +71,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Nonce is generated per-request and must be added to inline scripts
   const cspDirectives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${cspNonce}'`, // Nonce-based CSP - no unsafe-inline!
+    // Note: unsafe-inline is temporarily needed for Astro React hydration scripts
+    // TODO: Investigate Astro CSP nonce integration for better security
+    `script-src 'self' 'nonce-${cspNonce}' 'unsafe-inline'`,
     "style-src 'self' 'unsafe-inline'", // Unsafe-inline needed for Tailwind CSS
     "img-src 'self' data: https:", // Allow external images (OG metadata)
     "font-src 'self' data:",
