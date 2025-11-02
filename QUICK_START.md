@@ -6,6 +6,7 @@
 - ✅ Multiple routes: staging + production
 - ✅ Validation script: `pnpm validate`
 - ✅ Auto-deploy ready: Cloudflare Workers Builds
+- ✅ Auto PR workflow: develop → main (on feature merge)
 
 ## 🚀 Setup Cloudflare Auto-Deploy (One-Time)
 
@@ -53,10 +54,12 @@ This runs:
 - Build
 - Wrangler dry-run
 
-### Development Flow
+### Development Flow (Recommended: via develop branch)
 
 ```bash
-# 1. Create feature branch
+# 1. Create feature branch from develop
+git checkout develop
+git pull origin develop
 git checkout -b feature/my-feature
 
 # 2. Make changes
@@ -70,9 +73,36 @@ git add .
 git commit -m "Add feature"
 git push origin feature/my-feature
 
-# 5. Create PR to main
-# 6. After review, merge
-# 7. Cloudflare auto-deploys! 🎉
+# 5. Create PR to develop
+# 6. After review, merge to develop
+# 7. 🤖 Auto PR workflow creates/updates PR: develop → main
+# 8. Review aggregated changes and merge to main
+# 9. Cloudflare auto-deploys to production! 🎉
+```
+
+**Auto PR Workflow** (automatic after step 6):
+
+- When merged to `develop`, GitHub Action automatically:
+  - Creates new PR from `develop` to `main` (as DRAFT)
+  - OR updates existing `develop` → `main` PR with new changes
+- See `docs/AUTO_PR_WORKFLOW.md` for details
+
+### Hotfix Flow (Direct to main)
+
+For critical production issues only:
+
+```bash
+# 1. Create hotfix branch from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-issue
+
+# 2. Fix and validate
+pnpm validate
+
+# 3. Create PR directly to main
+# 4. Merge after urgent review
+# 5. Cloudflare auto-deploys immediately
 ```
 
 ## 🔍 Validate Commands
@@ -133,6 +163,9 @@ Method 2 - Cloudflare Dashboard:
 - `wrangler.jsonc` - Worker configuration
 - `validate-deploy.sh` - Validation script
 - `DEPLOYMENT.md` - Full deployment guide
+- `QUICK_START.md` - This file (quick reference)
+- `docs/AUTO_PR_WORKFLOW.md` - Auto PR workflow documentation
+- `.github/workflows/auto-pr-develop-to-main.yml` - Auto PR workflow
 - `package.json` - `pnpm validate` script
 
 ## ⚠️ Remember

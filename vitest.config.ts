@@ -17,7 +17,7 @@ export default defineWorkersConfig({
     },
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov', 'text-summary'],
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov', 'text-summary'],
       // Only include files that have tests (exclude 0% coverage files)
       include: [
         'src/lib/auth.ts',
