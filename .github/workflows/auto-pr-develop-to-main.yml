@@ -69,59 +69,59 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get the latest commits from develop
-          COMMITS=$(git log --oneline main..develop --max-count=10)
+          # Get the latest commits from develop (comparing against remote main)
+          COMMITS=$(git log --oneline origin/main...HEAD --max-count=10)
 
-          # Create PR body
-          PR_BODY=$(cat <<EOF
-          ## 🚀 Release: Develop to Main
+          # Create the PR body
+          cat > /tmp/pr-body.md << 'PRBODY'
+## 🚀 Release: Develop to Main
 
-          This PR was automatically created when changes were merged to the \`develop\` branch.
+This PR was automatically created when changes were merged to the `develop` branch.
 
-          ### 📝 Recent Changes
+### 📝 Recent Changes
 
-          \`\`\`
-          $COMMITS
-          \`\`\`
+```
+PRBODY
+          echo "${COMMITS}" >> /tmp/pr-body.md
+          cat >> /tmp/pr-body.md << 'PRBODY'
+```
 
-          ### ✅ Pre-merge Checklist
+### ✅ Pre-merge Checklist
 
-          Before merging this PR to \`main\`, ensure:
+Before merging this PR to `main`, ensure:
 
-          - [ ] All tests pass (\`pnpm test\`)
-          - [ ] Code has been reviewed
-          - [ ] No breaking changes (or properly documented)
-          - [ ] Deployment validation passed (\`pnpm validate\`)
-          - [ ] Ready for production deployment
+- [ ] All tests pass (`pnpm test`)
+- [ ] Code has been reviewed
+- [ ] No breaking changes (or properly documented)
+- [ ] Deployment validation passed (`pnpm validate`)
+- [ ] Ready for production deployment
 
-          ### 🌐 Deployment Impact
+### 🌐 Deployment Impact
 
-          Merging this PR will trigger:
-          - ✅ Cloudflare automatic deployment to production
-          - ✅ Updates to all routes:
-            - \`heri.life\` (production)
-            - \`www.heri.life\` (production)
-            - \`heridotlife.workers.dev\` (staging)
+Merging this PR will trigger:
+- ✅ Cloudflare automatic deployment to production
+- ✅ Updates to all routes:
+  - `heri.life` (production)
+  - `www.heri.life` (production)
+  - `heridotlife.workers.dev` (staging)
 
-          ### 📊 Review
+### 📊 Review
 
-          **Latest commit:** ${{ github.event.head_commit.message }}
-          **Pushed by:** @${{ github.actor }}
-          **Commit SHA:** \`${{ github.sha }}\`
+**Latest commit:** ${{ github.event.head_commit.message }}
+**Pushed by:** @${{ github.actor }}
+**Commit SHA:** `${{ github.sha }}`
 
-          ---
+---
 
-          🤖 This PR was automatically created by GitHub Actions
-          EOF
-          )
+🤖 This PR was automatically created by GitHub Actions
+PRBODY
 
           # Create the PR
           gh pr create \
             --base main \
             --head develop \
             --title "Release: Develop → Main" \
-            --body "$PR_BODY" \
-            --label "release,auto-pr" \
+            --body-file /tmp/pr-body.md \
             --draft
 
           echo "✅ Created new PR from develop to main"
