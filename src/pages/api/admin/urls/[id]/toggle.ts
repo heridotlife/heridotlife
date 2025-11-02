@@ -9,8 +9,7 @@ export const PATCH: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const url = new URL(context.request.url);
-    const id = url.searchParams.get('id');
+    const id = context.params.id;
     const urlId = Number(id);
 
     if (isNaN(urlId)) {

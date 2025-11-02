@@ -1,22 +1,17 @@
 {
   // Project Configuration
+  // SINGLE WORKER for both staging and production
+  // Worker name: heridotlife
+  // Staging URL: heridotlife.workers.dev
+  // Production URLs: heri.life, www.heri.life
   "name": "heridotlife",
   "compatibility_date": "2025-10-26",
   "compatibility_flags": ["nodejs_compat"],
 
-  // Workers.dev Subdomain
-  // Enable the heridotlife.workers.dev subdomain
+  // Enable workers.dev subdomain (for staging/preview)
   "workers_dev": true,
 
-  // Preview URLs
-  // Enable preview URLs for testing deployments
-  "preview_urls": true,
-
-  // Custom Domain Routes
-  // Cloudflare will automatically create DNS records and issue SSL certificates
-  // Custom domains route all paths automatically (no wildcards needed)
-  // NOTE: Any existing DNS records (A, CNAME) must be deleted before enabling
-  // TODO: Delete A records for heri.life (104.21.41.45, 172.67.159.245) then uncomment
+  // Custom Domain Routes (for production)
   "routes": [
     {
       "pattern": "heri.life",
@@ -62,8 +57,9 @@
   ],
 
   // Environment Variables
+  // Include all domains (production + staging)
   "vars": {
-    "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.pages.dev",
+    "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.workers.dev,*.heridotlife.pages.dev",
     "CANONICAL_DOMAIN": "heri.life",
   },
 
