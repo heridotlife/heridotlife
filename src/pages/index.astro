@@ -204,7 +204,7 @@ import Layout from '../layouts/Layout.astro';
   </main>
 </Layout>
 
-<script is:inline>
+<script is:inline nonce={Astro.locals.cspNonce}>
   const themeToggleButton = document.getElementById('theme-toggle');
   const sunIcon = document.getElementById('sun-icon');
   const moonIcon = document.getElementById('moon-icon');

@@ -3,6 +3,13 @@ import { getSession } from './lib/auth';
 import { validateHostMiddleware } from './lib/security';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Generate unique nonce for CSP (Content Security Policy)
+  // Using crypto.randomUUID for cryptographically secure random values
+  const cspNonce = crypto.randomUUID().replace(/-/g, '');
+
+  // Store nonce in locals so it can be accessed by pages/components
+  context.locals.cspNonce = cspNonce;
+
   // Validate host headers to prevent Host Header Injection attacks
   const hostValidation = validateHostMiddleware(context.request, context.locals?.runtime?.env);
 
@@ -60,11 +67,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Content Security Policy (CSP)
-  // Security hardened: removed 'unsafe-eval' to prevent eval(), Function(), etc.
-  // Note: 'unsafe-inline' kept for inline scripts - consider nonce-based CSP in future
+  // Note: Nonce is generated but not used in CSP because Astro's React hydration
+  // scripts are auto-generated and can't have nonces added to them.
+  // Per CSP spec: when nonce is present, 'unsafe-inline' is ignored.
+  // TODO: Investigate Astro CSP nonce integration for better security
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'", // Removed 'unsafe-eval' for security
+    // unsafe-inline needed for Astro React hydration scripts
+    `script-src 'self' 'unsafe-inline'`,
     "style-src 'self' 'unsafe-inline'", // Unsafe-inline needed for Tailwind CSS
     "img-src 'self' data: https:", // Allow external images (OG metadata)
     "font-src 'self' data:",
