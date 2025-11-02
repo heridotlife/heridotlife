@@ -217,6 +217,18 @@ develop → main (reviewed and merged)
 - Check repository settings → Actions → General → Workflow permissions
 - Enable "Allow GitHub Actions to create and approve pull requests"
 
+### Git Error: "unknown revision or path"
+
+**Error message:**
+
+```
+fatal: ambiguous argument 'main..develop': unknown revision or path not in the working tree.
+```
+
+**Cause:** The `main` branch doesn't exist locally in the checkout.
+
+**Solution:** The workflow uses `origin/main..develop` to reference the remote branch, which is always available in GitHub Actions. If you see this error, ensure the workflow file has been updated to use `origin/main` instead of `main`.
+
 ### Duplicate PRs Created
 
 **Possible causes:**

@@ -7,3 +7,6 @@ package-lock.json
 
 # Prettier has issues with complex Astro files
 src/pages/\[slug\].astro
+
+# GitHub workflows with multi-line strings
+.github/workflows/auto-pr-develop-to-main.yml

@@ -69,59 +69,57 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get the latest commits from develop
-          COMMITS=$(git log --oneline main..develop --max-count=10)
+          # Get the latest commits from develop (comparing against remote main)
+          COMMITS=$(git log --oneline origin/main...HEAD --max-count=10)
 
-          # Create PR body
-          PR_BODY=$(cat <<EOF
-          ## 🚀 Release: Develop to Main
-
-          This PR was automatically created when changes were merged to the \`develop\` branch.
-
-          ### 📝 Recent Changes
-
-          \`\`\`
-          $COMMITS
-          \`\`\`
-
-          ### ✅ Pre-merge Checklist
-
-          Before merging this PR to \`main\`, ensure:
-
-          - [ ] All tests pass (\`pnpm test\`)
-          - [ ] Code has been reviewed
-          - [ ] No breaking changes (or properly documented)
-          - [ ] Deployment validation passed (\`pnpm validate\`)
-          - [ ] Ready for production deployment
-
-          ### 🌐 Deployment Impact
-
-          Merging this PR will trigger:
-          - ✅ Cloudflare automatic deployment to production
-          - ✅ Updates to all routes:
-            - \`heri.life\` (production)
-            - \`www.heri.life\` (production)
-            - \`heridotlife.workers.dev\` (staging)
-
-          ### 📊 Review
-
-          **Latest commit:** ${{ github.event.head_commit.message }}
-          **Pushed by:** @${{ github.actor }}
-          **Commit SHA:** \`${{ github.sha }}\`
-
-          ---
-
-          🤖 This PR was automatically created by GitHub Actions
-          EOF
-          )
+          # Create the PR body in parts to avoid YAML escaping issues
+          {
+            echo "## 🚀 Release: Develop to Main"
+            echo ""
+            echo "This PR was automatically created when changes were merged to the \`develop\` branch."
+            echo ""
+            echo "### 📝 Recent Changes"
+            echo ""
+            echo "\`\`\`"
+            echo "${COMMITS}"
+            echo "\`\`\`"
+            echo ""
+            echo "### ✅ Pre-merge Checklist"
+            echo ""
+            echo "Before merging this PR to \`main\`, ensure:"
+            echo ""
+            echo "- [ ] All tests pass (\`pnpm test\`)"
+            echo "- [ ] Code has been reviewed"
+            echo "- [ ] No breaking changes (or properly documented)"
+            echo "- [ ] Deployment validation passed (\`pnpm validate\`)"
+            echo "- [ ] Ready for production deployment"
+            echo ""
+            echo "### 🌐 Deployment Impact"
+            echo ""
+            echo "Merging this PR will trigger:"
+            echo "- ✅ Cloudflare automatic deployment to production"
+            echo "- ✅ Updates to all routes:"
+            echo "  - \`heri.life\` (production)"
+            echo "  - \`www.heri.life\` (production)"
+            echo "  - \`heridotlife.workers.dev\` (staging)"
+            echo ""
+            echo "### 📊 Review"
+            echo ""
+            echo "**Latest commit:** ${{ github.event.head_commit.message }}"
+            echo "**Pushed by:** @${{ github.actor }}"
+            echo "**Commit SHA:** \`${{ github.sha }}\`"
+            echo ""
+            echo "---"
+            echo ""
+            echo "🤖 This PR was automatically created by GitHub Actions"
+          } > /tmp/pr-body.md
 
           # Create the PR
           gh pr create \
             --base main \
             --head develop \
             --title "Release: Develop → Main" \
-            --body "$PR_BODY" \
-            --label "release,auto-pr" \
+            --body-file /tmp/pr-body.md \
             --draft
 
           echo "✅ Created new PR from develop to main"
