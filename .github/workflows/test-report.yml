@@ -57,7 +57,7 @@ jobs:
 
       - name: Coverage Summary Comment
         if: github.event_name == 'pull_request'
-        uses: MishaKav/jest-coverage-comment@v1.0.25
+        uses: MishaKav/jest-coverage-comment@v1.0.29
         with:
           coverage-path: ./coverage/coverage-summary.json
           junitxml-path: ./coverage/junit.xml
