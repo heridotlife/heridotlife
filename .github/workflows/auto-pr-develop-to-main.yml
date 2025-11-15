@@ -2,6 +2,11 @@ name: Auto PR from Develop to Main
 
 # Trigger when changes are pushed to develop branch
 # This includes when feature branches are merged to develop
+#
+# SETUP REQUIRED:
+# Create a Personal Access Token (PAT) with 'repo' scope and save it as PAT_TOKEN secret
+# GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens
+# Required permissions: Contents (read/write), Pull requests (read/write)
 on:
   push:
     branches:
@@ -26,7 +31,7 @@ jobs:
       - name: Check for existing PR
         id: check-pr
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Check if there's already an open PR from develop to main
           PR_NUMBER=$(gh pr list \
@@ -48,7 +53,7 @@ jobs:
       - name: Update existing PR
         if: steps.check-pr.outputs.pr_exists == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           PR_NUMBER: ${{ steps.check-pr.outputs.pr_number }}
         run: |
           # Add a comment to the existing PR
@@ -67,52 +72,64 @@ jobs:
       - name: Create new PR
         if: steps.check-pr.outputs.pr_exists == 'false'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Get the latest commits from develop (comparing against remote main)
           COMMITS=$(git log --oneline origin/main...HEAD --max-count=10)
 
-          # Create the PR body in parts to avoid YAML escaping issues
-          {
-            echo "## 🚀 Release: Develop to Main"
-            echo ""
-            echo "This PR was automatically created when changes were merged to the \`develop\` branch."
-            echo ""
-            echo "### 📝 Recent Changes"
-            echo ""
-            echo "\`\`\`"
-            echo "${COMMITS}"
-            echo "\`\`\`"
-            echo ""
-            echo "### ✅ Pre-merge Checklist"
-            echo ""
-            echo "Before merging this PR to \`main\`, ensure:"
-            echo ""
-            echo "- [ ] All tests pass (\`pnpm test\`)"
-            echo "- [ ] Code has been reviewed"
-            echo "- [ ] No breaking changes (or properly documented)"
-            echo "- [ ] Deployment validation passed (\`pnpm validate\`)"
-            echo "- [ ] Ready for production deployment"
-            echo ""
-            echo "### 🌐 Deployment Impact"
-            echo ""
-            echo "Merging this PR will trigger:"
-            echo "- ✅ Cloudflare automatic deployment to production"
-            echo "- ✅ Updates to all routes:"
-            echo "  - \`heri.life\` (production)"
-            echo "  - \`www.heri.life\` (production)"
-            echo "  - \`heridotlife.workers.dev\` (staging)"
-            echo ""
-            echo "### 📊 Review"
-            echo ""
-            echo "**Latest commit:** ${{ github.event.head_commit.message }}"
-            echo "**Pushed by:** @${{ github.actor }}"
-            echo "**Commit SHA:** \`${{ github.sha }}\`"
-            echo ""
-            echo "---"
-            echo ""
-            echo "🤖 This PR was automatically created by GitHub Actions"
-          } > /tmp/pr-body.md
+          # Get commit message and properly escape it
+          COMMIT_MSG=$(cat << 'COMMIT_EOF'
+          ${{ github.event.head_commit.message }}
+          COMMIT_EOF
+          )
+
+          # Create the PR body
+          cat > /tmp/pr-body.md << 'EOF'
+          ## 🚀 Release: Develop to Main
+
+          This PR was automatically created when changes were merged to the `develop` branch.
+
+          ### 📝 Recent Changes
+
+          ```
+          EOF
+
+          echo "${COMMITS}" >> /tmp/pr-body.md
+
+          cat >> /tmp/pr-body.md << 'EOF'
+          ```
+
+          ### ✅ Pre-merge Checklist
+
+          Before merging this PR to `main`, ensure:
+
+          - [ ] All tests pass (`pnpm test`)
+          - [ ] Code has been reviewed
+          - [ ] No breaking changes (or properly documented)
+          - [ ] Deployment validation passed (`pnpm validate`)
+          - [ ] Ready for production deployment
+
+          ### 🌐 Deployment Impact
+
+          Merging this PR will trigger:
+          - ✅ Cloudflare automatic deployment to production
+          - ✅ Updates to all routes:
+            - `heri.life` (production)
+            - `www.heri.life` (production)
+            - `heridotlife.workers.dev` (staging)
+
+          ### 📊 Review
+
+          EOF
+
+          echo "" >> /tmp/pr-body.md
+          echo "**Latest commit:** ${COMMIT_MSG}" >> /tmp/pr-body.md
+          echo "**Pushed by:** @${{ github.actor }}" >> /tmp/pr-body.md
+          echo "**Commit SHA:** \`${{ github.sha }}\`" >> /tmp/pr-body.md
+          echo "" >> /tmp/pr-body.md
+          echo "---" >> /tmp/pr-body.md
+          echo "" >> /tmp/pr-body.md
+          echo "🤖 This PR was automatically created by GitHub Actions" >> /tmp/pr-body.md
 
           # Create the PR
           gh pr create \

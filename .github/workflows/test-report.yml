@@ -39,7 +39,7 @@ jobs:
         continue-on-error: true
 
       - name: Test Report Summary
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: Vitest Tests
@@ -49,7 +49,7 @@ jobs:
 
       - name: Coverage Report
         if: github.event_name == 'pull_request'
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: ./coverage/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
 
       - name: Coverage Summary Comment
         if: github.event_name == 'pull_request'
-        uses: MishaKav/jest-coverage-comment@v1.0.25
+        uses: MishaKav/jest-coverage-comment@v1.0.29
         with:
           coverage-path: ./coverage/coverage-summary.json
           junitxml-path: ./coverage/junit.xml
