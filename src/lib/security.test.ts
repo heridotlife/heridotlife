@@ -59,7 +59,7 @@ describe('Security - Host Validation', () => {
     });
 
     it('should handle non-string trusted hosts in env', () => {
-      const env = { TRUSTED_HOSTS: 123 as any };
+      const env = { TRUSTED_HOSTS: 123 as unknown as string };
       expect(isHostAllowed('heri.life', env)).toBe(true);
     });
   });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { fetchOGMetadata } from './og-fetcher';
 
 // Mock global fetch
@@ -7,7 +7,7 @@ global.fetch = vi.fn();
 describe('OG Metadata Fetcher with SSRF Protection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (global.fetch as any).mockClear();
+    (global.fetch as unknown as Mock).mockClear();
   });
 
   afterEach(() => {
@@ -151,7 +151,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -172,7 +172,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -190,7 +190,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -208,7 +208,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -228,7 +228,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -250,7 +250,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -268,7 +268,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -289,7 +289,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -308,7 +308,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -328,7 +328,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -350,7 +350,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -363,7 +363,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
 
   describe('Error Handling', () => {
     it('should handle fetch timeout', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Timeout'));
+      (global.fetch as unknown as Mock).mockRejectedValueOnce(new Error('Timeout'));
 
       const result = await fetchOGMetadata('https://example.com/');
       expect(result).toEqual({
@@ -374,7 +374,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should handle HTTP errors', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });
@@ -388,7 +388,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should handle network errors', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      (global.fetch as unknown as Mock).mockRejectedValueOnce(new Error('Network error'));
 
       const result = await fetchOGMetadata('https://example.com/');
       expect(result).toEqual({
@@ -401,7 +401,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should handle malformed HTML', async () => {
       const mockHtml = '<html><head><meta property="og:title" content="Unclosed';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -411,7 +411,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should handle empty response', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => '',
       });
@@ -425,7 +425,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should handle non-HTML content', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => 'Plain text without HTML',
       });
@@ -443,7 +443,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should send custom User-Agent header', async () => {
       const mockHtml = '<html><head><title>Test</title></head></html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -463,7 +463,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should set timeout signal', async () => {
       const mockHtml = '<html><head><title>Test</title></head></html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -483,7 +483,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should handle URLs with query parameters', async () => {
       const mockHtml = '<html><head><title>Test</title></head></html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -498,7 +498,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should handle URLs with fragments', async () => {
       const mockHtml = '<html><head><title>Test</title></head></html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -510,7 +510,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should handle international domain names', async () => {
       const mockHtml = '<html><head><title>Test</title></head></html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -534,7 +534,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -553,7 +553,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -578,7 +578,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     it('should handle extremely large responses safely', async () => {
       const largeHtml = '<html><head><title>Test</title></head>' + 'a'.repeat(10000000) + '</html>';
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => largeHtml,
       });
@@ -598,7 +598,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
         </html>
       `;
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: true,
         text: async () => mockHtml,
       });
@@ -624,7 +624,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should log warning for HTTP errors', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as Mock).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });
@@ -634,7 +634,7 @@ describe('OG Metadata Fetcher with SSRF Protection', () => {
     });
 
     it('should log error for exceptions', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      (global.fetch as unknown as Mock).mockRejectedValueOnce(new Error('Network error'));
 
       await fetchOGMetadata('https://example.com/');
       expect(consoleErrorSpy).toHaveBeenCalled();

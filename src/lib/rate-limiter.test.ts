@@ -271,6 +271,7 @@ describe('RateLimiter', () => {
       // Then manually trigger cleanup
       setTimeout(() => {
         // Access private cleanup method via type assertion
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (limiter as any).cleanup();
         limiter.destroy();
       }, 250);
@@ -284,6 +285,7 @@ describe('RateLimiter', () => {
       });
 
       // Trigger cleanup immediately (no expired entries)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (limiter as any).cleanup();
 
       // Should not throw and limiter should still work

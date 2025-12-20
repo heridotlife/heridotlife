@@ -9,6 +9,13 @@ export class MockD1PreparedStatement implements D1PreparedStatement {
     private values: unknown[] = []
   ) {}
 
+  /**
+   * Expose bound values for tests without making the underlying field public.
+   */
+  getBoundValues(): unknown[] {
+    return this.values;
+  }
+
   bind(...values: unknown[]): D1PreparedStatement {
     return new MockD1PreparedStatement(this.query, values);
   }
@@ -49,8 +56,6 @@ export class MockD1PreparedStatement implements D1PreparedStatement {
 }
 
 export class MockD1Database implements D1Database {
-  private data: Map<string, unknown[]> = new Map();
-
   prepare(query: string): D1PreparedStatement {
     return new MockD1PreparedStatement(query);
   }

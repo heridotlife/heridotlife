@@ -342,7 +342,7 @@ describe('Honeypot Detection System', () => {
       ];
 
       criticalPatterns.forEach((pattern) => {
-        expect(HONEYPOT_KEYS).toContain(pattern as any);
+        expect(HONEYPOT_KEYS).toContain(pattern as (typeof HONEYPOT_KEYS)[number]);
       });
     });
   });
