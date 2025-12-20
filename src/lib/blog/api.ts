@@ -474,9 +474,9 @@ export async function getBlogStats(db: D1Database): Promise<BlogStats> {
     .prepare(
       'SELECT id, title, slug, viewCount as views FROM BlogPost ORDER BY viewCount DESC LIMIT 5'
     )
-    .all();
+    .all<{ id: number; title: string; slug: string; views: number }>();
   const topPosts =
-    topPostsResult.results?.map((p: any) => ({
+    topPostsResult.results?.map((p) => ({
       id: p.id,
       title: p.title,
       slug: p.slug,
@@ -488,9 +488,9 @@ export async function getBlogStats(db: D1Database): Promise<BlogStats> {
     .prepare(
       'SELECT id, title, slug, status, updatedAt FROM BlogPost ORDER BY updatedAt DESC LIMIT 5'
     )
-    .all();
+    .all<{ id: number; title: string; slug: string; status: string; updatedAt: number }>();
   const recentPosts =
-    recentPostsResult.results?.map((p: any) => ({
+    recentPostsResult.results?.map((p) => ({
       id: p.id,
       title: p.title,
       slug: p.slug,

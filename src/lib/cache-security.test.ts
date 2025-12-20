@@ -259,6 +259,7 @@ describe('Cache Security', () => {
 
     it('should not throw on circular references', () => {
       const event: SecurityEvent = 'blocked_write';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const circular: any = { key: 'test' };
       circular.self = circular;
 
@@ -266,7 +267,7 @@ describe('Cache Security', () => {
       expect(() => {
         try {
           logSecurityEvent(event, circular);
-        } catch (e) {
+        } catch {
           // This is expected with circular references
           // In production, you might want to use a custom JSON serializer
         }

@@ -313,6 +313,7 @@ describe('Authentication', () => {
   describe('deleteSession', () => {
     it('should delete session cookie', () => {
       const mockDelete = vi.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cookies = { delete: mockDelete } as any;
 
       deleteSession(cookies);

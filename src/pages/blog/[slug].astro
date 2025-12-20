@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { createCachedD1Helper } from '../../lib/cached-d1';
 import { siteConfig } from '../../consts';
+import type { KVNamespace } from '@cloudflare/workers-types';
 
 const { slug } = Astro.params;
 
@@ -12,7 +13,7 @@ if (!slug) {
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
   Astro.locals.runtime.env.D1_db,
-  Astro.locals.runtime.env.heridotlife_kv as any
+  Astro.locals.runtime.env.heridotlife_kv as unknown as KVNamespace
 );
 
 // Fetch the blog post

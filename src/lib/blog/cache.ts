@@ -4,7 +4,7 @@
  * @module lib/blog/cache
  */
 
-import type { KVNamespace } from '@cloudflare/workers-types';
+import type { KVNamespace, D1Database } from '@cloudflare/workers-types';
 import { KVCache } from '../cache';
 
 /**
@@ -206,7 +206,7 @@ export class BlogCacheInvalidator {
 export class BlogCacheWarmer {
   constructor(
     private caches: BlogCacheInstances,
-    private db: any // D1Database type
+    private db: D1Database
   ) {}
 
   /**
