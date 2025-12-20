@@ -5,7 +5,7 @@ categories:
     labels:
       - 'feature'
       - 'feat'
-  - title: 'Qlts Bug Fixes'
+  - title: '🐛 Bug Fixes'
     labels:
       - 'fix'
       - 'bug'
