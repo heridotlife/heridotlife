@@ -8,6 +8,21 @@ import {
   validateOrigin,
 } from './security';
 
+// Helper to create a mock Request with custom headers (including forbidden ones)
+function createMockRequest(url: string, headers: Record<string, string> = {}): Request {
+  const request = new Request(url);
+  // Override headers.get to return our custom headers
+  const originalGet = request.headers.get.bind(request.headers);
+  request.headers.get = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName in headers) {
+      return headers[lowerName];
+    }
+    return originalGet(name);
+  };
+  return request;
+}
+
 describe('Security - Host Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -140,9 +155,7 @@ describe('Security - Host Validation', () => {
 
   describe('createSafeUrl', () => {
     it('should create HTTPS URL for production domain', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'heri.life' },
-      });
+      const request = new Request('http://heri.life/example');
       const url = createSafeUrl(request, '/path');
       expect(url.protocol).toBe('https:');
       expect(url.host).toBe('heri.life');
@@ -150,8 +163,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should create HTTP URL for localhost', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'localhost:4321' },
+      const request = new Request('http://localhost:4321/example', {
+        headers: { 'x-forwarded-host': 'localhost:4321' },
       });
       const url = createSafeUrl(request, '/path');
       expect(url.protocol).toBe('http:');
@@ -159,8 +172,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should create HTTP URL for 127.0.0.1', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: '127.0.0.1:3000' },
+      const request = new Request('http://127.0.0.1:3000/example', {
+        headers: { 'x-forwarded-host': '127.0.0.1:3000' },
       });
       const url = createSafeUrl(request, '/admin');
       expect(url.protocol).toBe('http:');
@@ -184,25 +197,19 @@ describe('Security - Host Validation', () => {
     });
 
     it('should sanitize untrusted hosts', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'evil.com' },
-      });
+      const request = new Request('http://evil.com/example');
       const url = createSafeUrl(request);
       expect(url.host).toBe('heri.life');
     });
 
     it('should handle empty pathname', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'heri.life' },
-      });
+      const request = new Request('http://heri.life/example');
       const url = createSafeUrl(request);
       expect(url.pathname).toBe('/');
     });
 
     it('should handle pathname with query string', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'heri.life' },
-      });
+      const request = new Request('http://heri.life/example');
       const url = createSafeUrl(request, '/search?q=test');
       expect(url.pathname).toBe('/search');
       expect(url.search).toBe('?q=test');
@@ -211,25 +218,21 @@ describe('Security - Host Validation', () => {
 
   describe('getSafeCanonicalUrl', () => {
     it('should return complete canonical URL', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'heri.life' },
-      });
+      const request = new Request('http://heri.life/example');
       const canonicalUrl = getSafeCanonicalUrl(request, '/blog/post-1');
       expect(canonicalUrl).toBe('https://heri.life/blog/post-1');
     });
 
     it('should handle localhost correctly', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'localhost:4321' },
+      const request = new Request('http://localhost:4321/example', {
+        headers: { 'x-forwarded-host': 'localhost:4321' },
       });
       const canonicalUrl = getSafeCanonicalUrl(request, '/admin');
       expect(canonicalUrl).toBe('http://localhost:4321/admin');
     });
 
     it('should sanitize malicious hosts', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'attacker.site' },
-      });
+      const request = new Request('http://attacker.site/example');
       const canonicalUrl = getSafeCanonicalUrl(request, '/page');
       expect(canonicalUrl).toBe('https://heri.life/page');
     });
@@ -244,18 +247,15 @@ describe('Security - Host Validation', () => {
 
   describe('validateHostMiddleware', () => {
     it('should allow valid host without X-Forwarded-Host', () => {
-      const request = new Request('http://example.com', {
-        headers: { host: 'heri.life' },
-      });
+      const request = new Request('http://heri.life/example');
       const result = validateHostMiddleware(request);
       expect(result.valid).toBe(true);
       expect(result.response).toBeUndefined();
     });
 
     it('should allow matching Host and X-Forwarded-Host', () => {
-      const request = new Request('http://example.com', {
+      const request = new Request('http://heri.life/example', {
         headers: {
-          host: 'heri.life',
           'x-forwarded-host': 'heri.life',
         },
       });
@@ -264,9 +264,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should allow both headers when they are in trusted list', () => {
-      const request = new Request('http://example.com', {
+      const request = new Request('http://heri.life/example', {
         headers: {
-          host: 'heri.life',
           'x-forwarded-host': 'www.heri.life',
         },
       });
@@ -276,13 +275,11 @@ describe('Security - Host Validation', () => {
 
     it('should reject mismatched untrusted headers', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const request = new Request('http://example.com', {
-        headers: {
-          host: 'heri.life',
-          'x-forwarded-host': 'evil.com',
-          'user-agent': 'Mozilla/5.0',
-          'cf-connecting-ip': '1.2.3.4',
-        },
+      const request = createMockRequest('http://heri.life/example', {
+        host: 'heri.life',
+        'x-forwarded-host': 'evil.com',
+        'user-agent': 'Mozilla/5.0',
+        'cf-connecting-ip': '1.2.3.4',
       });
       const result = validateHostMiddleware(request);
       expect(result.valid).toBe(false);
@@ -302,11 +299,9 @@ describe('Security - Host Validation', () => {
 
     it('should reject when X-Forwarded-Host is untrusted', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const request = new Request('http://example.com', {
-        headers: {
-          host: 'evil.com',
-          'x-forwarded-host': 'attacker.site',
-        },
+      const request = createMockRequest('http://evil.com/example', {
+        host: 'evil.com',
+        'x-forwarded-host': 'attacker.site',
       });
       const result = validateHostMiddleware(request);
       expect(result.valid).toBe(false);
@@ -315,11 +310,9 @@ describe('Security - Host Validation', () => {
     });
 
     it('should return 400 response with proper headers', async () => {
-      const request = new Request('http://example.com', {
-        headers: {
-          host: 'heri.life',
-          'x-forwarded-host': 'evil.com',
-        },
+      const request = createMockRequest('http://heri.life/example', {
+        host: 'heri.life',
+        'x-forwarded-host': 'evil.com',
       });
       const result = validateHostMiddleware(request);
       expect(result.response).toBeDefined();
@@ -332,9 +325,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should handle case insensitive comparison', () => {
-      const request = new Request('http://example.com', {
+      const request = new Request('http://HERI.LIFE/example', {
         headers: {
-          host: 'HERI.LIFE',
           'x-forwarded-host': 'heri.life',
         },
       });
@@ -343,9 +335,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should handle whitespace in headers', () => {
-      const request = new Request('http://example.com', {
+      const request = new Request('http://heri.life/example', {
         headers: {
-          host: '  heri.life  ',
           'x-forwarded-host': '  heri.life  ',
         },
       });
@@ -355,12 +346,10 @@ describe('Security - Host Validation', () => {
 
     it('should log security event with X-Forwarded-For fallback', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const request = new Request('http://example.com', {
-        headers: {
-          host: 'heri.life',
-          'x-forwarded-host': 'evil.com',
-          'x-forwarded-for': '192.168.1.1',
-        },
+      const request = createMockRequest('http://heri.life/example', {
+        host: 'heri.life',
+        'x-forwarded-host': 'evil.com',
+        'x-forwarded-for': '192.168.1.1',
       });
       validateHostMiddleware(request);
       expect(consoleSpy).toHaveBeenCalledWith(
@@ -381,8 +370,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should validate and return trusted origin', () => {
-      const request = new Request('http://example.com', {
-        headers: { origin: 'https://heri.life' },
+      const request = createMockRequest('http://example.com', {
+        origin: 'https://heri.life',
       });
       const result = validateOrigin(request);
       expect(result).toBe('https://heri.life');
@@ -397,8 +386,8 @@ describe('Security - Host Validation', () => {
     });
 
     it('should handle localhost origin', () => {
-      const request = new Request('http://example.com', {
-        headers: { origin: 'http://localhost:4321' },
+      const request = createMockRequest('http://example.com', {
+        origin: 'http://localhost:4321',
       });
       const result = validateOrigin(request);
       expect(result).toBe('http://localhost:4321');
@@ -406,8 +395,8 @@ describe('Security - Host Validation', () => {
 
     it('should return null for malformed origin', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const request = new Request('http://example.com', {
-        headers: { origin: 'not-a-valid-url' },
+      const request = createMockRequest('http://example.com', {
+        origin: 'not-a-valid-url',
       });
       const result = validateOrigin(request);
       expect(result).toBeNull();
@@ -417,16 +406,16 @@ describe('Security - Host Validation', () => {
 
     it('should validate origin with environment hosts', () => {
       const env = { TRUSTED_HOSTS: 'custom.domain' };
-      const request = new Request('http://example.com', {
-        headers: { origin: 'https://custom.domain' },
+      const request = createMockRequest('http://example.com', {
+        origin: 'https://custom.domain',
       });
       const result = validateOrigin(request, env);
       expect(result).toBe('https://custom.domain');
     });
 
     it('should handle wildcard patterns in origin validation', () => {
-      const request = new Request('http://example.com', {
-        headers: { origin: 'https://preview.heridotlife.pages.dev' },
+      const request = createMockRequest('http://example.com', {
+        origin: 'https://preview.heridotlife.pages.dev',
       });
       const result = validateOrigin(request);
       expect(result).toBe('https://preview.heridotlife.pages.dev');

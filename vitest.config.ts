@@ -1,6 +1,6 @@
-import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
+import { defineConfig } from 'vitest/config';
 
-export default defineWorkersConfig({
+export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
@@ -59,19 +59,6 @@ export default defineWorkersConfig({
       clean: true,
       cleanOnRerun: true,
       reportsDirectory: './coverage',
-    },
-    poolOptions: {
-      workers: {
-        wrangler: { configPath: './wrangler.toml' },
-        miniflare: {
-          bindings: {
-            AUTH_SECRET: 'test-secret-key-at-least-32-characters-long-for-security',
-            ADMIN_PASSWORD: 'test-admin-password',
-            TRUSTED_HOSTS: 'localhost,127.0.0.1,*.test',
-            CANONICAL_DOMAIN: 'localhost',
-          },
-        },
-      },
     },
   },
   resolve: {
