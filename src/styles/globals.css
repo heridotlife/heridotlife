@@ -1,17 +1,163 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Prose styling for blog content - Tailwind v4 compatible */
+.prose {
+  color: rgb(30 64 175);
+}
+
+:is(.dark .prose) {
+  color: rgb(186 230 253);
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgb(12 74 110);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+:is(.dark .prose h2) {
+  color: rgb(224 242 254);
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(12 74 110);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+:is(.dark .prose h3) {
+  color: rgb(224 242 254);
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.625;
+}
+
+.prose a {
+  color: rgb(2 132 199);
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: rgb(3 105 161);
+}
+
+:is(.dark .prose a) {
+  color: rgb(125 211 252);
+}
+
+:is(.dark .prose a:hover) {
+  color: rgb(165 243 252);
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose code {
+  background-color: rgb(224 242 254);
+  color: rgb(30 64 175);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+:is(.dark .prose code) {
+  background-color: rgb(30 41 59);
+  color: rgb(186 230 253);
+}
+
+.prose pre {
+  background-color: rgb(15 23 42);
+  color: rgb(241 245 249);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+:is(.dark .prose pre) {
+  background-color: rgb(2 6 23);
+}
+
+.prose pre code {
+  background-color: transparent;
+  color: rgb(241 245 249);
+  padding: 0;
+}
+
+.prose blockquote {
+  border-left: 4px solid rgb(14 165 233);
+  padding-left: 1rem;
+  font-style: italic;
+  color: rgb(3 105 161);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+:is(.dark .prose blockquote) {
+  color: rgb(165 243 252);
+}
+
+.prose img {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.prose th {
+  background-color: rgb(224 242 254);
+  color: rgb(12 74 110);
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+:is(.dark .prose th) {
+  background-color: rgb(30 41 59);
+  color: rgb(224 242 254);
+}
+
+.prose td {
+  border: 1px solid rgb(186 230 253);
+  padding: 0.5rem 1rem;
+}
+
+:is(.dark .prose td) {
+  border-color: rgb(7 89 133);
+}
 
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 20px) scale(0.9);
   }
+
   100% {
     transform: translate(0px, 0px) scale(1);
   }
@@ -33,9 +179,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
