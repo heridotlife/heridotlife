@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@variant dark (&:where(.dark, .dark *));
 
 /* Prose styling for blog content - Tailwind v4 compatible */
 .prose {
