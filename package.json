@@ -57,8 +57,8 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.10.15",
-    "@cloudflare/workers-types": "^4.20251220.0",
+    "@cloudflare/vitest-pool-workers": "^0.11.1",
+    "@cloudflare/workers-types": "^4.20251229.0",
     "@eslint/js": "^9.39.2",
     "@fontsource/inter": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
@@ -73,12 +73,12 @@
     "eslint": "^9.39.2",
     "eslint-plugin-astro": "^1.5.0",
     "happy-dom": "^20.0.11",
-    "jsdom": "^27.3.0",
+    "jsdom": "^27.4.0",
     "prettier": "^3.7.4",
     "prettier-plugin-astro": "^0.14.1",
     "satori": "^0.18.3",
     "sharp": "^0.34.5",
-    "typescript-eslint": "^8.50.0",
+    "typescript-eslint": "^8.50.1",
     "vitest": "2.1.9",
     "wrangler": "^4.56.0"
   },
