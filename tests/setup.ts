@@ -30,12 +30,7 @@ if (!global.crypto.subtle) {
 // Set default environment variables for testing
 process.env.AUTH_SECRET = 'test-auth-secret-at-least-32-characters-long-for-security';
 process.env.ADMIN_PASSWORD = 'test-admin-password';
-process.env.CANONICAL_DOMAIN = 'heri.life';
-process.env.TRUSTED_HOSTS = 'heri.life,localhost:4321';
-
-// Suppress console.error and console.warn in tests unless explicitly needed
-global.console = {
-  ...console,
-  error: vi.fn(),
-  warn: vi.fn(),
-};
+// Don't set CANONICAL_DOMAIN in tests - let it use the default or per-test values
+// Include all hosts that tests expect to be trusted
+process.env.TRUSTED_HOSTS =
+  'heri.life,www.heri.life,localhost:4321,localhost:3000,127.0.0.1:4321,127.0.0.1:3000,*.heridotlife.pages.dev';

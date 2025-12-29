@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import cloudflare from '@astrojs/cloudflare';
 
@@ -22,12 +22,12 @@ export default defineConfig({
     imageService: 'compile',
   }),
   integrations: [
-    tailwind(),
     react({
       experimentalReactChildren: false,
     }),
   ],
   vite: {
+    plugins: [tailwindcss()],
     define: {
       'process.env.NODE_ENV': JSON.stringify(
         // eslint-disable-next-line no-undef
