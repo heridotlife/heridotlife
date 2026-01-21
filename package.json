@@ -81,7 +81,7 @@
     "sharp": "^0.34.5",
     "typescript-eslint": "^8.51.0",
     "vitest": "4.0.16",
-    "wrangler": "^4.56.0"
+    "wrangler": "^4.59.1"
   },
   "pnpm": {
     "overrides": {
