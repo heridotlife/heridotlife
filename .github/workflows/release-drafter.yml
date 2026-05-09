@@ -28,7 +28,7 @@ jobs:
       # - name: Setup Release Drafter
       #   run: |
       #     echo "GITHUB_BASE_URL=$GITHUB_API_URL" >> $GITHUB_ENV
-      - uses: release-drafter/release-drafter@v6
+      - uses: release-drafter/release-drafter@v7
         with:
           # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
           config-name: release-drafter.yml
