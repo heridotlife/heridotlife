@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { createCachedD1Helper, type ShortUrl } from '../lib/cached-d1';
 import { toBool, toDate } from '../lib/d1';
 import { siteConfig } from '../consts';
+import { env } from 'cloudflare:workers';
 
 const { slug } = Astro.params;
 
@@ -17,9 +18,9 @@ if (reservedPaths.includes(slug.toLowerCase())) {
 
 // Use cached D1 helper for better performance
 const db = createCachedD1Helper(
-    Astro.locals.runtime.env.D1_db,
+    env.D1_db,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Astro.locals.runtime.env.heridotlife_kv as any
+    env.heridotlife_kv as any
 );
 
 // Initialize variables for category rendering

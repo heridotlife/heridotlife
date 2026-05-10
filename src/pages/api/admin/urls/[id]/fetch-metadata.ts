@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../../lib/auth';
 import { createCachedD1Helper } from '../../../../../lib/cached-d1';
 import { fetchOGMetadata } from '../../../../../lib/og-fetcher';
+import { env } from 'cloudflare:workers';
 
 /**
  * Fetch OG metadata for a URL and update the database
@@ -20,9 +21,9 @@ export const POST: APIRoute = async (context) => {
     }
 
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     // Get the URL

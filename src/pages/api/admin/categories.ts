@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
 import { createCategorySchema } from '../../../lib/validations';
 import { createCachedD1Helper } from '../../../lib/cached-d1';
+import { env } from 'cloudflare:workers';
 
 // GET all categories
 export const GET: APIRoute = async (context) => {
@@ -13,9 +14,9 @@ export const GET: APIRoute = async (context) => {
 
     // Use cached D1 helper for better performance
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     const categories = await db.getAllCategories();
@@ -49,9 +50,9 @@ export const POST: APIRoute = async (context) => {
 
     // Use cached D1 helper (will auto-invalidate category caches)
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     const category = await db.createCategory(name);

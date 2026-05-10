@@ -1,26 +1,31 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createSession, getSession, verifyPassword, deleteSession, hashPassword } from './auth';
 import { createMockContext } from '../../tests/helpers/mock-context';
+// The 'cloudflare:workers' import is resolved to tests/mocks/cloudflare-workers.ts via vitest alias
+import { env as mockEnv } from 'cloudflare:workers';
 
 describe('Authentication', () => {
   describe('verifyPassword', () => {
+    beforeEach(() => {
+      // Reset env values before each test
+      mockEnv.ADMIN_PASSWORD = 'test-admin-password';
+      mockEnv.AUTH_SECRET = 'test-secret-key-at-least-32-characters-long-for-security';
+    });
+
     it('should return true for correct password', async () => {
-      const context = createMockContext();
-      const result = await verifyPassword('test-admin-password', context.locals);
+      const result = await verifyPassword('test-admin-password');
       expect(result).toBe(true);
     });
 
     it('should return false for incorrect password', async () => {
-      const context = createMockContext();
-      const result = await verifyPassword('wrong-password', context.locals);
+      const result = await verifyPassword('wrong-password');
       expect(result).toBe(false);
     });
 
     it('should return false when ADMIN_PASSWORD is not set', async () => {
-      const context = createMockContext();
-      context.locals.runtime.env.ADMIN_PASSWORD = '';
+      mockEnv.ADMIN_PASSWORD = '';
 
-      const result = await verifyPassword('any-password', context.locals);
+      const result = await verifyPassword('any-password');
       expect(result).toBe(false);
     });
 
@@ -31,13 +36,12 @@ describe('Authentication', () => {
         return;
       }
 
-      const context = createMockContext();
       const attempts = 100;
       const timings: number[] = [];
 
       for (let i = 0; i < attempts; i++) {
         const start = performance.now();
-        await verifyPassword('wrong-password-' + i, context.locals);
+        await verifyPassword('wrong-password-' + i);
         const duration = performance.now() - start;
         timings.push(duration);
       }
@@ -64,31 +68,29 @@ describe('Authentication', () => {
     });
 
     it('should verify hashed passwords correctly', async () => {
-      const context = createMockContext();
       const plainPassword = 'my-secure-password-123';
 
       // Generate a hashed password
       const hashedPassword = await hashPassword(plainPassword);
-      context.locals.runtime.env.ADMIN_PASSWORD = hashedPassword;
+      mockEnv.ADMIN_PASSWORD = hashedPassword;
 
       // Correct password should verify
-      const resultCorrect = await verifyPassword(plainPassword, context.locals);
+      const resultCorrect = await verifyPassword(plainPassword);
       expect(resultCorrect).toBe(true);
 
       // Incorrect password should fail
-      const resultWrong = await verifyPassword('wrong-password', context.locals);
+      const resultWrong = await verifyPassword('wrong-password');
       expect(resultWrong).toBe(false);
     });
 
     it('should support legacy plain-text passwords with warning', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const context = createMockContext();
 
       // Plain-text password (legacy mode)
-      context.locals.runtime.env.ADMIN_PASSWORD = 'plain-text-password';
+      mockEnv.ADMIN_PASSWORD = 'plain-text-password';
 
       // First call should succeed
-      const result = await verifyPassword('plain-text-password', context.locals);
+      const result = await verifyPassword('plain-text-password');
       expect(result).toBe(true);
 
       // Warning should be called at most once (may already be called from previous tests)
@@ -105,7 +107,7 @@ describe('Authentication', () => {
 
       // Second call should not trigger another warning (log spam prevention)
       consoleWarnSpy.mockClear();
-      const result2 = await verifyPassword('plain-text-password', context.locals);
+      const result2 = await verifyPassword('plain-text-password');
       expect(result2).toBe(true);
       expect(consoleWarnSpy).not.toHaveBeenCalled();
 
@@ -114,11 +116,10 @@ describe('Authentication', () => {
 
     it('should reject invalid hash format (wrong number of parts)', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const context = createMockContext();
       // Starts with 'pbkdf2:' but only has 3 parts instead of 4
-      context.locals.runtime.env.ADMIN_PASSWORD = 'pbkdf2:invalid:format';
+      mockEnv.ADMIN_PASSWORD = 'pbkdf2:invalid:format';
 
-      const result = await verifyPassword('any-password', context.locals);
+      const result = await verifyPassword('any-password');
       expect(result).toBe(false);
       expect(consoleErrorSpy).toHaveBeenCalledWith('Invalid password hash format');
 
@@ -127,11 +128,10 @@ describe('Authentication', () => {
 
     it('should reject hash with too many parts', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const context = createMockContext();
       // Starts with 'pbkdf2:' but has 5 parts instead of 4
-      context.locals.runtime.env.ADMIN_PASSWORD = 'pbkdf2:600000:c2FsdA==:aGFzaA==:extrapart';
+      mockEnv.ADMIN_PASSWORD = 'pbkdf2:600000:c2FsdA==:aGFzaA==:extrapart';
 
-      const result = await verifyPassword('any-password', context.locals);
+      const result = await verifyPassword('any-password');
       expect(result).toBe(false);
       expect(consoleErrorSpy).toHaveBeenCalledWith('Invalid password hash format');
 
@@ -140,11 +140,10 @@ describe('Authentication', () => {
 
     it('should handle errors during password verification', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const context = createMockContext();
       // Invalid base64 in salt will cause decoding error
-      context.locals.runtime.env.ADMIN_PASSWORD = 'pbkdf2:600000:invalid-base64!!!:aGFzaA==';
+      mockEnv.ADMIN_PASSWORD = 'pbkdf2:600000:invalid-base64!!!:aGFzaA==';
 
-      const result = await verifyPassword('any-password', context.locals);
+      const result = await verifyPassword('any-password');
       expect(result).toBe(false);
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Password verification error:',
@@ -176,29 +175,27 @@ describe('Authentication', () => {
       expect(hash1).not.toBe(hash2);
 
       // But both should verify correctly
-      const context = createMockContext();
+      mockEnv.ADMIN_PASSWORD = hash1;
+      expect(await verifyPassword(password)).toBe(true);
 
-      context.locals.runtime.env.ADMIN_PASSWORD = hash1;
-      expect(await verifyPassword(password, context.locals)).toBe(true);
-
-      context.locals.runtime.env.ADMIN_PASSWORD = hash2;
-      expect(await verifyPassword(password, context.locals)).toBe(true);
+      mockEnv.ADMIN_PASSWORD = hash2;
+      expect(await verifyPassword(password)).toBe(true);
     });
 
     it('should handle unicode and special characters', async () => {
       const password = '🔐 Pāsswörd-with-émojis! 中文密码';
       const hash = await hashPassword(password);
-      const context = createMockContext();
-      context.locals.runtime.env.ADMIN_PASSWORD = hash;
+      mockEnv.ADMIN_PASSWORD = hash;
 
-      expect(await verifyPassword(password, context.locals)).toBe(true);
-      expect(await verifyPassword('wrong', context.locals)).toBe(false);
+      expect(await verifyPassword(password)).toBe(true);
+      expect(await verifyPassword('wrong')).toBe(false);
     });
   });
 
   describe('createSession', () => {
     beforeEach(() => {
       vi.clearAllMocks();
+      mockEnv.AUTH_SECRET = 'test-secret-key-at-least-32-characters-long-for-security';
     });
 
     it('should create a JWT session cookie', async () => {
@@ -222,7 +219,7 @@ describe('Authentication', () => {
 
     it('should throw error when AUTH_SECRET is not set', async () => {
       const context = createMockContext();
-      context.locals.runtime.env.AUTH_SECRET = '';
+      mockEnv.AUTH_SECRET = '';
 
       await expect(createSession(context)).rejects.toThrow(
         'AUTH_SECRET environment variable is not set'
@@ -231,7 +228,7 @@ describe('Authentication', () => {
 
     it('should throw error when AUTH_SECRET is too short', async () => {
       const context = createMockContext();
-      context.locals.runtime.env.AUTH_SECRET = 'short'; // Less than 32 chars
+      mockEnv.AUTH_SECRET = 'short'; // Less than 32 chars
 
       await expect(createSession(context)).rejects.toThrow(
         'AUTH_SECRET must be at least 32 characters'
@@ -254,6 +251,10 @@ describe('Authentication', () => {
   });
 
   describe('getSession', () => {
+    beforeEach(() => {
+      mockEnv.AUTH_SECRET = 'test-secret-key-at-least-32-characters-long-for-security';
+    });
+
     it('should return null when no cookie exists', async () => {
       const context = createMockContext();
       const result = await getSession(context);
