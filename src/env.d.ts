@@ -29,6 +29,29 @@ interface CloudflareEnv {
 }
 
 /**
+ * Cloudflare Workers execution context
+ */
+interface CloudflareContext {
+  waitUntil(promise: Promise<unknown>): void;
+  passThroughOnException(): void;
+}
+
+/**
+ * Cloudflare Workers runtime env shape used by cloudflare:workers virtual module
+ */
+declare namespace Cloudflare {
+  interface Env {
+    AUTH_SECRET: string;
+    ADMIN_PASSWORD: string;
+    D1_db: D1Database;
+    heridotlife_kv: KVNamespace;
+    CANONICAL_DOMAIN?: string;
+    TRUSTED_HOSTS?: string;
+    [key: string]: string | D1Database | KVNamespace | undefined;
+  }
+}
+
+/**
  * Module declaration for cloudflare:workers
  * Provides typed access to Cloudflare Workers environment bindings
  */
@@ -44,6 +67,11 @@ declare namespace App {
    * Astro.locals - Available in all endpoints and middleware
    */
   interface Locals {
+    runtime: {
+      env: CloudflareEnv;
+      cf: CfProperties;
+      ctx: CloudflareContext;
+    };
     /** CSP nonce for inline scripts (generated per request) */
     cspNonce: string;
   }
