@@ -24,8 +24,14 @@ const rootDir = join(__dirname, '..');
 
 async function checkBuildOutput() {
   try {
-    // Check if critical build outputs exist
+    // Astro 5 Cloudflare adapter output
     await access(join(rootDir, 'dist', '_worker.js', 'index.js'));
+    return true;
+  } catch {}
+
+  try {
+    // Astro 6 server output format
+    await access(join(rootDir, 'dist', 'server', 'entry.mjs'));
     return true;
   } catch {
     return false;
