@@ -28,6 +28,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      exclude: ['react/jsx-dev-runtime', 'react/jsx-runtime'],
+    },
     define: {
       'process.env.NODE_ENV': JSON.stringify(
         // eslint-disable-next-line no-undef

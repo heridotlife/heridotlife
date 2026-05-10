@@ -24,13 +24,13 @@
   ],
 
   // Workers Script Entry Point
-  // The Cloudflare adapter creates _worker.js/index.js in the dist directory
-  "main": "./dist/_worker.js/index.js",
+  // The Cloudflare adapter creates server/entry.mjs in the dist directory (Astro 6)
+  "main": "./dist/server/entry.mjs",
 
   // Static Assets Configuration
-  // Serves static files from dist directory using Workers Assets
+  // Serves static files from dist/client directory using Workers Assets (Astro 6)
   "assets": {
-    "directory": "./dist",
+    "directory": "./dist/client",
     "binding": "ASSETS",
   },
 
