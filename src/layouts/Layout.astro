@@ -1,7 +1,6 @@
 ---
 import '../styles/globals.css';
 import { siteConfig } from '../consts';
-import { getSafeCanonicalUrl } from '../lib/security';
 
 export interface Props {
   title: string;
@@ -24,11 +23,7 @@ const {
 } = Astro.props;
 
 // Generate safe canonical URL using validated host
-const canonicalUrl = getSafeCanonicalUrl(
-  Astro.request,
-  Astro.url.pathname,
-  Astro.locals?.runtime?.env
-);
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
 
 // Generate dynamic OG image URL
 const ogImageUrl =
