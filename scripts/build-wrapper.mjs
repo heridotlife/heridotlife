@@ -30,7 +30,7 @@ async function checkBuildOutput() {
   } catch {}
 
   try {
-    // Astro 6 Cloudflare adapter output
+    // Astro 6 server output format
     await access(join(rootDir, 'dist', 'server', 'entry.mjs'));
     return true;
   } catch {
