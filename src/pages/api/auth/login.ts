@@ -57,7 +57,7 @@ export const POST: APIRoute = async (context) => {
     const { password } = validation.data;
 
     // Use async verifyPassword with timing-safe comparison
-    const isValid = await verifyPassword(password, context.locals);
+    const isValid = await verifyPassword(password);
 
     if (!isValid) {
       console.warn(`[Security] Failed login attempt from IP: ${clientIp}`);

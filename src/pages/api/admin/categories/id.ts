@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth';
 import { D1Helper } from '../../../../lib/d1';
 import { updateCategorySchema } from '../../../../lib/validations';
+import { env } from 'cloudflare:workers';
 
 // PUT - Update category
 export const PUT: APIRoute = async (context) => {
@@ -32,7 +33,7 @@ export const PUT: APIRoute = async (context) => {
 
     const { name } = validation.data;
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    const db = new D1Helper(env.D1_db);
 
     try {
       const updated = await db.updateCategory(categoryId, name);
@@ -70,7 +71,7 @@ export const DELETE: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid category ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    const db = new D1Helper(env.D1_db);
 
     try {
       await db.deleteCategory(categoryId);

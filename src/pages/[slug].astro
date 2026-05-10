@@ -10,7 +10,20 @@ if (!slug) {
     return Astro.redirect('/404');
 }
 
-const reservedPaths = ['admin', 'api', 'blog', 'category', 'urls', 'c', 'categories'];
+const reservedPaths = [
+    'admin',
+    'api',
+    'blog',
+    'category',
+    'urls',
+    'c',
+    'categories',
+    'assets',
+    '_astro',
+    'favicon.ico',
+    'robots.txt',
+    'sitemap.xml'
+];
 if (reservedPaths.includes(slug.toLowerCase())) {
     return Astro.redirect('/404');
 }

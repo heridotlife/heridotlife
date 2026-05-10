@@ -9,6 +9,7 @@
 
 /**
  * Cloudflare Workers environment bindings
+ * Used to type the `env` export from "cloudflare:workers"
  */
 interface CloudflareEnv {
   /** JWT secret for authentication (min 32 characters) */
@@ -31,16 +32,31 @@ interface CloudflareEnv {
  * Cloudflare Workers execution context
  */
 interface CloudflareContext {
-  /**
-   * Extend the request's lifetime until the promise resolves
-   * Useful for background tasks that should complete even after response is sent
-   */
   waitUntil(promise: Promise<unknown>): void;
-  /**
-   * Prevent Cloudflare's error page from being shown
-   * Allow custom error handling
-   */
   passThroughOnException(): void;
+}
+
+/**
+ * Cloudflare Workers runtime env shape used by cloudflare:workers virtual module
+ */
+declare namespace Cloudflare {
+  interface Env {
+    AUTH_SECRET: string;
+    ADMIN_PASSWORD: string;
+    D1_db: D1Database;
+    heridotlife_kv: KVNamespace;
+    CANONICAL_DOMAIN?: string;
+    TRUSTED_HOSTS?: string;
+    [key: string]: string | D1Database | KVNamespace | undefined;
+  }
+}
+
+/**
+ * Module declaration for cloudflare:workers
+ * Provides typed access to Cloudflare Workers environment bindings
+ */
+declare module 'cloudflare:workers' {
+  const env: CloudflareEnv;
 }
 
 /**
@@ -51,13 +67,9 @@ declare namespace App {
    * Astro.locals - Available in all endpoints and middleware
    */
   interface Locals {
-    /** Cloudflare Workers runtime bindings */
     runtime: {
-      /** Environment variables and bindings */
       env: CloudflareEnv;
-      /** Cloudflare request properties (geo, colo, etc.) */
       cf: CfProperties;
-      /** Execution context for worker lifecycle */
       ctx: CloudflareContext;
     };
     /** CSP nonce for inline scripts (generated per request) */

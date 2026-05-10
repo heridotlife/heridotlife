@@ -4,6 +4,7 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { updateBlogPostSchema } from '../../../../lib/blog/validations';
 import { getPostById, updateBlogPost, deleteBlogPost } from '../../../../lib/blog/api';
 import type { UpdateBlogPostInput } from '../../../../lib/blog/types';
+import { env } from 'cloudflare:workers';
 
 /**
  * GET /api/blog/posts/[id]
@@ -26,7 +27,7 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid post ID' }), { status: 400 });
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
     const post = await getPostById(db, postId);
 
     if (!post) {
@@ -86,7 +87,7 @@ export const PUT: APIRoute = async (context) => {
       );
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
 
     // Update the blog post
     const input: UpdateBlogPostInput = validation.data;
@@ -144,7 +145,7 @@ export const DELETE: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid post ID' }), { status: 400 });
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
 
     // Check if post exists before deleting
     const post = await getPostById(db, postId);

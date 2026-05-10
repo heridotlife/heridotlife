@@ -7,12 +7,12 @@
     "pnpm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro dev",
     "dev:wrangler": "./setup_db.sh && pnpm build && wrangler dev",
     "dev:wrangler:skip-build": "./setup_db.sh && wrangler dev",
-    "start": "astro dev",
+    "start": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro dev",
     "prebuild": "node scripts/generate-seo-files.mjs",
-    "build": "node scripts/build-wrapper.mjs",
+    "build": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc node scripts/build-wrapper.mjs",
     "preview": "wrangler dev",
     "deploy": "wrangler deploy",
     "validate": "./validate-deploy.sh",
@@ -32,60 +32,74 @@
     "test:integration": "vitest run --project integration",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
-    "type-check": "astro check",
+    "type-check": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro check",
     "og:generate": "node scripts/generate-og-image.mjs",
     "og:convert": "node scripts/convert-og-to-jpeg.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
-    "@astrojs/cloudflare": "^12.6.12",
-    "@astrojs/node": "^9.5.1",
+    "@astrojs/cloudflare": "^13.1.10",
+    "@astrojs/node": "^10.0.5",
     "@astrojs/react": "^4.4.2",
     "@astrojs/tailwind": "^6.0.2",
     "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.16.6",
+    "astro": "^6.1.6",
     "clsx": "^2.1.1",
     "jose": "^6.1.3",
     "lucide-react": "^0.562.0",
-    "pnpm": "^10.26.2",
+    "pnpm": "^10.28.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "zod": "^4.2.1"
+    "vite": "^7.3.2",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.11.1",
-    "@cloudflare/workers-types": "^4.20251229.0",
+    "@cloudflare/vitest-pool-workers": "^0.12.12",
+    "@cloudflare/workers-types": "^4.20260509.1",
     "@eslint/js": "^9.39.2",
     "@fontsource/inter": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.1",
-    "@types/node": "^25.0.3",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^25.2.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitest/coverage-v8": "4.0.16",
-    "@vitest/ui": "4.0.16",
-    "esbuild": "^0.27.2",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "4.0.18",
+    "esbuild": "^0.27.3",
     "eslint": "^9.39.2",
-    "eslint-plugin-astro": "^1.5.0",
-    "happy-dom": "^20.0.11",
+    "eslint-plugin-astro": "^1.6.0",
+    "happy-dom": "^20.8.9",
     "jsdom": "^27.4.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
-    "satori": "^0.18.3",
+    "satori": "^0.19.2",
     "sharp": "^0.34.5",
-    "typescript-eslint": "^8.50.1",
-    "vitest": "4.0.16",
-    "wrangler": "^4.56.0"
+    "typescript-eslint": "^8.55.0",
+    "vitest": "4.0.18",
+    "wrangler": "^4.90.0"
   },
   "pnpm": {
     "overrides": {
-      "esbuild": "^0.27.0"
+      "ajv": "^6.14.0",
+      "brace-expansion": "^1.1.13",
+      "esbuild": "^0.27.0",
+      "lodash": "^4.18.0",
+      "minimatch": "^3.1.5",
+      "postcss": "^8.5.10",
+      "undici": "^7.24.0",
+      "yaml": "^2.8.3"
     }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
   }
 }

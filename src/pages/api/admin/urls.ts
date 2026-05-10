@@ -4,6 +4,7 @@ import { createCachedD1Helper } from '../../../lib/cached-d1';
 import { toBool, toDate } from '../../../lib/d1';
 import { createUrlSchema } from '../../../lib/validations';
 import { fetchOGMetadata } from '../../../lib/og-fetcher';
+import { env } from 'cloudflare:workers';
 
 // GET all URLs
 export const GET: APIRoute = async (context) => {
@@ -15,9 +16,9 @@ export const GET: APIRoute = async (context) => {
 
     // Use cached D1 helper for better performance
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     const urls = await db.getAllShortUrls();
@@ -70,9 +71,9 @@ export const POST: APIRoute = async (context) => {
 
     // Use cached D1 helper (will auto-invalidate caches on create)
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     const existing = await db.findShortUrl(slug);

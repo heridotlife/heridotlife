@@ -22,19 +22,7 @@ export function createMockContext(overrides?: Partial<APIContext>): APIContext {
         headers: { Location: path },
       }),
     locals: {
-      runtime: {
-        env: {
-          AUTH_SECRET: 'test-secret-key-at-least-32-characters-long-for-security',
-          ADMIN_PASSWORD: 'test-admin-password',
-          D1_db: null,
-          heridotlife_kv: null,
-        },
-        cf: {},
-        ctx: {
-          waitUntil: () => {},
-          passThroughOnException: () => {},
-        },
-      },
+      cspNonce: '',
     },
     ...overrides,
   } as unknown as APIContext;

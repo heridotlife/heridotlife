@@ -1,17 +1,10 @@
 {
-  // Project Configuration
-  // SINGLE WORKER for both staging and production
-  // Worker name: heridotlife
-  // Staging URL: heridotlife.workers.dev
-  // Production URLs: heri.life, www.heri.life
+  // Vite-only Wrangler config used by Astro/Vite tooling.
+  // Keep this file free of `main` so @cloudflare/vite-plugin can run before build output exists.
   "name": "heridotlife",
   "compatibility_date": "2025-10-26",
   "compatibility_flags": ["nodejs_compat"],
-
-  // Enable workers.dev subdomain (for staging/preview)
   "workers_dev": true,
-
-  // Custom Domain Routes (for production)
   "routes": [
     {
       "pattern": "heri.life",
@@ -22,19 +15,10 @@
       "custom_domain": true,
     },
   ],
-
-  // Workers Script Entry Point
-  // The Cloudflare adapter creates server/entry.mjs in the dist directory (Astro 6)
-  "main": "./dist/server/entry.mjs",
-
-  // Static Assets Configuration
-  // Serves static files from dist/client directory using Workers Assets (Astro 6)
   "assets": {
-    "directory": "./dist/client",
+    "directory": "./dist",
     "binding": "ASSETS",
   },
-
-  // D1 Database Binding
   "d1_databases": [
     {
       "binding": "D1_db",
@@ -42,8 +26,6 @@
       "database_id": "55bf671e-d7c3-43a2-ad26-0c3fa2a3d1da",
     },
   ],
-
-  // KV Namespace Bindings
   "kv_namespaces": [
     {
       "binding": "heridotlife_kv",
@@ -55,16 +37,10 @@
       "preview_id": "c693aa7d7393439caf6bf0a77b383317",
     },
   ],
-
-  // Environment Variables
-  // Include all domains (production + staging)
   "vars": {
     "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.workers.dev,*.heridotlife.pages.dev",
     "CANONICAL_DOMAIN": "heri.life",
   },
-
-  // Observability Configuration
-  // Workers Logs - Persistent logging with invocation details
   "observability": {
     "logs": {
       "enabled": true,
