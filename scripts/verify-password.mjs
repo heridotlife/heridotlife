@@ -9,7 +9,6 @@
  *   node scripts/verify-password.mjs <password-to-test>
  */
 
-/* eslint-env node */
 /* global TextEncoder */
 
 import { webcrypto } from 'crypto';
