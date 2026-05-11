@@ -40,7 +40,7 @@
     "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^13.5.0",
     "@astrojs/node": "^10.1.0",
-    "@astrojs/react": "^4.4.2",
+    "@astrojs/react": "^5.0.4",
     "@astrojs/tailwind": "^6.0.2",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.1",
