@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
 import { createCachedD1Helper } from '../../../lib/cached-d1';
+import { env } from 'cloudflare:workers';
 
 interface TTLConfig {
   shortTerm: number;
@@ -51,9 +52,9 @@ export const POST: APIRoute = async (context) => {
     }
 
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     const requestBody = (await context.request.json()) as { action: string };
@@ -105,7 +106,7 @@ export const POST: APIRoute = async (context) => {
       }
 
       case 'get_ttl_config': {
-        const ttlConfig = await getTTLConfig(context.locals.runtime.env.heridotlife_kv);
+        const ttlConfig = await getTTLConfig(env.heridotlife_kv);
         return new Response(
           JSON.stringify({
             ttlConfig,
@@ -150,7 +151,7 @@ export const POST: APIRoute = async (context) => {
           }
         }
 
-        await setTTLConfig(context.locals.runtime.env.heridotlife_kv, newTTLConfig);
+        await setTTLConfig(env.heridotlife_kv, newTTLConfig);
 
         // Clear all caches since TTL changed
         const clearResult = await db.clearAllCaches();
@@ -199,14 +200,14 @@ export const GET: APIRoute = async (context) => {
     const action = url.searchParams.get('action');
 
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     if (action === 'get_ttl_config') {
       // Get current TTL configuration
-      const ttlConfig = await getTTLConfig(context.locals.runtime.env.heridotlife_kv);
+      const ttlConfig = await getTTLConfig(env.heridotlife_kv);
 
       return new Response(
         JSON.stringify({

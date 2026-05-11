@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../../lib/auth';
 import { D1Helper, toBool, toDate } from '../../../../../lib/d1';
+import { env } from 'cloudflare:workers';
 
 export const PATCH: APIRoute = async (context) => {
   try {
@@ -16,7 +17,7 @@ export const PATCH: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid URL ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(context.locals.runtime.env.D1_db);
+    const db = new D1Helper(env.D1_db);
     const updatedUrl = await db.toggleShortUrlActive(urlId);
 
     if (!updatedUrl) {

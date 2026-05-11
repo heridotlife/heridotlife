@@ -64,6 +64,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': '/src',
+      'cloudflare:workers': '/tests/mocks/cloudflare-workers.ts',
     },
   },
 });

@@ -5,6 +5,7 @@
  */
 
 import type { APIContext } from 'astro';
+import { env } from 'cloudflare:workers';
 import { jwtVerify, SignJWT } from 'jose';
 
 // Track if we've warned about plain-text passwords to prevent log spam
@@ -39,12 +40,11 @@ const COOKIE_NAME = 'admin-session' as const;
 
 /**
  * Get JWT secret key from environment
- * @param locals - Astro locals with runtime environment
  * @returns Secret key as Uint8Array
  * @throws Error if AUTH_SECRET is not set or too short
  */
-function getSecretKey(locals: APIContext['locals']): Uint8Array {
-  const secret = locals.runtime?.env.AUTH_SECRET;
+function getSecretKey(): Uint8Array {
+  const secret = env.AUTH_SECRET;
 
   // Security: Fail hard if AUTH_SECRET is not set - don't use insecure defaults
   if (!secret) {
@@ -65,7 +65,7 @@ function getSecretKey(locals: APIContext['locals']): Uint8Array {
  * @param context - Astro API context
  */
 export async function createSession(context: APIContext): Promise<void> {
-  const secretKey = getSecretKey(context.locals);
+  const secretKey = getSecretKey();
 
   // Generate unique session ID for tracking and potential revocation
   const sessionId = crypto.randomUUID();
@@ -104,7 +104,7 @@ export async function getSession(context: APIContext): Promise<AuthenticatedSess
   }
 
   try {
-    const secretKey = getSecretKey(context.locals);
+    const secretKey = getSecretKey();
     const { payload } = await jwtVerify(token, secretKey);
     return payload.authenticated ? { authenticated: true } : null;
   } catch {
@@ -278,14 +278,10 @@ async function verifyPasswordHash(password: string, hashedPassword: string): Pro
  * Verify a password against the configured admin password
  * Supports both hashed passwords (recommended) and plain text (legacy)
  * @param password - Password to verify
- * @param locals - Astro locals with runtime environment
  * @returns True if password matches, false otherwise
  */
-export async function verifyPassword(
-  password: string,
-  locals: APIContext['locals']
-): Promise<boolean> {
-  const adminPassword = locals.runtime?.env.ADMIN_PASSWORD;
+export async function verifyPassword(password: string): Promise<boolean> {
+  const adminPassword = env.ADMIN_PASSWORD;
 
   // Security: Fail hard if ADMIN_PASSWORD is not set - don't use insecure defaults
   if (!adminPassword) {

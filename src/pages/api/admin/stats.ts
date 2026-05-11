@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
 import { createCachedD1Helper } from '../../../lib/cached-d1';
 import { toDate } from '../../../lib/d1';
+import { env } from 'cloudflare:workers';
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -12,9 +13,9 @@ export const GET: APIRoute = async (context) => {
 
     // Use cached D1 helper for better performance
     const db = createCachedD1Helper(
-      context.locals.runtime.env.D1_db,
+      env.D1_db,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context.locals.runtime.env.heridotlife_kv as any
+      env.heridotlife_kv as any
     );
 
     // Get stats (now cached for 30 minutes)

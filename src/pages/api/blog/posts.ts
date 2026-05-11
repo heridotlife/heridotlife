@@ -4,6 +4,7 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { createBlogPostSchema } from '../../../lib/blog/validations';
 import { getAllPublishedPosts, createBlogPost } from '../../../lib/blog/api';
 import type { CreateBlogPostInput } from '../../../lib/blog/types';
+import { env } from 'cloudflare:workers';
 
 /**
  * GET /api/blog/posts
@@ -17,7 +18,7 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
     const url = new URL(context.request.url);
 
     // Parse query parameters
@@ -82,7 +83,7 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
 
     // Create the blog post
     const input: CreateBlogPostInput = {

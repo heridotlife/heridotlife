@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth';
 import type { D1Database } from '@cloudflare/workers-types';
 import { getAllTags } from '../../../lib/blog/api';
+import { env } from 'cloudflare:workers';
 
 /**
  * GET /api/blog/tags
@@ -14,7 +15,7 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const db = context.locals.runtime.env.D1_db as D1Database;
+    const db = env.D1_db as D1Database;
     const tags = await getAllTags(db);
 
     return new Response(JSON.stringify(tags), {
