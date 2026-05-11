@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useEffect, useState } from 'react';
+import { type SubmitEvent, useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
@@ -72,7 +72,7 @@ export default function URLForm({ urlId }: URLFormProps) {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);

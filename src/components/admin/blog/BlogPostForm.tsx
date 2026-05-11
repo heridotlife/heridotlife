@@ -98,7 +98,7 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     // Validation

@@ -136,7 +136,8 @@ export class KVCache {
 
       console.error('Cache key generation failed:', error);
       throw new Error(
-        `Invalid cache key: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Invalid cache key: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error }
       );
     }
   }

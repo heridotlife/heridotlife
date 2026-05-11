@@ -37,10 +37,10 @@ const db = createCachedD1Helper(
 );
 
 // Initialize variables for category rendering
-let shortUrls: ShortUrl[] = [];
-let activeUrls: ShortUrl[] = [];
-let pageTitle = '';
-let pageDescription = '';
+let shortUrls: ShortUrl[];
+let activeUrls: ShortUrl[];
+let pageTitle: string;
+let pageDescription: string;
 
 // Check if this is a category first (now cached)
 const categoryRecord = await db.getCategoryByName(slug);

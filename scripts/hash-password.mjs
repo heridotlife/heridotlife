@@ -12,7 +12,6 @@
  * in your .env or .dev.vars file.
  */
 
-/* eslint-env node */
 /* global TextEncoder */
 
 import { createInterface } from 'readline';

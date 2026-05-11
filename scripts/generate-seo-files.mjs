@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-env node */
 
 import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
