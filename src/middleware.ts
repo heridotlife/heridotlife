@@ -11,24 +11,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Store nonce in locals so it can be accessed by pages/components
   context.locals.cspNonce = cspNonce;
 
-  // Astro v6 no longer guarantees direct runtime env access in the same shape.
-  // Normalize bindings for routes/pages that still read context.locals.runtime.env.
-  try {
-    if (!context.locals.runtime) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (context.locals as any).runtime = {};
-    }
-
-    Object.defineProperty(context.locals.runtime, 'env', {
-      value: cloudflareEnv,
-      configurable: true,
-      enumerable: true,
-      writable: false,
-    });
-  } catch {
-    // Ignore if runtime env cannot be redefined in this execution context.
-  }
-
   // Validate host headers to prevent Host Header Injection attacks
   const hostValidation = validateHostMiddleware(
     context.request,

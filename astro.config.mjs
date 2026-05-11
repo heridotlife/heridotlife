@@ -16,7 +16,6 @@ export default defineConfig({
   site: 'https://heri.life',
   output: 'server',
   adapter: cloudflare({
-    mode: 'advanced',
     // Use compile-time image optimization (works with free tier)
     // Images are optimized at build time instead of on-demand
     imageService: 'compile',

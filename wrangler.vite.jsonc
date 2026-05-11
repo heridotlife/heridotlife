@@ -2,7 +2,7 @@
   // Vite-only Wrangler config used by Astro/Vite tooling.
   // Keep this file free of `main` so @cloudflare/vite-plugin can run before build output exists.
   "name": "heridotlife",
-  "compatibility_date": "2025-10-26",
+  "compatibility_date": "2026-04-21",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "routes": [

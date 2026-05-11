@@ -1,5 +1,6 @@
 ---
 import '../styles/globals.css';
+import { env as cloudflareEnv } from 'cloudflare:workers';
 import { siteConfig } from '../consts';
 import { getSafeCanonicalUrl } from '../lib/security';
 
@@ -24,11 +25,7 @@ const {
 } = Astro.props;
 
 // Generate safe canonical URL using validated host
-const canonicalUrl = getSafeCanonicalUrl(
-  Astro.request,
-  Astro.url.pathname,
-  Astro.locals?.runtime?.env
-);
+const canonicalUrl = getSafeCanonicalUrl(Astro.request, Astro.url.pathname, cloudflareEnv);
 
 // Generate dynamic OG image URL
 const ogImageUrl =

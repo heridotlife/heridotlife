@@ -5,8 +5,8 @@
   // Staging URL: heridotlife.workers.dev
   // Production URLs: heri.life, www.heri.life
   "name": "heridotlife",
-  "compatibility_date": "2025-10-26",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2026-04-21",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 
   // Enable workers.dev subdomain (for staging/preview)
   "workers_dev": true,
@@ -24,8 +24,8 @@
   ],
 
   // Workers Script Entry Point
-  // The Cloudflare adapter creates server/entry.mjs in the dist directory (Astro 6)
-  "main": "./dist/server/entry.mjs",
+  // Use unified Astro v6 entrypoint for both dev and production
+  "main": "@astrojs/cloudflare/entrypoints/server",
 
   // Static Assets Configuration
   // Serves static files from dist/client directory using Workers Assets (Astro 6)
