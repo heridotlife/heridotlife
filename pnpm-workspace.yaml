@@ -6,3 +6,5 @@ onlyBuiltDependencies:
   - sharp
   - workerd
   - esbuild
+overrides:
+  yaml: '2.8.4'
