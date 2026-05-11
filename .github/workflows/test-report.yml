@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: 10
 
@@ -57,7 +57,7 @@ jobs:
 
       - name: Coverage Summary Comment
         if: github.event_name == 'pull_request'
-        uses: MishaKav/jest-coverage-comment@v1.0.32
+        uses: MishaKav/jest-coverage-comment@v1.0.33
         with:
           coverage-path: ./coverage/coverage-summary.json
           junitxml-path: ./coverage/junit.xml
