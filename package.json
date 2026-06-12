@@ -70,7 +70,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "4.1.6",
     "@vitest/ui": "4.1.6",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "eslint": "^10.3.0",
     "eslint-plugin-astro": "^1.7.0",
     "happy-dom": "^20.9.0",
