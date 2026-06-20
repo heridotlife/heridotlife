@@ -195,6 +195,41 @@
   animation: gradient 3s ease infinite;
 }
 
+/* Scroll indicator (animated mouse + wheel) */
+.scroll-indicator-mouse {
+  display: block;
+  width: 24px;
+  height: 40px;
+  border: 2px solid currentColor;
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-indicator-wheel {
+  display: block;
+  width: 4px;
+  height: 8px;
+  background: currentColor;
+  border-radius: 2px;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollWheel 2s ease infinite;
+}
+
+@keyframes scrollWheel {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, 15px);
+    opacity: 0;
+  }
+}
+
 /* Typography System */
 .text-display-lg {
   font-size: 2.5rem;
