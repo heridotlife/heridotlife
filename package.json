@@ -59,8 +59,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.16.15",
-    "@cloudflare/workers-types": "^4.20260615.1",
+    "@cloudflare/vitest-pool-workers": "0.16.17",
+    "@cloudflare/workers-types": "4.20260619.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
@@ -79,10 +79,10 @@
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
     "satori": "^0.26.0",
-    "sharp": "^0.35.1",
+    "sharp": "0.35.1",
     "typescript-eslint": "^8.61.0",
     "vitest": "4.1.9",
-    "wrangler": "^4.100.0"
+    "wrangler": "4.102.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
