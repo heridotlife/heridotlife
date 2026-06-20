@@ -376,6 +376,11 @@ export class CachedD1Helper extends D1Helper {
     const { getAllCategories } = await import('./blog/api');
     return await getAllCategories(this.database as import('@cloudflare/workers-types').D1Database);
   }
+
+  async getBlogStats(): Promise<import('./blog/types').BlogStats> {
+    const { getBlogStats } = await import('./blog/api');
+    return await getBlogStats(this.database as import('@cloudflare/workers-types').D1Database);
+  }
 }
 
 // Helper function to create cached D1 helper instance
