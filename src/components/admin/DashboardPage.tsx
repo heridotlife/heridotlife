@@ -57,7 +57,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-sky-600 dark:text-sky-400">Loading stats...</div>
+        <div className="text-slate-500 dark:text-slate-400">Loading stats...</div>
       </div>
     );
   }
@@ -79,16 +79,14 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-display-md font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300">
-            Dashboard
-          </h1>
-          <p className="text-body-lg text-sky-600 dark:text-sky-400 mt-2">
+          <h1 className="text-display-md font-bold text-slate-900 dark:text-white">Dashboard</h1>
+          <p className="text-body-lg text-slate-500 dark:text-slate-400 mt-2">
             Overview of your short URLs
           </p>
         </div>
         <a
           href="/admin/urls/new"
-          className="px-6 py-3 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 transition-all duration-300"
+          className="px-6 py-3 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-medium shadow-lg shadow-sky-500/25 hover:scale-105 transition-transform duration-300"
         >
           Add New URL
         </a>
@@ -123,8 +121,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-6">
-        <h2 className="text-heading-lg font-bold text-sky-900 dark:text-sky-100 mb-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+        <h2 className="text-heading-lg font-bold text-slate-900 dark:text-white mb-4">
           Recent Activity
         </h2>
         {stats.recentClicks.length > 0 ? (
@@ -132,30 +130,30 @@ export default function DashboardPage() {
             {stats.recentClicks.map((click) => (
               <div
                 key={click.id}
-                className="flex items-center justify-between p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg border border-sky-100 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors duration-200"
+                className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/40 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200"
               >
                 <div className="flex-1">
                   <a
                     href={`/${click.shortUrl}`}
                     target="_blank"
-                    className="text-body-md font-medium text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200"
+                    className="text-body-md font-medium text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300"
                   >
                     /{click.shortUrl}
                   </a>
                   {click.title && (
-                    <p className="text-body-sm text-sky-600 dark:text-sky-400 mt-1">
+                    <p className="text-body-sm text-slate-500 dark:text-slate-400 mt-1">
                       {click.title}
                     </p>
                   )}
                 </div>
-                <div className="text-caption text-sky-500 dark:text-sky-500">
+                <div className="text-caption text-slate-400 dark:text-slate-500">
                   {new Date(click.latestClick).toLocaleString()}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-body-md text-sky-600 dark:text-sky-400 text-center py-8">
+          <p className="text-body-md text-slate-500 dark:text-slate-400 text-center py-8">
             No recent activity yet
           </p>
         )}
