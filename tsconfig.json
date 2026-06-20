@@ -8,5 +8,6 @@
       "@/*": ["src/*"]
     },
     "strictNullChecks": true
-  }
+  },
+  "exclude": ["node_modules", "dist", "coverage", ".wrangler", ".astro/cache"]
 }
