@@ -15,8 +15,8 @@
 [![CI](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml)
 [![Test Report](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml)
 [![codecov](https://codecov.io/gh/heridotlife/heridotlife/branch/main/graph/badge.svg)](https://codecov.io/gh/heridotlife/heridotlife)
-[![Tests](https://img.shields.io/badge/tests-95%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
-[![Coverage](https://img.shields.io/badge/coverage-90.95%25-brightgreen)](https://github.com/heridotlife/heridotlife/actions)
+[![Tests](https://img.shields.io/badge/tests-399%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
+[![Coverage](https://img.shields.io/badge/coverage-92.99%25-brightgreen)](https://github.com/heridotlife/heridotlife/actions)
 [![Security](https://img.shields.io/badge/security-A%20rating-brightgreen)](https://github.com/heridotlife/heridotlife/blob/main/SECURITY.md)
 
 </div>
@@ -115,6 +115,7 @@ This repository contains my personal website and production-ready URL shortener 
 
 ### ✨ Key Features
 
+- 🧑‍💻 **Portfolio Homepage** - Multi-section landing page (about, skills, experience timeline, projects, certifications, contact) driven by a single typed content source
 - 🔗 **Custom URL Shortener** - Create branded short links with analytics and metadata
 - 📊 **Analytics Dashboard** - Track clicks and manage URLs with comprehensive stats
 - 🏷️ **Category System** - Organize links with public category pages
@@ -124,16 +125,16 @@ This repository contains my personal website and production-ready URL shortener 
 - ⚡ **Edge Performance** - Deployed on Cloudflare Workers for sub-50ms latency
 - 🛡️ **Security Hardened** - SSRF protection, rate limiting, CSP, and comprehensive security measures
 - 🖼️ **Image Optimization** - Cloudflare Image Resizing with automatic WebP/AVIF conversion
-- 🧪 **90.95% Test Coverage** - Comprehensive testing with Vitest
+- 🧪 **92.99% Test Coverage** - Comprehensive testing with Vitest (399 tests)
 
 ### 🛠️ Built With
 
 **Frontend & Framework:**
 
-- ⚡ **Astro 5.15.1** - Modern SSR web framework
-- 📝 **TypeScript 5.9.3** - Type-safe development (strict mode)
-- ⚛️ **React 19.2.0** - Interactive admin components
-- 🎨 **Tailwind CSS 3.4.18** - Utility-first styling
+- ⚡ **Astro 6** - Modern SSR web framework
+- 📝 **TypeScript 6** - Type-safe development (strict mode)
+- ⚛️ **React 19.2** - Interactive admin components
+- 🎨 **Tailwind CSS 4** - Utility-first styling
 
 **Backend & Infrastructure:**
 
@@ -147,7 +148,7 @@ This repository contains my personal website and production-ready URL shortener 
 - 🛡️ **SSRF Protection** - Blocks private IPs and metadata endpoints
 - 🚦 **Rate Limiting** - Sliding window algorithm
 - 🔒 **Content Security Policy** - Hardened CSP without unsafe-eval
-- 🧪 **Vitest 2.1.8** - 95 tests passing, 90.95% coverage
+- 🧪 **Vitest 4** - 399 tests passing, 92.99% coverage
 - ✅ **ESLint & Prettier** - Zero errors, clean codebase
 
 ### 🔗 Live Demo
