@@ -55,17 +55,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           PR_NUMBER: ${{ steps.check-pr.outputs.pr_number }}
+          # Untrusted inputs are passed via env (not inlined into the script) to
+          # avoid shell-quoting breakage and script injection from commit messages.
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
-          # Add a comment to the existing PR
-          gh pr comment $PR_NUMBER --body "🔄 **New changes pushed to \`develop\`**
+          # Build the comment body from env vars, then post via --body-file
+          {
+            printf '%s\n\n' '🔄 **New changes pushed to `develop`**'
+            printf '%s\n\n' 'New commits have been merged to the `develop` branch.'
+            printf '**Latest commit:** %s\n' "${COMMIT_MSG}"
+            printf '**Pushed by:** @%s\n' "${ACTOR}"
+            printf '**Commit SHA:** `%s`\n\n' "${COMMIT_SHA}"
+            printf '%s\n' 'Please review the changes before merging to `main`.'
+          } > /tmp/pr-comment.md
 
-          New commits have been merged to the \`develop\` branch.
-
-          **Latest commit:** ${{ github.event.head_commit.message }}
-          **Pushed by:** @${{ github.actor }}
-          **Commit SHA:** \`${{ github.sha }}\`
-
-          Please review the changes before merging to \`main\`."
+          gh pr comment "$PR_NUMBER" --body-file /tmp/pr-comment.md
 
           echo "✅ Updated existing PR #$PR_NUMBER with new changes"
 
@@ -73,15 +79,13 @@ jobs:
         if: steps.check-pr.outputs.pr_exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          # Untrusted inputs via env (not inlined) to avoid script injection.
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
           # Get the latest commits from develop (comparing against remote main)
           COMMITS=$(git log --oneline origin/main...HEAD --max-count=10)
-
-          # Get commit message and properly escape it
-          COMMIT_MSG=$(cat << 'COMMIT_EOF'
-          ${{ github.event.head_commit.message }}
-          COMMIT_EOF
-          )
 
           # Create the PR body
           cat > /tmp/pr-body.md << 'EOF'
@@ -123,9 +127,9 @@ jobs:
           EOF
 
           echo "" >> /tmp/pr-body.md
-          echo "**Latest commit:** ${COMMIT_MSG}" >> /tmp/pr-body.md
-          echo "**Pushed by:** @${{ github.actor }}" >> /tmp/pr-body.md
-          echo "**Commit SHA:** \`${{ github.sha }}\`" >> /tmp/pr-body.md
+          printf '**Latest commit:** %s\n' "${COMMIT_MSG}" >> /tmp/pr-body.md
+          printf '**Pushed by:** @%s\n' "${ACTOR}" >> /tmp/pr-body.md
+          printf '**Commit SHA:** `%s`\n' "${COMMIT_SHA}" >> /tmp/pr-body.md
           echo "" >> /tmp/pr-body.md
           echo "---" >> /tmp/pr-body.md
           echo "" >> /tmp/pr-body.md
