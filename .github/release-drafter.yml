@@ -2,37 +2,49 @@ name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 categories:
   - title: '🚀 Features'
-    labels:
-      - 'feature'
-      - 'feat'
+    when:
+      labels:
+        - 'feature'
+        - 'feat'
   - title: '🐛 Bug Fixes'
-    labels:
-      - 'fix'
-      - 'bug'
+    when:
+      labels:
+        - 'fix'
+        - 'bug'
   - title: '🧰 Maintenance'
-    labels:
-      - 'chore'
-      - 'refactor'
-      - 'style'
-      - 'test'
+    when:
+      labels:
+        - 'chore'
+        - 'refactor'
+        - 'style'
+        - 'test'
   - title: '📚 Documentation'
-    labels:
-      - 'docs'
-      - 'documentation'
+    when:
+      labels:
+        - 'docs'
+        - 'documentation'
+  # Version resolver (replaces the deprecated top-level `version-resolver` block).
+  # The final condition-less entry reproduces the old `default: patch` behavior.
+  - type: 'version-resolver'
+    semver-increment: 'major'
+    when:
+      labels:
+        - 'major'
+  - type: 'version-resolver'
+    semver-increment: 'minor'
+    when:
+      labels:
+        - 'minor'
+  - type: 'version-resolver'
+    semver-increment: 'patch'
+    when:
+      labels:
+        - 'patch'
+        - 'bug'
+        - 'fix'
+  - type: 'version-resolver'
+    semver-increment: 'patch'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-version-resolver:
-  major:
-    labels:
-      - 'major'
-  minor:
-    labels:
-      - 'minor'
-  patch:
-    labels:
-      - 'patch'
-      - 'bug'
-      - 'fix'
-  default: patch
 template: |
   ## What's Changed
   $CHANGES
