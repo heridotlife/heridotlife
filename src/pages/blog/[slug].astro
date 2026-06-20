@@ -35,9 +35,55 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+// SEO: canonical URL, article metadata, and JSON-LD structured data
+const canonicalUrl = `${siteConfig.url}/blog/${post.slug}`;
+const isoPublished = post.publishedAt ? new Date(post.publishedAt * 1000).toISOString() : undefined;
+const isoModified = post.updatedAt ? new Date(post.updatedAt * 1000).toISOString() : isoPublished;
+const tagNames = (post.tags ?? []).map((t) => t.name);
+const author = { '@type': 'Person', name: 'Heri Rusmanto', url: siteConfig.url };
+const postImage = post.ogImage || post.featuredImage || undefined;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.metaDescription || post.excerpt,
+    image: postImage,
+    datePublished: isoPublished,
+    dateModified: isoModified,
+    author,
+    publisher: author,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    keywords: post.keywords || tagNames.join(', ') || undefined,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteConfig.url },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${siteConfig.url}/blog` },
+      { '@type': 'ListItem', position: 3, name: post.title, item: canonicalUrl },
+    ],
+  },
+];
+
+const articleMeta = {
+  publishedTime: isoPublished,
+  modifiedTime: isoModified ?? undefined,
+  author: 'Heri Rusmanto',
+  tags: tagNames,
+};
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={postImage}
+  article={articleMeta}
+  jsonLd={jsonLd}
+>
   <article
     class="min-h-screen bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
   >
