@@ -24,13 +24,15 @@ const year = new Date().getFullYear();
     <Nav />
 
     <!-- Hero -->
-    <section class="relative overflow-hidden border-b border-slate-200 dark:border-slate-800">
+    <section
+      class="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-b border-slate-200 dark:border-slate-800"
+    >
       <div
         class="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
       >
       </div>
       <div
-        class="mx-auto flex max-w-5xl flex-col-reverse items-center gap-10 px-4 py-20 sm:px-6 md:flex-row md:py-28"
+        class="mx-auto flex w-full max-w-5xl flex-1 flex-col-reverse items-center gap-10 px-4 py-16 sm:px-6 md:flex-row"
       >
         <div class="flex-1 text-center md:text-left">
           <p
@@ -109,6 +111,26 @@ const year = new Date().getFullYear();
           </div>
         </div>
       </div>
+
+      <!-- Scroll hint -->
+      <a
+        href="#about"
+        aria-label="Scroll to about section"
+        class="group mx-auto mb-8 flex flex-col items-center gap-2 text-slate-400 transition-colors hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400"
+      >
+        <span class="text-caption font-semibold uppercase tracking-[0.2em]">Scroll</span>
+        <svg
+          class="h-5 w-5 animate-bounce"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg
+        >
+      </a>
     </section>
 
     <!-- About -->
@@ -287,28 +309,55 @@ const year = new Date().getFullYear();
       <div class="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
         <SectionHeading eyebrow="Get in Touch" title="Let's Connect" />
         <p class="mx-auto mb-8 max-w-xl text-body-lg text-slate-600 dark:text-slate-300">
-          I'm always interested in new opportunities and collaborations. The fastest way to reach me
-          is by email — I'll get back to you soon.
+          I'm always interested in new opportunities and collaborations. Drop me an email or book a
+          time that works for you — I'll get back to you soon.
         </p>
-        <a
-          href={`mailto:${profile.email}`}
-          class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 px-8 py-4 text-body-md font-semibold text-white shadow-lg shadow-sky-500/25 transition-transform hover:scale-105"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><rect width="20" height="16" x="2" y="4" rx="2"></rect><path
-              d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg
+        <div class="flex flex-wrap justify-center gap-3">
+          <a
+            href={`mailto:${profile.email}`}
+            class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 px-8 py-4 text-body-md font-semibold text-white shadow-lg shadow-sky-500/25 transition-transform hover:scale-105"
           >
-          {profile.email}
-        </a>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><rect width="20" height="16" x="2" y="4" rx="2"></rect><path
+                d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg
+            >
+            {profile.email}
+          </a>
+          <a
+            href={profile.calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-8 py-4 text-body-md font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M8 2v4"></path><path d="M16 2v4"></path><rect
+                width="18"
+                height="18"
+                x="3"
+                y="4"
+                rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg
+            >
+            Book a Meeting
+          </a>
+        </div>
 
         <div class="mt-10 flex justify-center gap-4">
           {
