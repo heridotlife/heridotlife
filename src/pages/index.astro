@@ -112,24 +112,16 @@ const year = new Date().getFullYear();
         </div>
       </div>
 
-      <!-- Scroll hint -->
+      <!-- Scroll hint (animated mouse + wheel, mirrors adityaseth.in) -->
       <a
         href="#about"
         aria-label="Scroll to about section"
-        class="group mx-auto mb-8 flex flex-col items-center gap-2 text-slate-400 transition-colors hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400"
+        class="mx-auto mb-8 flex flex-col items-center gap-2 text-slate-400 opacity-80 transition-opacity hover:opacity-100 dark:text-slate-500"
       >
+        <span class="scroll-indicator-mouse">
+          <span class="scroll-indicator-wheel"></span>
+        </span>
         <span class="text-caption font-semibold uppercase tracking-[0.2em]">Scroll</span>
-        <svg
-          class="h-5 w-5 animate-bounce"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg
-        >
       </a>
     </section>
 
