@@ -36,32 +36,25 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950 transition-colors duration-500">
-      {/* Gradient Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-sky-300 dark:bg-sky-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 dark:opacity-20"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 dark:opacity-20"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 dark:opacity-20"></div>
-      </div>
-
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 transition-colors duration-300">
       {/* Main Content */}
       <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12">
         <div className="relative z-10 w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-2">
-              URL Admin
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+              Admin<span className="text-sky-500">.</span>
             </h1>
-            <p className="text-sky-600 dark:text-sky-400">Sign in to manage your short URLs</p>
+            <p className="text-slate-500 dark:text-slate-400">Sign in to manage your short URLs</p>
           </div>
 
           {/* Login Card */}
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-xl border border-sky-200 dark:border-sky-700 p-8">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Password
                 </label>
@@ -84,7 +77,7 @@ export default function AdminLoginPage() {
                 disabled={loading}
                 variant="primary"
                 size="lg"
-                className="bg-gradient-to-r from-sky-500 to-cyan-500 dark:from-sky-600 dark:to-cyan-600 hover:from-sky-600 hover:to-cyan-600 dark:hover:from-sky-700 dark:hover:to-cyan-700 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="shadow-lg shadow-sky-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
                 fullWidth
                 loading={loading}
               >
@@ -97,7 +90,7 @@ export default function AdminLoginPage() {
           <div className="text-center mt-6">
             <a
               href="/"
-              className="text-sm text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200"
+              className="text-sm text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
             >
               ← Back to Home
             </a>

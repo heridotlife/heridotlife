@@ -20,29 +20,28 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
-    const baseClasses = ['rounded-xl', 'transition-all duration-300'];
+    const baseClasses = ['rounded-2xl', 'transition-all duration-300'];
 
     // Variant styles
     const variantClasses = {
       default: [
-        'bg-white/80 dark:bg-slate-800/80',
-        'backdrop-blur-sm',
-        'border border-sky-200 dark:border-sky-700',
-        'shadow-lg',
+        'bg-white dark:bg-slate-800',
+        'border border-slate-200 dark:border-slate-700',
+        'shadow-sm',
       ],
       elevated: [
         'bg-white dark:bg-slate-800',
-        'shadow-xl',
-        'border border-sky-100 dark:border-sky-900',
+        'shadow-md',
+        'border border-slate-200 dark:border-slate-700',
       ],
       outlined: [
         'bg-white dark:bg-slate-800',
-        'border-2 border-sky-300 dark:border-sky-700',
+        'border border-slate-300 dark:border-slate-600',
         'shadow-sm',
       ],
       filled: [
-        'bg-sky-50 dark:bg-slate-700',
-        'border border-sky-200 dark:border-sky-600',
+        'bg-slate-50 dark:bg-slate-700/50',
+        'border border-slate-200 dark:border-slate-700',
         'shadow-sm',
       ],
     };
@@ -62,10 +61,10 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       interactiveClasses.push(
         'hover:shadow-xl',
         'hover:-translate-y-1',
-        variant === 'default' && 'hover:border-sky-300 dark:hover:border-sky-600',
-        variant === 'elevated' && 'hover:shadow-2xl',
-        variant === 'outlined' && 'hover:border-sky-400 dark:hover:border-sky-600',
-        variant === 'filled' && 'hover:bg-sky-100 dark:hover:bg-slate-600'
+        variant === 'default' && 'hover:border-slate-300 dark:hover:border-slate-600',
+        variant === 'elevated' && 'hover:shadow-lg',
+        variant === 'outlined' && 'hover:border-slate-400 dark:hover:border-slate-500',
+        variant === 'filled' && 'hover:bg-slate-100 dark:hover:bg-slate-700'
       );
     }
 
@@ -125,7 +124,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadin
   ({ className = '', children, ...props }, ref) => (
     <h3
       ref={ref}
-      className={`text-lg sm:text-xl font-semibold text-slate-800 dark:text-slate-200 ${className}`}
+      className={`text-lg sm:text-xl font-semibold text-slate-900 dark:text-white ${className}`}
       {...props}
     >
       {children}
@@ -149,7 +148,7 @@ const CardFooter = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   ({ className = '', children, ...props }, ref) => (
     <div
       ref={ref}
-      className={`mt-4 pt-4 border-t border-sky-200 dark:border-sky-700 ${className}`}
+      className={`mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 ${className}`}
       {...props}
     >
       {children}

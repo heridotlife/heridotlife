@@ -42,18 +42,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     // Variant styles
     const variantClasses = {
       default: [
-        'border border-sky-200 dark:border-sky-700',
+        'border border-slate-300 dark:border-slate-700',
         'bg-white dark:bg-slate-900',
-        'text-sky-900 dark:text-sky-100',
-        'placeholder:text-sky-400 dark:placeholder:text-sky-500',
+        'text-slate-900 dark:text-white',
+        'placeholder:text-slate-400 dark:placeholder:text-slate-500',
         'focus:ring-sky-500 focus:border-sky-500',
         error ? 'border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500' : '',
       ],
       filled: [
         'border-0',
-        'bg-sky-50 dark:bg-slate-800',
-        'text-sky-900 dark:text-sky-100',
-        'placeholder:text-sky-400 dark:placeholder:text-sky-500',
+        'bg-slate-100 dark:bg-slate-800',
+        'text-slate-900 dark:text-white',
+        'placeholder:text-slate-400 dark:placeholder:text-slate-500',
         'focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-900',
         error ? 'bg-red-50 dark:bg-red-900/20 focus:ring-red-500' : '',
       ],
@@ -81,7 +81,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
           >
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
@@ -93,7 +93,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {/* Left Icon */}
           {leftIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <div className="text-sky-400 dark:text-sky-500">{leftIcon}</div>
+              <div className="text-slate-400 dark:text-slate-500">{leftIcon}</div>
             </div>
           )}
 
@@ -103,7 +103,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {/* Right Icon */}
           {rightIcon && (
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <div className="text-sky-400 dark:text-sky-500">{rightIcon}</div>
+              <div className="text-slate-400 dark:text-slate-500">{rightIcon}</div>
             </div>
           )}
         </div>
@@ -117,7 +117,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {/* Helper Text */}
         {helperText && !error && (
-          <p className="mt-2 text-sm text-sky-600 dark:text-sky-400">{helperText}</p>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{helperText}</p>
         )}
       </div>
     );

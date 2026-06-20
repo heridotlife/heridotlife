@@ -24,10 +24,10 @@ export default function CachePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-display-md font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300">
+          <h1 className="text-display-md font-bold text-slate-900 dark:text-white">
             Cache Management
           </h1>
-          <p className="text-body-lg text-sky-600 dark:text-sky-400 mt-2">
+          <p className="text-body-lg text-slate-500 dark:text-slate-400 mt-2">
             Manage application cache, performance monitoring, and TTL configuration
           </p>
         </div>

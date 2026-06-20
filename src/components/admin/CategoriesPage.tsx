@@ -131,7 +131,7 @@ export default function CategoriesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-sky-600 dark:text-sky-400">Loading categories...</div>
+        <div className="text-slate-500 dark:text-slate-400">Loading categories...</div>
       </div>
     );
   }
@@ -148,16 +148,14 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300">
-          Categories
-        </h1>
-        <p className="text-sky-600 dark:text-sky-400 mt-2">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Categories</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-2">
           Organize your short URLs with categories
         </p>
       </div>
 
       {/* Add Category */}
-      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-4">
         <div className="flex gap-4">
           <Input
             type="text"
@@ -184,7 +182,7 @@ export default function CategoriesPage() {
           categories.map((category) => (
             <div
               key={category.id}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-6 hover:shadow-xl transition-shadow duration-300"
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-6 hover:shadow-xl transition-shadow duration-300"
             >
               {editingId === category.id ? (
                 // Edit mode
@@ -227,7 +225,7 @@ export default function CategoriesPage() {
                 // View mode
                 <>
                   <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-xl font-bold text-sky-900 dark:text-sky-100 flex-1">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white flex-1">
                       {category.name}
                     </h3>
                     <div className="flex gap-2">
@@ -251,14 +249,14 @@ export default function CategoriesPage() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-sky-600 dark:text-sky-400">URLs:</span>
-                      <span className="font-semibold text-sky-700 dark:text-sky-300">
+                      <span className="text-slate-500 dark:text-slate-400">URLs:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
                         {category._count.shortUrls}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-sky-600 dark:text-sky-400">Clicks:</span>
-                      <span className="font-semibold text-sky-700 dark:text-sky-300">
+                      <span className="text-slate-500 dark:text-slate-400">Clicks:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
                         {category.clickCount}
                       </span>
                     </div>
@@ -268,7 +266,7 @@ export default function CategoriesPage() {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-12 text-sky-600 dark:text-sky-400">
+          <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
             No categories yet. Create your first one above!
           </div>
         )}
