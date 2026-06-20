@@ -1,0 +1,20 @@
+---
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  id?: string;
+}
+const { eyebrow, title, id } = Astro.props;
+---
+
+<div class="mb-10 text-center" id={id}>
+  {
+    eyebrow && (
+      <p class="mb-2 text-caption font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+        {eyebrow}
+      </p>
+    )
+  }
+  <h2 class="text-display-sm font-bold text-slate-900 dark:text-white">{title}</h2>
+  <div class="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-sky-500 to-cyan-400"></div>
+</div>
