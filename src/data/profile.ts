@@ -183,5 +183,4 @@ export const socials: SocialLink[] = [
   { label: 'LinkedIn', href: 'https://heri.life/li', icon: 'linkedin' },
   { label: 'GitHub', href: 'https://heri.life/gh', icon: 'github' },
   { label: 'Email', href: 'mailto:mail@heri.life', icon: 'email' },
-  { label: 'Website', href: 'https://heri.life', icon: 'website' },
 ];
