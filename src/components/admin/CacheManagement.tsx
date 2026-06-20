@@ -188,13 +188,13 @@ export default function CacheManagement() {
   const actions = ['warm_cache', 'invalidate_urls', 'clear_all'];
 
   return (
-    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg border border-sky-200 dark:border-sky-700 p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-heading-lg font-bold text-sky-900 dark:text-sky-100">
+          <h2 className="text-heading-lg font-bold text-slate-900 dark:text-white">
             Cache Management
           </h2>
-          <p className="text-body-sm text-sky-600 dark:text-sky-400 mt-1">
+          <p className="text-body-sm text-slate-500 dark:text-slate-400 mt-1">
             Monitor and control application cache
           </p>
         </div>
@@ -205,21 +205,21 @@ export default function CacheManagement() {
 
       {/* Cache Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-sky-50 dark:bg-slate-700/50 rounded-lg p-4 border border-sky-100 dark:border-sky-800">
-          <div className="text-caption text-sky-600 dark:text-sky-400 mb-1">Cache Hits</div>
-          <div className="text-heading-md font-bold text-sky-900 dark:text-sky-100">
+        <div className="bg-slate-50 dark:bg-slate-700/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+          <div className="text-caption text-slate-500 dark:text-slate-400 mb-1">Cache Hits</div>
+          <div className="text-heading-md font-bold text-slate-900 dark:text-white">
             {cacheStats?.hits ?? 'N/A'}
           </div>
         </div>
-        <div className="bg-sky-50 dark:bg-slate-700/50 rounded-lg p-4 border border-sky-100 dark:border-sky-800">
-          <div className="text-caption text-sky-600 dark:text-sky-400 mb-1">Cache Misses</div>
-          <div className="text-heading-md font-bold text-sky-900 dark:text-sky-100">
+        <div className="bg-slate-50 dark:bg-slate-700/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+          <div className="text-caption text-slate-500 dark:text-slate-400 mb-1">Cache Misses</div>
+          <div className="text-heading-md font-bold text-slate-900 dark:text-white">
             {cacheStats?.misses ?? 'N/A'}
           </div>
         </div>
-        <div className="bg-sky-50 dark:bg-slate-700/50 rounded-lg p-4 border border-sky-100 dark:border-sky-800">
-          <div className="text-caption text-sky-600 dark:text-sky-400 mb-1">Hit Rate</div>
-          <div className="text-heading-md font-bold text-sky-900 dark:text-sky-100">
+        <div className="bg-slate-50 dark:bg-slate-700/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+          <div className="text-caption text-slate-500 dark:text-slate-400 mb-1">Hit Rate</div>
+          <div className="text-heading-md font-bold text-slate-900 dark:text-white">
             {cacheStats?.hitRate ? `${(cacheStats.hitRate * 100).toFixed(1)}%` : 'N/A'}
           </div>
         </div>
@@ -240,20 +240,20 @@ export default function CacheManagement() {
 
       {/* Cache Actions */}
       <div className="space-y-3">
-        <h3 className="text-heading-sm font-semibold text-sky-900 dark:text-sky-100 mb-3">
+        <h3 className="text-heading-sm font-semibold text-slate-900 dark:text-white mb-3">
           Cache Actions
         </h3>
 
         {actions.map((action) => (
           <div
             key={action}
-            className="flex items-center justify-between p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg border border-sky-100 dark:border-sky-800"
+            className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/40 rounded-lg border border-slate-200 dark:border-slate-700"
           >
             <div className="flex-1">
-              <div className="text-body-md font-medium text-sky-900 dark:text-sky-100">
+              <div className="text-body-md font-medium text-slate-900 dark:text-white">
                 {getActionLabel(action)}
               </div>
-              <div className="text-body-sm text-sky-600 dark:text-sky-400 mt-1">
+              <div className="text-body-sm text-slate-500 dark:text-slate-400 mt-1">
                 {getActionDescription(action)}
               </div>
             </div>
@@ -270,13 +270,13 @@ export default function CacheManagement() {
         ))}
 
         {/* TTL Configuration Section */}
-        <div className="p-4 bg-sky-50 dark:bg-slate-700/50 rounded-lg border border-sky-100 dark:border-sky-800">
+        <div className="p-4 bg-slate-50 dark:bg-slate-700/40 rounded-lg border border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-body-md font-medium text-sky-900 dark:text-sky-100">
+              <div className="text-body-md font-medium text-slate-900 dark:text-white">
                 TTL Configuration
               </div>
-              <div className="text-body-sm text-sky-600 dark:text-sky-400 mt-1">
+              <div className="text-body-sm text-slate-500 dark:text-slate-400 mt-1">
                 Configure cache time-to-live settings for different cache layers
               </div>
             </div>
@@ -292,10 +292,10 @@ export default function CacheManagement() {
           </div>
 
           {showTTLConfig && (
-            <div className="mt-4 space-y-4 border-t border-sky-200 dark:border-sky-700 pt-4">
+            <div className="mt-4 space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                  <label className="block text-body-sm font-medium text-slate-900 dark:text-white mb-2">
                     Short Cache (seconds)
                   </label>
                   <input
@@ -307,17 +307,17 @@ export default function CacheManagement() {
                         shortTerm: parseInt(e.target.value) || 300,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     min="60"
                     max="3600"
                   />
-                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                  <p className="text-caption text-slate-400 dark:text-slate-500 mt-1">
                     For frequently changing data (60s - 1hr)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                  <label className="block text-body-sm font-medium text-slate-900 dark:text-white mb-2">
                     Medium Cache (seconds)
                   </label>
                   <input
@@ -329,17 +329,17 @@ export default function CacheManagement() {
                         mediumTerm: parseInt(e.target.value) || 3600,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     min="300"
                     max="86400"
                   />
-                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                  <p className="text-caption text-slate-400 dark:text-slate-500 mt-1">
                     For moderately changing data (5min - 24hr)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                  <label className="block text-body-sm font-medium text-slate-900 dark:text-white mb-2">
                     Long Cache (seconds)
                   </label>
                   <input
@@ -351,17 +351,17 @@ export default function CacheManagement() {
                         longTerm: parseInt(e.target.value) || 86400,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     min="3600"
                     max="604800"
                   />
-                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                  <p className="text-caption text-slate-400 dark:text-slate-500 mt-1">
                     For stable data (1hr - 7 days)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                  <label className="block text-body-sm font-medium text-slate-900 dark:text-white mb-2">
                     URL Lookup Cache (seconds)
                   </label>
                   <input
@@ -373,17 +373,17 @@ export default function CacheManagement() {
                         urlLookup: parseInt(e.target.value) || 86400,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     min="3600"
                     max="604800"
                   />
-                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                  <p className="text-caption text-slate-400 dark:text-slate-500 mt-1">
                     For URL slug lookups (1hr - 7 days)
                   </p>
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-body-sm font-medium text-sky-900 dark:text-sky-100 mb-2">
+                  <label className="block text-body-sm font-medium text-slate-900 dark:text-white mb-2">
                     Admin Stats Cache (seconds)
                   </label>
                   <input
@@ -395,17 +395,17 @@ export default function CacheManagement() {
                         adminStats: parseInt(e.target.value) || 1800,
                       }))
                     }
-                    className="w-full px-3 py-2 border border-sky-200 dark:border-sky-700 rounded-md bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     min="60"
                     max="3600"
                   />
-                  <p className="text-caption text-sky-500 dark:text-sky-400 mt-1">
+                  <p className="text-caption text-slate-400 dark:text-slate-500 mt-1">
                     For admin dashboard statistics (1min - 1hr)
                   </p>
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4 border-t border-sky-200 dark:border-sky-700">
+              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Button onClick={() => setShowTTLConfig(false)} variant="secondary" size="sm">
                   Cancel
                 </Button>
@@ -425,7 +425,7 @@ export default function CacheManagement() {
 
       {/* Last Updated */}
       {lastUpdate && (
-        <div className="mt-4 text-caption text-sky-500 dark:text-sky-500 text-center">
+        <div className="mt-4 text-caption text-slate-400 dark:text-slate-500 text-center">
           Last updated: {new Date(lastUpdate).toLocaleString()}
         </div>
       )}

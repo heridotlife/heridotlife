@@ -122,7 +122,7 @@ export default function URLForm({ urlId }: URLFormProps) {
 
       <div>
         <div className="flex items-center gap-2">
-          <span className="text-sky-600 dark:text-sky-400">/</span>
+          <span className="text-slate-500 dark:text-slate-400">/</span>
           <Input
             id="slug"
             label="Short URL Slug"
@@ -159,7 +159,7 @@ export default function URLForm({ urlId }: URLFormProps) {
 
       {categories.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
             Categories
           </label>
           <div className="flex flex-wrap gap-2">
@@ -181,7 +181,7 @@ export default function URLForm({ urlId }: URLFormProps) {
       <div>
         <label
           htmlFor="expiresAt"
-          className="block text-sm font-medium text-sky-700 dark:text-sky-300 mb-2"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
           Expires At (Optional)
         </label>
@@ -200,9 +200,12 @@ export default function URLForm({ urlId }: URLFormProps) {
           type="checkbox"
           checked={formData.active}
           onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-          className="w-4 h-4 text-sky-600 bg-white dark:bg-slate-900 border-sky-300 dark:border-sky-700 rounded focus:ring-sky-500"
+          className="w-4 h-4 text-sky-600 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 rounded focus:ring-sky-500"
         />
-        <label htmlFor="active" className="ml-2 text-sm font-medium text-sky-700 dark:text-sky-300">
+        <label
+          htmlFor="active"
+          className="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           Active
         </label>
       </div>
