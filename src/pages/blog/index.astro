@@ -67,15 +67,11 @@ const pageDescription = isSearching
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <div
-    class="min-h-screen bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
-  >
+  <div class="min-h-screen bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Header -->
       <div class="text-center mb-12">
-        <h1
-          class="text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-blue-600 to-cyan-700 dark:from-sky-300 dark:via-cyan-200 dark:to-blue-300 mb-4"
-        >
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
           {
             isSearching
               ? `Search: ${query}`
@@ -86,7 +82,7 @@ const pageDescription = isSearching
                   : 'Blog'
           }
         </h1>
-        <p class="text-lg text-sky-600 dark:text-sky-400 max-w-2xl mx-auto">
+        <p class="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {pageDescription}
         </p>
       </div>
@@ -100,7 +96,7 @@ const pageDescription = isSearching
             value={query}
             placeholder="Search posts…"
             aria-label="Search blog posts"
-            class="flex-1 px-4 py-3 rounded-lg border border-sky-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sky-900 dark:text-sky-100 placeholder:text-sky-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            class="flex-1 px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
           />
           <button
             type="submit"
@@ -111,7 +107,7 @@ const pageDescription = isSearching
         </form>
         {
           isSearching && (
-            <p class="mt-3 text-center text-sm text-sky-600 dark:text-sky-400">
+            <p class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
               {searchResponse?.total ?? 0} result{(searchResponse?.total ?? 0) === 1 ? '' : 's'} for
               <span class="font-semibold">“{query}”</span> ·{' '}
               <a class="underline" href="/blog">
@@ -128,7 +124,7 @@ const pageDescription = isSearching
           <div class="mb-8 space-y-4">
             {/* Categories */}
             <div class="flex flex-wrap gap-2 justify-center items-center">
-              <span class="text-sm font-semibold text-sky-700 dark:text-sky-300 mr-2">
+              <span class="text-sm font-semibold text-slate-600 dark:text-slate-400 mr-2">
                 Categories:
               </span>
               <a
@@ -136,7 +132,7 @@ const pageDescription = isSearching
                 class={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   !categorySlug && !tagSlug
                     ? 'bg-sky-600 text-white'
-                    : 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 All Posts
@@ -147,7 +143,7 @@ const pageDescription = isSearching
                   class={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     categorySlug === category.slug
                       ? 'bg-sky-600 text-white'
-                      : 'bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   {category.name}
@@ -158,14 +154,16 @@ const pageDescription = isSearching
             {/* Tags */}
             {allTags.length > 0 && (
               <div class="flex flex-wrap gap-2 justify-center items-center">
-                <span class="text-sm font-semibold text-sky-700 dark:text-sky-300 mr-2">Tags:</span>
+                <span class="text-sm font-semibold text-slate-600 dark:text-slate-400 mr-2">
+                  Tags:
+                </span>
                 {allTags.slice(0, 10).map((tag) => (
                   <a
                     href={`/blog?tag=${tag.slug}`}
                     class={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                       tagSlug === tag.slug
                         ? 'bg-cyan-600 text-white'
-                        : 'bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-slate-700 border border-cyan-200 dark:border-cyan-800'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     #{tag.name}
@@ -183,7 +181,7 @@ const pageDescription = isSearching
           (searchResponse && searchResponse.results.length > 0 ? (
             <div class="space-y-6 mb-12 max-w-3xl mx-auto">
               {searchResponse.results.map((r) => (
-                <article class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 hover:shadow-md transition-shadow">
                   {r.categories && r.categories.length > 0 && (
                     <div class="flex flex-wrap gap-2 mb-2">
                       {r.categories.map((category) => (
@@ -197,12 +195,12 @@ const pageDescription = isSearching
                     </div>
                   )}
                   <a href={`/blog/${r.slug}`}>
-                    <h2 class="text-xl font-bold text-sky-900 dark:text-sky-100 mb-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                       {r.title}
                     </h2>
                   </a>
                   <p
-                    class="text-sky-700 dark:text-sky-300"
+                    class="text-slate-600 dark:text-slate-300"
                     set:html={r.highlightedSnippet || r.excerpt}
                   />
                   <div class="mt-3 text-sm">
@@ -219,8 +217,8 @@ const pageDescription = isSearching
           ) : (
             <div class="text-center py-16">
               <div class="text-6xl mb-4">🔍</div>
-              <h2 class="text-2xl font-bold text-sky-700 dark:text-sky-300 mb-2">No results</h2>
-              <p class="text-sky-600 dark:text-sky-400">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">No results</h2>
+              <p class="text-slate-500 dark:text-slate-400">
                 Nothing matched “{query}”. Try different keywords.
               </p>
             </div>
@@ -233,8 +231,8 @@ const pageDescription = isSearching
           (posts.length === 0 ? (
             <div class="text-center py-16">
               <div class="text-6xl mb-4">📝</div>
-              <h2 class="text-2xl font-bold text-sky-700 dark:text-sky-300 mb-2">No posts found</h2>
-              <p class="text-sky-600 dark:text-sky-400">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">No posts found</h2>
+              <p class="text-slate-500 dark:text-slate-400">
                 {categorySlug || tagSlug
                   ? 'Try removing filters to see all posts'
                   : 'Check back soon for new content!'}
@@ -243,7 +241,7 @@ const pageDescription = isSearching
           ) : (
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {posts.map((post) => (
-                <article class="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                   {post.featuredImage && (
                     <a href={`/blog/${post.slug}`} class="block">
                       <img
@@ -270,12 +268,14 @@ const pageDescription = isSearching
                     )}
 
                     <a href={`/blog/${post.slug}`}>
-                      <h2 class="text-xl font-bold text-sky-900 dark:text-sky-100 mb-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                      <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                         {post.title}
                       </h2>
                     </a>
 
-                    <p class="text-sky-700 dark:text-sky-300 mb-4 line-clamp-3">{post.excerpt}</p>
+                    <p class="text-slate-600 dark:text-slate-300 mb-4 line-clamp-3">
+                      {post.excerpt}
+                    </p>
 
                     {post.tags && post.tags.length > 0 && (
                       <div class="flex flex-wrap gap-2 mb-4">
@@ -290,7 +290,7 @@ const pageDescription = isSearching
                       </div>
                     )}
 
-                    <div class="flex items-center justify-between text-sm text-sky-600 dark:text-sky-400">
+                    <div class="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
                       <div class="flex items-center gap-4">
                         {post.readTime && <span>📖 {post.readTime} min read</span>}
                         {post.viewCount > 0 && <span>👁️ {post.viewCount} views</span>}
@@ -323,20 +323,20 @@ const pageDescription = isSearching
             {pagination.hasPrev && (
               <a
                 href={pageHref(page - 1)}
-                class="px-4 py-2 bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+                class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
                 ← Previous
               </a>
             )}
 
-            <span class="px-4 py-2 text-sky-700 dark:text-sky-300">
+            <span class="px-4 py-2 text-slate-600 dark:text-slate-400">
               Page {pagination.page} of {pagination.totalPages}
             </span>
 
             {pagination.hasNext && (
               <a
                 href={pageHref(page + 1)}
-                class="px-4 py-2 bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+                class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
                 Next →
               </a>
