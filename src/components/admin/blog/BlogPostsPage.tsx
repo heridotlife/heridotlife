@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search, Tags } from 'lucide-react';
 import Button from '../../ui/Button';
 import type { BlogPost } from '../../../lib/blog/types';
 import { formatRelativeTime } from '../../../lib/utils';
@@ -91,14 +91,24 @@ export default function BlogPostsPage() {
             {filteredPosts.length === 1 ? 'post' : 'posts'})
           </p>
         </div>
-        <Button
-          onClick={() => (window.location.href = '/admin/blog/new')}
-          variant="primary"
-          icon={Plus}
-          className="min-h-[44px]"
-        >
-          New Post
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => (window.location.href = '/admin/blog/taxonomy')}
+            variant="secondary"
+            icon={Tags}
+            className="min-h-[44px]"
+          >
+            Categories &amp; Tags
+          </Button>
+          <Button
+            onClick={() => (window.location.href = '/admin/blog/new')}
+            variant="primary"
+            icon={Plus}
+            className="min-h-[44px]"
+          >
+            New Post
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filter */}

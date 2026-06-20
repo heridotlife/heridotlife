@@ -16,6 +16,9 @@ import type {
   BlogStats,
   BlogSearchResponse,
   BlogSearchResult,
+  CreateBlogCategoryInput,
+  UpdateBlogCategoryInput,
+  CreateBlogTagInput,
 } from './types';
 import { buildFtsMatchQuery, buildHighlightedSnippet, tokenizeSearchQuery } from './utils';
 
@@ -546,6 +549,162 @@ export async function getAllTags(db: D1Database): Promise<BlogTag[]> {
     .all<BlogTag>();
 
   return result.results || [];
+}
+
+/**
+ * Get a single category by id.
+ */
+export async function getCategoryById(db: D1Database, id: number): Promise<BlogCategory | null> {
+  return await db.prepare('SELECT * FROM BlogCategory WHERE id = ?').bind(id).first<BlogCategory>();
+}
+
+/**
+ * Create a new blog category.
+ */
+export async function createBlogCategory(
+  db: D1Database,
+  input: CreateBlogCategoryInput
+): Promise<BlogCategory> {
+  const result = await db
+    .prepare(
+      `INSERT INTO BlogCategory (slug, name, description, icon, color)
+       VALUES (?, ?, ?, ?, ?)`
+    )
+    .bind(
+      input.slug,
+      input.name,
+      input.description || null,
+      input.icon || null,
+      input.color || null
+    )
+    .run();
+
+  const id = result.meta.last_row_id;
+  if (typeof id !== 'number' || !id) {
+    throw new Error('Failed to create category');
+  }
+
+  const category = await getCategoryById(db, id);
+  if (!category) throw new Error('Failed to retrieve the newly created category');
+  return category;
+}
+
+/**
+ * Update a blog category (partial).
+ */
+export async function updateBlogCategory(
+  db: D1Database,
+  id: number,
+  input: UpdateBlogCategoryInput
+): Promise<BlogCategory> {
+  const fields: string[] = [];
+  const values: (string | null)[] = [];
+
+  if (input.slug !== undefined) {
+    fields.push('slug = ?');
+    values.push(input.slug);
+  }
+  if (input.name !== undefined) {
+    fields.push('name = ?');
+    values.push(input.name);
+  }
+  if (input.description !== undefined) {
+    fields.push('description = ?');
+    values.push(input.description || null);
+  }
+  if (input.icon !== undefined) {
+    fields.push('icon = ?');
+    values.push(input.icon || null);
+  }
+  if (input.color !== undefined) {
+    fields.push('color = ?');
+    values.push(input.color || null);
+  }
+
+  if (fields.length > 0) {
+    values.push(String(id));
+    await db
+      .prepare(`UPDATE BlogCategory SET ${fields.join(', ')} WHERE id = ?`)
+      .bind(...values)
+      .run();
+  }
+
+  const category = await getCategoryById(db, id);
+  if (!category) throw new Error(`Category with id ${id} not found after update.`);
+  return category;
+}
+
+/**
+ * Delete a blog category. Junction rows are removed via FK cascade.
+ */
+export async function deleteBlogCategory(db: D1Database, id: number): Promise<void> {
+  await db.prepare('DELETE FROM BlogCategory WHERE id = ?').bind(id).run();
+}
+
+/**
+ * Get a single tag by id.
+ */
+export async function getTagById(db: D1Database, id: number): Promise<BlogTag | null> {
+  return await db.prepare('SELECT * FROM BlogTag WHERE id = ?').bind(id).first<BlogTag>();
+}
+
+/**
+ * Create a new blog tag.
+ */
+export async function createBlogTag(db: D1Database, input: CreateBlogTagInput): Promise<BlogTag> {
+  const result = await db
+    .prepare('INSERT INTO BlogTag (slug, name) VALUES (?, ?)')
+    .bind(input.slug, input.name)
+    .run();
+
+  const id = result.meta.last_row_id;
+  if (typeof id !== 'number' || !id) {
+    throw new Error('Failed to create tag');
+  }
+
+  const tag = await getTagById(db, id);
+  if (!tag) throw new Error('Failed to retrieve the newly created tag');
+  return tag;
+}
+
+/**
+ * Update a blog tag (slug/name).
+ */
+export async function updateBlogTag(
+  db: D1Database,
+  id: number,
+  input: { slug?: string; name?: string }
+): Promise<BlogTag> {
+  const fields: string[] = [];
+  const values: string[] = [];
+
+  if (input.slug !== undefined) {
+    fields.push('slug = ?');
+    values.push(input.slug);
+  }
+  if (input.name !== undefined) {
+    fields.push('name = ?');
+    values.push(input.name);
+  }
+
+  if (fields.length > 0) {
+    values.push(String(id));
+    await db
+      .prepare(`UPDATE BlogTag SET ${fields.join(', ')} WHERE id = ?`)
+      .bind(...values)
+      .run();
+  }
+
+  const tag = await getTagById(db, id);
+  if (!tag) throw new Error(`Tag with id ${id} not found after update.`);
+  return tag;
+}
+
+/**
+ * Delete a blog tag. Junction rows are removed via FK cascade.
+ */
+export async function deleteBlogTag(db: D1Database, id: number): Promise<void> {
+  await db.prepare('DELETE FROM BlogTag WHERE id = ?').bind(id).run();
 }
 
 /**

@@ -1,0 +1,8 @@
+---
+import BlogTaxonomyPage from '../../../components/admin/blog/BlogTaxonomyPage';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Blog Categories & Tags">
+  <BlogTaxonomyPage client:only="react" />
+</AdminLayout>
