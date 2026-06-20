@@ -22,6 +22,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       className = '',
       disabled,
+      // Default to "button" so buttons rendered inside a <form> (e.g. admin
+      // forms) don't accidentally submit it. Real submit buttons pass
+      // type="submit" explicitly, which overrides this default.
+      type = 'button',
       ...props
     },
     ref
@@ -104,7 +108,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }[size];
 
     return (
-      <button ref={ref} className={classes} disabled={disabled || loading} {...props}>
+      <button ref={ref} type={type} className={classes} disabled={disabled || loading} {...props}>
         {loading ? (
           <>
             <svg
