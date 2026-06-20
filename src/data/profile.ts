@@ -35,7 +35,7 @@ export const profile = {
   subtitle: 'Infrastructure System Engineer · Cloud & Backend Specialist',
   location: 'Tokyo, Japan',
   email: 'mail@heri.life',
-  calendarUrl: 'https://calendar.app.google/iTMhcrPHG5xAXH4z5', // Google Calendar booking link
+  calendarUrl: 'https://heri.life/bm', // heri.life short link -> Google Calendar booking
   resumeUrl: '/cv', // heri.life short link to CV; update if needed
   about: [
     'Cloud and Backend Engineer with extensive experience administering and optimizing customer systems, ensuring reliability through preventive maintenance and proactive issue resolution. Currently an Infrastructure System Engineer in Tokyo, Japan.',
