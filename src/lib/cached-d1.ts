@@ -345,6 +345,18 @@ export class CachedD1Helper extends D1Helper {
     );
   }
 
+  async searchPosts(options: {
+    q: string;
+    page?: number;
+    limit?: number;
+  }): Promise<import('./blog/types').BlogSearchResponse> {
+    const { searchPosts } = await import('./blog/api');
+    return await searchPosts(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      options
+    );
+  }
+
   async getPostById(id: number): Promise<import('./blog/types').BlogPost | null> {
     const { getPostById } = await import('./blog/api');
     return await getPostById(this.database as import('@cloudflare/workers-types').D1Database, id);
