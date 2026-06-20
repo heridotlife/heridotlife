@@ -48,16 +48,16 @@ export interface RateLimitStatus {
  */
 export class RateLimiter {
   private attempts: Map<string, RateLimitEntry> = new Map();
-  private cleanupInterval: number | null = null;
+  /** Timestamp of the last opportunistic cleanup sweep */
+  private lastCleanup = 0;
+  /** Minimum interval between opportunistic cleanup sweeps (ms) */
+  private readonly cleanupIntervalMs = 60000;
 
   /**
    * Create a new rate limiter instance
    * @param config - Rate limiter configuration
    */
-  constructor(private config: RateLimiterConfig) {
-    // Start periodic cleanup to prevent memory leaks
-    this.startCleanup();
-  }
+  constructor(private config: RateLimiterConfig) {}
 
   /**
    * Check if a key has exceeded the rate limit
@@ -66,6 +66,7 @@ export class RateLimiter {
    */
   isRateLimited(identifier: string): boolean {
     const now = Date.now();
+    this.maybeCleanup(now);
     const entry = this.attempts.get(identifier);
 
     if (!entry) {
@@ -210,25 +211,25 @@ export class RateLimiter {
   }
 
   /**
-   * Start periodic cleanup of expired entries
+   * Opportunistically purge expired entries.
+   *
+   * Cloudflare Workers forbid timers (setInterval) in global scope, and an
+   * in-memory limiter only lives for the lifetime of an isolate anyway, so we
+   * sweep lazily during normal calls instead of on a background timer. The
+   * sweep runs at most once per `cleanupIntervalMs`, keeping it amortized O(1).
    */
-  private startCleanup(): void {
-    // Clean up every minute
-    const cleanupIntervalMs = 60000;
-
-    // Use setInterval in a way that works in both Node and Workers
-    if (typeof setInterval !== 'undefined') {
-      this.cleanupInterval = setInterval(() => {
-        this.cleanup();
-      }, cleanupIntervalMs) as unknown as number;
+  private maybeCleanup(now: number): void {
+    if (now - this.lastCleanup < this.cleanupIntervalMs) {
+      return;
     }
+    this.lastCleanup = now;
+    this.cleanup(now);
   }
 
   /**
    * Clean up expired entries to prevent memory leaks
    */
-  private cleanup(): void {
-    const now = Date.now();
+  private cleanup(now: number = Date.now()): void {
     const expiredKeys: string[] = [];
 
     for (const [key, entry] of this.attempts.entries()) {
@@ -252,10 +253,6 @@ export class RateLimiter {
    * Stop the cleanup interval
    */
   destroy(): void {
-    if (this.cleanupInterval !== null) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
-    }
     this.attempts.clear();
   }
 }
