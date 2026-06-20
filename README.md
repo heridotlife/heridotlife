@@ -15,7 +15,7 @@
 [![CI](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml)
 [![Test Report](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml)
 [![codecov](https://codecov.io/gh/heridotlife/heridotlife/branch/main/graph/badge.svg)](https://codecov.io/gh/heridotlife/heridotlife)
-[![Tests](https://img.shields.io/badge/tests-399%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
+[![Tests](https://img.shields.io/badge/tests-414%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
 [![Coverage](https://img.shields.io/badge/coverage-92.99%25-brightgreen)](https://github.com/heridotlife/heridotlife/actions)
 [![Security](https://img.shields.io/badge/security-A%20rating-brightgreen)](https://github.com/heridotlife/heridotlife/blob/main/SECURITY.md)
 
@@ -119,13 +119,13 @@ This repository contains my personal website and production-ready URL shortener 
 - 🔗 **Custom URL Shortener** - Create branded short links with analytics and metadata
 - 📊 **Analytics Dashboard** - Track clicks and manage URLs with comprehensive stats
 - 🏷️ **Category System** - Organize links with public category pages
-- 📝 **Blog System** - Full-featured blog with categories and tags
+- 📝 **Blog System** - Full-featured blog with full-text search (FTS5), category & tag management, live HTML preview editor, RSS feed, XML sitemap, and structured-data (JSON-LD) SEO
 - 🔒 **Secure Admin Panel** - JWT-based authentication with HTTP-only cookies
 - 🌙 **Dark Mode** - Modern UI with theme switching
 - ⚡ **Edge Performance** - Deployed on Cloudflare Workers for sub-50ms latency
 - 🛡️ **Security Hardened** - SSRF protection, rate limiting, CSP, and comprehensive security measures
 - 🖼️ **Image Optimization** - Cloudflare Image Resizing with automatic WebP/AVIF conversion
-- 🧪 **92.99% Test Coverage** - Comprehensive testing with Vitest (399 tests)
+- 🧪 **Comprehensive Test Coverage** - Tested with Vitest (414 tests)
 
 ### 🛠️ Built With
 
@@ -148,7 +148,7 @@ This repository contains my personal website and production-ready URL shortener 
 - 🛡️ **SSRF Protection** - Blocks private IPs and metadata endpoints
 - 🚦 **Rate Limiting** - Sliding window algorithm
 - 🔒 **Content Security Policy** - Hardened CSP without unsafe-eval
-- 🧪 **Vitest 4** - 399 tests passing, 92.99% coverage
+- 🧪 **Vitest 4** - 414 tests passing
 - ✅ **ESLint & Prettier** - Zero errors, clean codebase
 
 ### 🔗 Live Demo

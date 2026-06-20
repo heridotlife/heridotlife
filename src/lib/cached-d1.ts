@@ -345,6 +345,18 @@ export class CachedD1Helper extends D1Helper {
     );
   }
 
+  async searchPosts(options: {
+    q: string;
+    page?: number;
+    limit?: number;
+  }): Promise<import('./blog/types').BlogSearchResponse> {
+    const { searchPosts } = await import('./blog/api');
+    return await searchPosts(
+      this.database as import('@cloudflare/workers-types').D1Database,
+      options
+    );
+  }
+
   async getPostById(id: number): Promise<import('./blog/types').BlogPost | null> {
     const { getPostById } = await import('./blog/api');
     return await getPostById(this.database as import('@cloudflare/workers-types').D1Database, id);
@@ -363,6 +375,11 @@ export class CachedD1Helper extends D1Helper {
   async getAllBlogCategories(): Promise<import('./blog/types').BlogCategory[]> {
     const { getAllCategories } = await import('./blog/api');
     return await getAllCategories(this.database as import('@cloudflare/workers-types').D1Database);
+  }
+
+  async getBlogStats(): Promise<import('./blog/types').BlogStats> {
+    const { getBlogStats } = await import('./blog/api');
+    return await getBlogStats(this.database as import('@cloudflare/workers-types').D1Database);
   }
 }
 

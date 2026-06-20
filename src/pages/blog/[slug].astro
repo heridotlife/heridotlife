@@ -35,17 +35,61 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+// SEO: canonical URL, article metadata, and JSON-LD structured data
+const canonicalUrl = `${siteConfig.url}/blog/${post.slug}`;
+const isoPublished = post.publishedAt ? new Date(post.publishedAt * 1000).toISOString() : undefined;
+const isoModified = post.updatedAt ? new Date(post.updatedAt * 1000).toISOString() : isoPublished;
+const tagNames = (post.tags ?? []).map((t) => t.name);
+const author = { '@type': 'Person', name: 'Heri Rusmanto', url: siteConfig.url };
+const postImage = post.ogImage || post.featuredImage || undefined;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.metaDescription || post.excerpt,
+    image: postImage,
+    datePublished: isoPublished,
+    dateModified: isoModified,
+    author,
+    publisher: author,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    keywords: post.keywords || tagNames.join(', ') || undefined,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteConfig.url },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${siteConfig.url}/blog` },
+      { '@type': 'ListItem', position: 3, name: post.title, item: canonicalUrl },
+    ],
+  },
+];
+
+const articleMeta = {
+  publishedTime: isoPublished,
+  modifiedTime: isoModified ?? undefined,
+  author: 'Heri Rusmanto',
+  tags: tagNames,
+};
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
-  <article
-    class="min-h-screen bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
-  >
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={postImage}
+  article={articleMeta}
+  jsonLd={jsonLd}
+>
+  <article class="min-h-screen bg-white text-slate-700 dark:bg-slate-950 dark:text-slate-300">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Back to blog -->
       <a
         href="/blog"
-        class="inline-flex items-center gap-2 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 mb-8 transition-colors"
+        class="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 mb-8 transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -78,13 +122,13 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
 
         <!-- Title -->
         <h1
-          class="text-4xl sm:text-5xl font-bold text-sky-900 dark:text-sky-100 mb-4 leading-tight"
+          class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4 leading-tight"
         >
           {post.title}
         </h1>
 
         <!-- Meta -->
-        <div class="flex flex-wrap items-center gap-4 text-sky-600 dark:text-sky-400 mb-6">
+        <div class="flex flex-wrap items-center gap-4 text-slate-500 dark:text-slate-400 mb-6">
           <time datetime={publishedDate.toISOString()}>
             {formattedDate}
           </time>
@@ -106,7 +150,9 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
         <!-- Excerpt -->
         {
           post.excerpt && (
-            <p class="text-xl text-sky-700 dark:text-sky-300 mb-8 font-medium">{post.excerpt}</p>
+            <p class="text-xl text-slate-600 dark:text-slate-300 mb-8 font-medium">
+              {post.excerpt}
+            </p>
           )
         }
       </header>
@@ -117,13 +163,13 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
       <!-- Tags -->
       {
         post.tags && post.tags.length > 0 && (
-          <div class="border-t border-sky-200 dark:border-sky-800 pt-8 mb-8">
-            <h3 class="text-lg font-semibold text-sky-900 dark:text-sky-100 mb-4">Tags</h3>
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-8 mb-8">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tags</h3>
             <div class="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <a
                   href={`/blog?tag=${tag.slug}`}
-                  class="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-sky-700 dark:text-sky-300 rounded-lg hover:bg-sky-100 dark:hover:bg-slate-700 transition-colors"
+                  class="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   #{tag.name}
                 </a>
@@ -134,8 +180,8 @@ const formattedDate = publishedDate.toLocaleDateString('en-US', {
       }
 
       <!-- Share Section -->
-      <div class="border-t border-sky-200 dark:border-sky-800 pt-8">
-        <h3 class="text-lg font-semibold text-sky-900 dark:text-sky-100 mb-4">Share this post</h3>
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-8">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Share this post</h3>
         <div class="flex gap-4">
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(Astro.url.href)}`}
