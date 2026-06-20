@@ -42,7 +42,7 @@ export default function URLsPage() {
 
   const handleToggle = async (id: number) => {
     try {
-      const response = await fetch(`/api/admin/urls/id/toggle?id=${id}`, {
+      const response = await fetch(`/api/admin/urls/${id}/toggle`, {
         method: 'PATCH',
       });
       if (!response.ok) throw new Error('Failed to toggle URL');
@@ -56,7 +56,7 @@ export default function URLsPage() {
     if (!confirm(`Delete URL "/${shortUrl}"?`)) return;
 
     try {
-      const response = await fetch(`/api/admin/urls/id?id=${id}`, {
+      const response = await fetch(`/api/admin/urls/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete URL');
