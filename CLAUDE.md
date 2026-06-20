@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**heridotlife** is a production-ready URL shortener and personal portfolio website built with Astro 5, deployed on Cloudflare Workers. The application features a custom admin dashboard, URL analytics, category management, and a blog system, all optimized for edge computing with multi-tier caching and comprehensive security measures.
+**heridotlife** is a production-ready URL shortener and personal portfolio website built with Astro 6, deployed on Cloudflare Workers. The application features a custom admin dashboard, URL analytics, category management, and a full-featured blog system (full-text search, category/tag management, SEO), all optimized for edge computing with multi-tier caching and comprehensive security measures.
 
 **Tech Stack:**
 
-- **Framework:** Astro 5.15.1 (SSR mode) with React 19.2.0 components
-- **Styling:** Tailwind CSS 3.4.18
-- **Language:** TypeScript 5.9.3 (strict mode)
-- **Database:** Cloudflare D1 (SQLite)
+- **Framework:** Astro 6 (SSR mode) with React 19.2 components
+- **Styling:** Tailwind CSS 4
+- **Language:** TypeScript 6 (strict mode)
+- **Database:** Cloudflare D1 (SQLite, incl. FTS5 full-text search)
 - **Cache:** Cloudflare KV (multi-tier strategy)
 - **Deployment:** Cloudflare Workers with Workers Assets
 - **Authentication:** JWT-based sessions with HTTP-only cookies
-- **Testing:** Vitest 2.1.8 with 90.95% coverage (95 tests passing)
+- **Testing:** Vitest 4 (414 tests passing)
 - **Image Optimization:** Cloudflare Image Resizing (edge optimization)
 
 ---
@@ -157,6 +157,41 @@ await db.updateShortUrl(id, { title: 'New Title' });
 - `schema.sql` - Database schema with indexes
 
 ---
+
+## Blog System
+
+A full-featured blog lives alongside the URL shortener.
+
+**Data access (`src/lib/blog/`):**
+
+- `api.ts` — all blog D1 operations: post CRUD, `getAllPublishedPosts` (category/tag filter + pagination), `searchPosts` (FTS5), category/tag CRUD (`createBlogCategory`/`updateBlogCategory`/`deleteBlogCategory`, `createBlogTag`/`updateBlogTag`/`deleteBlogTag`), and `getBlogStats`.
+- `utils.ts` — search helpers: `tokenizeSearchQuery`, `buildFtsMatchQuery` (safe FTS5 MATCH), `buildHighlightedSnippet` (HTML-escaped `<mark>` snippets), plus reading-time/excerpt helpers.
+- `types.ts`, `validations.ts` (Zod), `cache.ts` (blog cache key/TTL helpers).
+
+`CachedD1Helper` exposes blog reads (`getAllPublishedPosts`, `getPostBySlug`, `searchPosts`, `getAllTags`, `getAllBlogCategories`, `getBlogStats`).
+
+**Full-text search:** `BlogPost_fts` is an FTS5 external-content table kept in sync by triggers (`blogpost_ai/ad/au`). `searchPosts` runs a bm25-ranked `MATCH` over published posts. User input is tokenized into quoted prefix tokens so FTS5 operators can never be injected.
+
+**API endpoints (`src/pages/api/blog/`):**
+
+- `GET /api/blog/search` — **public** FTS5 search (`q`, `page`, `limit`).
+- `posts.ts` (GET list, POST create), `posts/[id].ts` (PUT, DELETE) — admin.
+- `categories.ts` (GET, POST), `categories/[id].ts` (PUT, DELETE) — admin.
+- `tags.ts` (GET, POST), `tags/[id].ts` (PUT, DELETE) — admin.
+- `GET /api/admin/blog/stats` — aggregate stats for the dashboard.
+
+Blog API routes use the **RESTful dynamic `[id]`** convention (`/api/blog/.../${id}`), unlike the older URL/category admin endpoints which use a literal `id` route + `?id=` query param. Match the convention of the endpoint you are calling.
+
+**Pages:**
+
+- `/blog` (`index.astro`) — listing with category/tag filters, SSR full-text search, pagination.
+- `/blog/[slug].astro` — post detail; emits `BlogPosting` + `BreadcrumbList` JSON-LD and article Open Graph tags.
+- `/admin/blog`, `/admin/blog/new`, `/admin/blog/edit/[id]` — post management (the editor has a Write/Split/Preview live HTML preview).
+- `/admin/blog/taxonomy` — category & tag management.
+
+**SEO endpoints:** `/sitemap.xml`, `/robots.txt`, `/blog/rss.xml`. `Layout.astro` accepts optional `article` and `jsonLd` props.
+
+> Blog post `content` is stored and rendered as raw HTML (`set:html`). The admin preview renders it the same way; treat content as trusted-author input.
 
 ## Caching Strategy
 
@@ -727,9 +762,8 @@ Configured in `tsconfig.json`:
 
 **Current Status:**
 
-- **Test Files:** 4 passed
-- **Total Tests:** 95 passed
-- **Coverage:** 90.95%
+- **Test Files:** 11 passed
+- **Total Tests:** 414 passed
 - **Coverage Threshold:** Lines 80%, Functions 80%, Branches 75%, Statements 80%
 
 **Test Categories:**
@@ -766,11 +800,10 @@ pnpm test:ui           # Interactive test UI
 
 ---
 
-## Quality Metrics (October 27, 2025)
+## Quality Metrics
 
 - **Security Rating:** A (Excellent)
-- **Test Coverage:** 90.95%
-- **Tests Passing:** 95/95
+- **Tests Passing:** 414/414 (11 files)
 - **ESLint Errors:** 0
 - **ESLint Warnings:** 15 (acceptable)
 - **Build Warnings:** 1 (down from 6)
@@ -779,9 +812,9 @@ pnpm test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** October 27, 2025
-**Astro Version:** 5.15.1
-**React Version:** 19.2.0
+**Last Updated:** June 21, 2026
+**Astro Version:** 6.4.6
+**React Version:** 19.2
 **Node Version:** >=24.0.0 (pnpm >=10.0.0)
 
 **Important Development Notes:**
