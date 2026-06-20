@@ -1,6 +1,7 @@
 'use client';
 
 import { Activity, CheckCircle, LinkIcon, XCircle } from '../ui/icons';
+import { FileText, FileEdit, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import StatsCard from './StatsCard';
@@ -22,8 +23,19 @@ interface Stats {
   }[];
 }
 
+interface BlogStats {
+  totalPosts: number;
+  publishedPosts: number;
+  draftPosts: number;
+  totalViews: number;
+  totalCategories: number;
+  totalTags: number;
+  topPosts: { id: number; title: string; slug: string; views: number }[];
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [blogStats, setBlogStats] = useState<BlogStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -42,6 +54,16 @@ export default function DashboardPage() {
       }
       const data = (await response.json()) as Stats;
       setStats(data);
+
+      // Blog stats are non-critical: load them best-effort.
+      try {
+        const blogRes = await fetch('/api/admin/blog/stats');
+        if (blogRes.ok) {
+          setBlogStats((await blogRes.json()) as BlogStats);
+        }
+      } catch {
+        // Ignore blog stats failures; the URL dashboard still renders.
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
@@ -158,6 +180,75 @@ export default function DashboardPage() {
           </p>
         )}
       </div>
+
+      {/* Blog Stats */}
+      {blogStats && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-heading-lg font-bold text-slate-900 dark:text-white">Blog</h2>
+            <a
+              href="/admin/blog"
+              className="text-body-sm font-medium text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300"
+            >
+              Manage posts →
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatsCard
+              title="Total Posts"
+              value={blogStats.totalPosts}
+              icon={FileText}
+              iconColor="text-sky-600 dark:text-sky-400"
+            />
+            <StatsCard
+              title="Published"
+              value={blogStats.publishedPosts}
+              icon={CheckCircle}
+              iconColor="text-green-600 dark:text-green-400"
+            />
+            <StatsCard
+              title="Drafts"
+              value={blogStats.draftPosts}
+              icon={FileEdit}
+              iconColor="text-amber-600 dark:text-amber-400"
+            />
+            <StatsCard
+              title="Total Views"
+              value={blogStats.totalViews}
+              icon={Eye}
+              iconColor="text-cyan-600 dark:text-cyan-400"
+            />
+          </div>
+
+          {blogStats.topPosts.length > 0 && (
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <h3 className="text-heading-md font-bold text-slate-900 dark:text-white mb-4">
+                Top Posts by Views
+              </h3>
+              <div className="space-y-3">
+                {blogStats.topPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/40 rounded-xl border border-slate-200 dark:border-slate-700"
+                  >
+                    <a
+                      href={`/blog/${post.slug}`}
+                      target="_blank"
+                      className="text-body-md font-medium text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 truncate"
+                    >
+                      {post.title}
+                    </a>
+                    <span className="text-caption text-slate-500 dark:text-slate-400 whitespace-nowrap ml-4">
+                      {post.views.toLocaleString()} views
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Cache Management */}
       <CacheManagement />

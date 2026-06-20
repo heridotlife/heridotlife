@@ -185,6 +185,98 @@ export function highlightSearchTerms(text: string, searchQuery: string): string 
 }
 
 /**
+ * Escape a string for safe insertion into HTML text content.
+ */
+export function escapeHtml(text: string): string {
+  return text.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+  );
+}
+
+/**
+ * Escape a string so it can be used literally inside a RegExp.
+ */
+export function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Tokenize a free-text search query into safe, lowercased word tokens.
+ *
+ * Only Unicode letters and numbers are kept, which strips every FTS5 operator
+ * (`"`, `*`, `:`, `-`, `(`, `)`, `AND`, `OR`, `NEAR`, ...) so user input can
+ * never break out of a quoted phrase or inject query syntax.
+ */
+export function tokenizeSearchQuery(query: string, maxTokens: number = 10): string[] {
+  const matches = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+  return matches.filter((t) => t.length > 0).slice(0, maxTokens);
+}
+
+/**
+ * Build a safe FTS5 MATCH expression from raw user input.
+ *
+ * Each token is wrapped in a quoted phrase with a trailing prefix token (`*`)
+ * so partial words match, and tokens are AND-ed together (implicit). Returns an
+ * empty string when the query has no usable tokens.
+ */
+export function buildFtsMatchQuery(query: string, maxTokens: number = 10): string {
+  return tokenizeSearchQuery(query, maxTokens)
+    .map((token) => `"${token}"*`)
+    .join(' ');
+}
+
+/**
+ * Build an HTML-safe, highlighted snippet from (possibly HTML) source text.
+ *
+ * The source is stripped of tags, a window around the first matching term is
+ * extracted, the result is HTML-escaped, and matched terms are wrapped in
+ * `<mark>`. Because escaping happens before the (single-pass) highlight, the
+ * only HTML in the output is the `<mark>` tags this function inserts.
+ */
+export function buildHighlightedSnippet(
+  source: string,
+  terms: string[],
+  options: { contextRadius?: number; maxLength?: number } = {}
+): string {
+  const { contextRadius = 120, maxLength = 240 } = options;
+  const plain = stripHtmlTags(source);
+  if (!plain) return '';
+
+  const lower = plain.toLowerCase();
+  let pos = -1;
+  let matchLen = 0;
+  for (const term of terms) {
+    const i = lower.indexOf(term);
+    if (i !== -1 && (pos === -1 || i < pos)) {
+      pos = i;
+      matchLen = term.length;
+    }
+  }
+
+  let snippet: string;
+  if (pos === -1) {
+    snippet = truncateText(plain, maxLength, '…');
+  } else {
+    const start = Math.max(0, pos - contextRadius);
+    const end = Math.min(plain.length, pos + matchLen + contextRadius);
+    snippet = plain.slice(start, end);
+    // Trim partial leading/trailing words and add ellipses where we cut.
+    if (start > 0) snippet = '…' + snippet.replace(/^\S+\s/, '');
+    if (end < plain.length) snippet = snippet.replace(/\s\S+$/, '') + '…';
+  }
+
+  const escaped = escapeHtml(snippet);
+  const pattern = terms
+    .filter(Boolean)
+    .map((t) => escapeRegExp(escapeHtml(t)))
+    .join('|');
+  if (!pattern) return escaped;
+
+  return escaped.replace(new RegExp(`(${pattern})`, 'gi'), '<mark>$1</mark>');
+}
+
+/**
  * Get reading progress percentage
  */
 export function getReadingProgress(
