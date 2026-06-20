@@ -28,6 +28,7 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [contentView, setContentView] = useState<'write' | 'split' | 'preview'>('write');
 
   useEffect(() => {
     fetchCategories();
@@ -281,17 +282,51 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
 
           {/* Content */}
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-lg border border-slate-200 dark:border-slate-700">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Content <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              rows={25}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono text-sm"
-              placeholder="Write your post content (HTML or Markdown)"
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Content <span className="text-red-500">*</span>
+              </label>
+              <div className="inline-flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden text-xs">
+                {(['write', 'split', 'preview'] as const).map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() => setContentView(view)}
+                    className={`px-3 py-1.5 capitalize transition-colors ${
+                      contentView === view
+                        ? 'bg-sky-600 text-white'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {view}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={contentView === 'split' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : ''}>
+              {contentView !== 'preview' && (
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  required
+                  rows={25}
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono text-sm"
+                  placeholder="Write your post content (HTML)"
+                />
+              )}
+              {contentView !== 'write' && (
+                <div
+                  className="prose prose-sky dark:prose-invert max-w-none rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 overflow-auto min-h-[200px] max-h-[640px]"
+                  // Admin-only preview of the author's own HTML content; rendered
+                  // identically to the public post page (set:html).
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      content ||
+                      '<p class="text-slate-400">Nothing to preview yet — start writing.</p>',
+                  }}
+                />
+              )}
+            </div>
             <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
               <span>
                 {wordCount} words · ~{readTime} min read
