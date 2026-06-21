@@ -31,6 +31,9 @@ importers:
       '@astrojs/tailwind':
         specifier: ^6.0.2
         version: 6.0.2(astro@6.4.8(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.3)(yaml@2.8.4))(tailwindcss@4.3.1)
+      '@cf-wasm/og':
+        specifier: ^0.4.0
+        version: 0.4.0(react@19.2.7)
       '@tailwindcss/vite':
         specifier: ^4.3.1
         version: 4.3.1(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.8.4))
@@ -355,6 +358,15 @@ packages:
   '@capsizecss/unpack@4.0.0':
     resolution: {integrity: sha512-VERIM64vtTP1C4mxQ5thVT9fK0apjPFobqybMtA1UdUujWka24ERHbRHFGmpbbhp73MhV+KSsHQH9C6uOTdEQA==}
     engines: {node: '>=18'}
+
+  '@cf-wasm/og@0.4.0':
+    resolution: {integrity: sha512-w5zhwEdZWGd4CEMqUxgCo4IOsxuaAC9utju2Yc5Lk1OqesxfouIdRDGrRiZBZwf0AJVq4Dg01+SpJV8gVcXn8g==}
+
+  '@cf-wasm/resvg@0.3.4':
+    resolution: {integrity: sha512-CMgV0ynRszZvTaHif5yPFFW4ibkopIfnaQZnklC5p80neJR/DCAUKGUgOFGhIVD8Biziiu86TFC0IQYRJyfWdw==}
+
+  '@cf-wasm/satori@0.3.6':
+    resolution: {integrity: sha512-IMN1uTnV7pfj/oGnkgUBC2W5W1cNHVMkT6mrzpRjXXCK7slF4OgjEHiX0GQPv/KLzajaalJB3exTaux6MYJ5sA==}
 
   '@clack/core@1.3.0':
     resolution: {integrity: sha512-xJPHpAmEQUBrXSLx0gF+q5K/IyihXpsHZcha+jB+tyahsKRK3Dxo4D0coZDewHo12NhiuzC3dTtMPbm53GEAAA==}
@@ -703,6 +715,12 @@ packages:
 
   '@fontsource/inter@5.2.8':
     resolution: {integrity: sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg==}
+
+  '@hedgedoc/html-to-react@2.1.1':
+    resolution: {integrity: sha512-jZQYG8XWi7CmhUo5F3YcnDjwlTIaY3PwuCSRgcP01CXEVHz8+dYKtHwaP7Fpu9qMRMoMQSWLgHXIKaGgbch/bA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.0'
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1172,6 +1190,14 @@ packages:
 
   '@resvg/resvg-js@2.6.2':
     resolution: {integrity: sha512-xBaJish5OeGmniDj9cW5PRa/PtmuVU3ziqrbr5xJj901ZDN4TosrVaNZpEiLZAxdfnhAe7uQ7QFWfjPe9d9K2Q==}
+    engines: {node: '>= 10'}
+
+  '@resvg/resvg-wasm@2.4.1':
+    resolution: {integrity: sha512-yi6R0HyHtsoWTRA06Col4WoDs7SvlXU3DLMNP2bdAgs7HK18dTEVl1weXgxRzi8gwLteGUbIg29zulxIB3GSdg==}
+    engines: {node: '>= 10'}
+
+  '@resvg/resvg-wasm@2.6.2':
+    resolution: {integrity: sha512-FqALmHI8D4o6lk/LRWDnhw95z5eO+eAa6ORjVg09YRR7BkcM6oPHU9uyC0gtQG5vpFLvgpeU4+zEAz2H8APHNw==}
     engines: {node: '>= 10'}
 
   '@rolldown/binding-android-arm64@1.0.3':
@@ -2460,6 +2486,9 @@ packages:
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
+
+  htmlparser2@9.1.0:
+    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
 
   http-cache-semantics@4.2.0:
     resolution: {integrity: sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==}
@@ -4269,6 +4298,23 @@ snapshots:
     dependencies:
       fontkitten: 1.0.3
 
+  '@cf-wasm/og@0.4.0(react@19.2.7)':
+    dependencies:
+      '@cf-wasm/resvg': 0.3.4
+      '@cf-wasm/satori': 0.3.6
+      '@hedgedoc/html-to-react': 2.1.1(react@19.2.7)
+    transitivePeerDependencies:
+      - react
+
+  '@cf-wasm/resvg@0.3.4':
+    dependencies:
+      '@resvg/resvg-wasm': 2.6.2
+      '@resvg/resvg-wasm-legacy': '@resvg/resvg-wasm@2.4.1'
+
+  '@cf-wasm/satori@0.3.6':
+    dependencies:
+      satori: 0.26.0
+
   '@clack/core@1.3.0':
     dependencies:
       fast-wrap-ansi: 0.2.0
@@ -4521,6 +4567,13 @@ snapshots:
   '@exodus/bytes@1.15.0': {}
 
   '@fontsource/inter@5.2.8': {}
+
+  '@hedgedoc/html-to-react@2.1.1(react@19.2.7)':
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      htmlparser2: 9.1.0
+      react: 19.2.7
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -4851,6 +4904,10 @@ snapshots:
       '@resvg/resvg-js-win32-arm64-msvc': 2.6.2
       '@resvg/resvg-js-win32-ia32-msvc': 2.6.2
       '@resvg/resvg-js-win32-x64-msvc': 2.6.2
+
+  '@resvg/resvg-wasm@2.4.1': {}
+
+  '@resvg/resvg-wasm@2.6.2': {}
 
   '@rolldown/binding-android-arm64@1.0.3':
     optional: true
@@ -6244,6 +6301,13 @@ snapshots:
   html-escaper@3.0.3: {}
 
   html-void-elements@3.0.0: {}
+
+  htmlparser2@9.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.2
+      entities: 4.5.0
 
   http-cache-semantics@4.2.0: {}
 
