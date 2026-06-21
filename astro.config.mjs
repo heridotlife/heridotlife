@@ -48,8 +48,14 @@ export default defineConfig({
           manualChunks: (id) => {
             // Separate vendor chunks for better caching
             if (id.includes('node_modules')) {
-              // Core React libraries
-              if (id.includes('react') || id.includes('react-dom')) {
+              // Core React libraries.
+              // NOTE: match path-bounded `/react/` and `/react-dom/` rather than
+              // a bare `react` substring. A bare match also catches CSS-in-JS
+              // deps like `css-to-react-native` (pulled in by satori via
+              // `@cf-wasm/og`) and splits them from siblings such as
+              // `css-color-keywords`, producing a circular chunk that throws
+              // "Cannot access 'require$$0' before initialization" at runtime.
+              if (id.includes('/react/') || id.includes('/react-dom/')) {
                 return 'react-vendor';
               }
               // Icon libraries (split separately as they're large)
