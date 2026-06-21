@@ -21,6 +21,9 @@ import { siteConfig } from '../../consts';
 
 const STATIC_FALLBACK = siteConfig.ogImage;
 
+// Generated cards are deterministic for a given URL, so they can be cached hard.
+const CACHE_CONTROL = 'public, max-age=86400';
+
 // 302 to the pre-rendered static social card (guaranteed valid JPEG).
 function staticFallback(): Response {
   return new Response(null, {
@@ -165,14 +168,24 @@ export const GET: APIRoute = async (context) => {
   );
 
   try {
-    return await ImageResponse.async(root, {
-      width: 1200,
-      height: 630,
-      fonts: [new GoogleFont('Inter')],
-      headers: {
-        'Cache-Control': 'public, max-age=86400',
+    // Serve from the Cloudflare Cache API when possible: identical card URLs
+    // are rendered once, then returned from the edge without re-running
+    // Satori/resvg. Requires `cfContext` (set above) for `waitUntil`; if it is
+    // missing the library transparently falls back to rendering every time.
+    // `overwriteCacheControl: false` preserves our own Cache-Control header.
+    return await cache.serve(
+      url.toString(),
+      () => {
+        console.log('[og] cache miss, rendering card:', type);
+        return ImageResponse.async(root, {
+          width: 1200,
+          height: 630,
+          fonts: [new GoogleFont('Inter')],
+          headers: { 'Cache-Control': CACHE_CONTROL },
+        });
       },
-    });
+      { overwriteCacheControl: false }
+    );
   } catch (error) {
     console.error('OG image generation failed, serving static fallback:', error);
     return staticFallback();
