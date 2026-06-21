@@ -9,67 +9,27 @@
  * - Location: Tokyo, Japan
  * - Website: heri.life
  * - Brand colors: Sky blue gradient
+ *
+ * Uses the same all-WASM engine as the runtime `/api/og` endpoint
+ * (`@cf-wasm/og` = Satori + resvg-wasm), so there is a single OG-rendering
+ * stack across build time and the edge. Outputs `src/assets/og.png` and
+ * `public/images/og.png`; run `pnpm og:convert` afterwards for the JPEG.
  */
 
-/* global URL, fetch */
+/* global URL */
 
-import satori from 'satori';
-import { Resvg } from '@resvg/resvg-js';
+import { ImageResponse, GoogleFont } from '@cf-wasm/og/node';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-/**
- * Fetch Inter font from Google Fonts
- * @returns {Promise<ArrayBuffer>} Font data
- */
-async function fetchInterFont() {
-  // Fetch Inter font (Regular weight) from Google Fonts
-  const CSS_URL =
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap';
-
-  try {
-    // Get CSS with font URLs
-    const cssResponse = await fetch(CSS_URL, {
-      headers: {
-        // User agent is important to get TTF format
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
-    });
-
-    const css = await cssResponse.text();
-
-    // Extract first font URL (should be TTF or OTF)
-    const fontUrlMatch = css.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.(?:ttf|otf))\)/);
-
-    if (!fontUrlMatch) {
-      throw new Error('Could not extract font URL from Google Fonts CSS');
-    }
-
-    const fontUrl = fontUrlMatch[1];
-    console.log(`📥 Fetching font from: ${fontUrl}`);
-
-    // Fetch the actual font file
-    const fontResponse = await fetch(fontUrl);
-
-    if (!fontResponse.ok) {
-      throw new Error(`Failed to fetch font: ${fontResponse.statusText}`);
-    }
-
-    return await fontResponse.arrayBuffer();
-  } catch (error) {
-    console.error('Failed to fetch font from Google Fonts:', error);
-    throw error;
-  }
-}
-
 // OG Image dimensions
 const WIDTH = 1200;
 const HEIGHT = 630;
 
-// Design the OG image using JSX-like syntax
+// Design the OG image using a Satori element tree
 const ogImage = {
   type: 'div',
   props: {
@@ -188,37 +148,21 @@ async function generateOGImage() {
   console.log('🎨 Generating custom OG image for heridotlife...\n');
 
   try {
-    // Fetch Inter font
-    console.log('📥 Fetching Inter font from Google Fonts...');
-    const fontData = await fetchInterFont();
-    console.log('✅ Font loaded successfully\n');
-
-    // Generate SVG using Satori
-    console.log('📝 Rendering SVG with Satori...');
-    const svg = await satori(ogImage, {
+    // Render PNG with @cf-wasm/og (Satori + resvg-wasm). Inter weights are
+    // fetched from Google Fonts so the heavy name/title render crisply.
+    console.log('🖼️  Rendering PNG with @cf-wasm/og...');
+    const response = await ImageResponse.async(ogImage, {
       width: WIDTH,
       height: HEIGHT,
       fonts: [
-        {
-          name: 'Inter',
-          data: fontData,
-          weight: 400,
-          style: 'normal',
-        },
+        new GoogleFont('Inter', { weight: 400 }),
+        new GoogleFont('Inter', { weight: 500 }),
+        new GoogleFont('Inter', { weight: 600 }),
+        new GoogleFont('Inter', { weight: 900 }),
       ],
     });
 
-    // Convert SVG to PNG using Resvg
-    console.log('🖼️  Converting SVG to PNG...');
-    const resvg = new Resvg(svg, {
-      fitTo: {
-        mode: 'width',
-        value: WIDTH,
-      },
-    });
-
-    const pngData = resvg.render();
-    const pngBuffer = pngData.asPng();
+    const pngBuffer = Buffer.from(await response.arrayBuffer());
 
     // Save to src/assets/og.png
     const outputPath = join(__dirname, '..', 'src', 'assets', 'og.png');
