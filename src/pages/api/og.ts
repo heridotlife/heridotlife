@@ -1,109 +1,193 @@
 import type { APIRoute } from 'astro';
+import { createElement } from 'react';
+import { ImageResponse, GoogleFont, cache } from '@cf-wasm/og/workerd';
+import { siteConfig } from '../../consts';
 
-export const GET: APIRoute = async ({ url }) => {
+/**
+ * Dynamic Open Graph image endpoint.
+ *
+ * Renders a 1200x630 social card as a real PNG using an all-WASM pipeline
+ * (Satori + resvg-wasm via `@cf-wasm/og`). This runs on the Cloudflare Workers
+ * runtime, which has no native bindings — so the build-time `satori` +
+ * `@resvg/resvg-js` (native) pipeline in `scripts/generate-og-image.mjs` cannot
+ * be used here.
+ *
+ * Fallback chain:
+ *   1. `type=url` + `originalUrl` -> 302 to the target page's own og:image.
+ *   2. Generated PNG card.
+ *   3. On any failure -> 302 to the static `siteConfig.ogImage` JPEG, so social
+ *      platforms always receive a valid raster image.
+ */
+
+const STATIC_FALLBACK = siteConfig.ogImage;
+
+// Generated cards are deterministic for a given URL, so they can be cached hard.
+const CACHE_CONTROL = 'public, max-age=86400';
+
+// 302 to the pre-rendered static social card (guaranteed valid JPEG).
+function staticFallback(): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: STATIC_FALLBACK,
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });
+}
+
+// Color schemes for different card types.
+const colorSchemes = {
+  default: { primary: '#0369a1', secondary: '#0891b2', accent: '#0284c7' },
+  category: { primary: '#7c3aed', secondary: '#a855f7', accent: '#8b5cf6' },
+  url: { primary: '#dc2626', secondary: '#ea580c', accent: '#f97316' },
+} as const;
+
+export const GET: APIRoute = async (context) => {
+  const { url, locals } = context;
+
+  // Required on Cloudflare Workers: lets the library cache the compiled WASM
+  // and fetched fonts across requests via the Cache API + waitUntil.
+  // Astro v6 exposes the execution context as `locals.cfContext`
+  // (`locals.runtime.ctx` was removed and now throws on access).
+  const ctx = locals?.cfContext;
+  if (ctx) {
+    cache.setExecutionContext(ctx);
+  }
+
   const searchParams = new URL(url).searchParams;
 
   const title = searchParams.get('title') || 'heridotlife';
   const description =
     searchParams.get('description') || 'DevOps & Software Engineer, automation enthusiast';
-  const type = searchParams.get('type') || 'default';
+  const type = (searchParams.get('type') || 'default') as keyof typeof colorSchemes;
   const category = searchParams.get('category') || '';
   const originalUrl = searchParams.get('originalUrl') || '';
 
-  // For short URLs, try to fetch OG image from original URL
+  // For short URLs, prefer the target page's own og:image.
   if (type === 'url' && originalUrl) {
     try {
       const response = await fetch(originalUrl);
       const html = await response.text();
-
-      // Extract OG image from HTML
       const ogImageMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/i);
       if (ogImageMatch && ogImageMatch[1]) {
-        const ogImageUrl = ogImageMatch[1];
-        // Redirect to the original OG image
         return new Response(null, {
           status: 302,
           headers: {
-            Location: ogImageUrl,
+            Location: ogImageMatch[1],
             'Cache-Control': 'public, max-age=3600',
           },
         });
       }
     } catch (error) {
       console.error('Failed to fetch original URL OG image:', error);
-      // Fall back to generated image if fetching fails
+      // Fall through to generated card.
     }
   }
 
-  // Color schemes for different types
-  const colorSchemes = {
-    default: { primary: '#0369a1', secondary: '#0891b2', accent: '#0284c7' },
-    category: { primary: '#7c3aed', secondary: '#a855f7', accent: '#8b5cf6' },
-    url: { primary: '#dc2626', secondary: '#ea580c', accent: '#f97316' },
-  };
+  const colors = colorSchemes[type] || colorSchemes.default;
 
-  const colors = colorSchemes[type as keyof typeof colorSchemes] || colorSchemes.default;
+  // Type-specific heading + body lines (no emoji — Satori would need an emoji
+  // provider, which adds runtime fetches; plain text keeps the edge path fast).
+  let heading: string;
+  let body: string;
+  if (type === 'category') {
+    heading = category;
+    body = description;
+  } else if (type === 'url') {
+    heading = 'Short URL';
+    body = title;
+  } else {
+    heading = title;
+    body = description;
+  }
 
-  // Generate SVG instead of using @vercel/og
-  const svgContent = `
-    <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:${colors.primary};stop-opacity:1" />
-          <stop offset="50%" style="stop-color:${colors.secondary};stop-opacity:1" />
-          <stop offset="100%" style="stop-color:${colors.accent};stop-opacity:1" />
-        </linearGradient>
-        <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:${colors.primary};stop-opacity:1" />
-          <stop offset="100%" style="stop-color:${colors.accent};stop-opacity:1" />
-        </linearGradient>
-      </defs>
-      
-      <!-- Background -->
-      <rect width="1200" height="630" fill="url(#bgGradient)"/>
-      
-      <!-- Main card -->
-      <rect x="150" y="115" width="900" height="400" rx="20" fill="rgba(255,255,255,0.95)" 
-            filter="drop-shadow(0 20px 40px rgba(0,0,0,0.15))"/>
-      
-      <!-- Brand -->
-      <text x="600" y="200" text-anchor="middle" font-family="Arial, sans-serif" 
-            font-size="48" font-weight="700" fill="url(#textGradient)">heri.life</text>
-      
-      <!-- Content based on type -->
-      ${
-        type === 'category'
-          ? `
-        <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="36" font-weight="600" fill="${colors.primary}">📂 ${category}</text>
-        <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="22" fill="#64748b">${description}</text>
-      `
-          : type === 'url'
-            ? `
-        <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="36" font-weight="600" fill="${colors.primary}">🔗 Short URL</text>
-        <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="24" font-weight="500" fill="#1e293b">${title}</text>
-      `
-            : `
-        <text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="40" font-weight="700" fill="${colors.primary}">${title}</text>
-        <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="22" fill="#64748b">${description}</text>
-      `
-      }
-      
-      <!-- Footer -->
-      <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" 
-            font-size="18" fill="#94a3b8">🔧 DevOps & Automation Enthusiast</text>
-    </svg>
-  `;
+  const text = (content: string, style: Record<string, unknown>) =>
+    createElement('div', { style: { display: 'flex', ...style } }, content);
 
-  return new Response(svgContent, {
-    headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'public, max-age=3600',
+  const card = createElement(
+    'div',
+    {
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 900,
+        height: 400,
+        padding: '48px 64px',
+        borderRadius: 24,
+        background: 'rgba(255,255,255,0.96)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+        textAlign: 'center',
+      },
     },
-  });
+    [
+      text('heri.life', {
+        fontSize: 48,
+        fontWeight: 700,
+        color: colors.primary,
+        marginBottom: 24,
+      }),
+      text(heading, {
+        fontSize: 44,
+        fontWeight: 700,
+        color: '#1e293b',
+        lineHeight: 1.2,
+        marginBottom: 16,
+      }),
+      text(body, {
+        fontSize: 24,
+        fontWeight: 400,
+        color: '#64748b',
+        lineHeight: 1.4,
+      }),
+      text('DevOps & Automation Enthusiast', {
+        fontSize: 18,
+        fontWeight: 500,
+        color: '#94a3b8',
+        marginTop: 32,
+      }),
+    ]
+  );
+
+  const root = createElement(
+    'div',
+    {
+      style: {
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 64,
+        fontFamily: 'Inter',
+        background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 50%, ${colors.accent} 100%)`,
+      },
+    },
+    card
+  );
+
+  try {
+    // Serve from the Cloudflare Cache API when possible: identical card URLs
+    // are rendered once, then returned from the edge without re-running
+    // Satori/resvg. Requires `cfContext` (set above) for `waitUntil`; if it is
+    // missing the library transparently falls back to rendering every time.
+    // `overwriteCacheControl: false` preserves our own Cache-Control header.
+    return await cache.serve(
+      url.toString(),
+      () => {
+        console.log('[og] cache miss, rendering card:', type);
+        return ImageResponse.async(root, {
+          width: 1200,
+          height: 630,
+          fonts: [new GoogleFont('Inter')],
+          headers: { 'Cache-Control': CACHE_CONTROL },
+        });
+      },
+      { overwriteCacheControl: false }
+    );
+  } catch (error) {
+    console.error('OG image generation failed, serving static fallback:', error);
+    return staticFallback();
+  }
 };

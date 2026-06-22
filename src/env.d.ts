@@ -70,8 +70,12 @@ declare namespace App {
     runtime: {
       env: CloudflareEnv;
       cf: CfProperties;
-      ctx: CloudflareContext;
     };
+    /**
+     * Cloudflare Workers execution context. Astro v6 moved this here from
+     * `runtime.ctx` (which was removed and now throws on access).
+     */
+    cfContext?: CloudflareContext;
     /** CSP nonce for inline scripts (generated per request) */
     cspNonce: string;
   }

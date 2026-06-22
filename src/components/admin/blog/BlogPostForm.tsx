@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, ArrowLeft, Eye, X } from 'lucide-react';
+import { Save, ArrowLeft, Eye, X, Plus } from 'lucide-react';
 import Button from '../../ui/Button';
 import { generateSlug } from '../../../lib/blog/validations';
 import { calculateReadingTime } from '../../../lib/blog/utils';
@@ -9,6 +9,13 @@ interface BlogPostFormProps {
   mode: 'create' | 'edit';
   postId?: string;
 }
+
+// Per-post limits, shared by the existing checkboxes and the inline "add" inputs.
+const MAX_CATEGORIES = 5;
+const MAX_TAGS = 10;
+// Default color for categories created inline; full styling is editable in the
+// taxonomy page (/admin/blog/taxonomy).
+const DEFAULT_CATEGORY_COLOR = '#0ea5e9';
 
 export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
   const [loading, setLoading] = useState(mode === 'edit');
@@ -29,6 +36,12 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [contentView, setContentView] = useState<'write' | 'split' | 'preview'>('write');
+
+  // Inline taxonomy creation
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [addingTag, setAddingTag] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -162,6 +175,96 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
       alert(error instanceof Error ? error.message : 'Failed to save post');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Create a new category inline and auto-select it. If one with the same name/
+  // slug already exists (locally or per the API's UNIQUE constraint), select that
+  // one instead of erroring.
+  const handleAddCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    if (selectedCategories.length >= MAX_CATEGORIES) {
+      alert(`Maximum ${MAX_CATEGORIES} categories per post`);
+      return;
+    }
+
+    const slug = generateSlug(name);
+    const existing = categories.find(
+      (c) => c.slug === slug || c.name.toLowerCase() === name.toLowerCase()
+    );
+    if (existing) {
+      setSelectedCategories((prev) => (prev.includes(existing.id) ? prev : [...prev, existing.id]));
+      setNewCategoryName('');
+      return;
+    }
+
+    setAddingCategory(true);
+    try {
+      const response = await fetch('/api/blog/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, slug, color: DEFAULT_CATEGORY_COLOR }),
+      });
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          message?: string;
+          error?: string;
+        };
+        throw new Error(data.message || data.error || 'Failed to create category');
+      }
+      const created = (await response.json()) as BlogCategory;
+      setCategories((prev) => [...prev, created]);
+      setSelectedCategories((prev) => [...prev, created.id]);
+      setNewCategoryName('');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to create category');
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
+  // Create a new tag inline and auto-select it (same dedupe behavior as above).
+  const handleAddTag = async () => {
+    const name = newTagName.trim();
+    if (!name) return;
+    if (selectedTags.length >= MAX_TAGS) {
+      alert(`Maximum ${MAX_TAGS} tags per post`);
+      return;
+    }
+
+    const slug = generateSlug(name);
+    const existing = tags.find(
+      (t) => t.slug === slug || t.name.toLowerCase() === name.toLowerCase()
+    );
+    if (existing) {
+      setSelectedTags((prev) => (prev.includes(existing.id) ? prev : [...prev, existing.id]));
+      setNewTagName('');
+      return;
+    }
+
+    setAddingTag(true);
+    try {
+      const response = await fetch('/api/blog/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, slug }),
+      });
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          message?: string;
+          error?: string;
+        };
+        throw new Error(data.message || data.error || 'Failed to create tag');
+      }
+      const created = (await response.json()) as BlogTag;
+      setTags((prev) => [...prev, created]);
+      setSelectedTags((prev) => [...prev, created.id]);
+      setNewTagName('');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to create tag');
+    } finally {
+      setAddingTag(false);
     }
   };
 
@@ -466,8 +569,8 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
                       checked={selectedCategories.includes(category.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          if (selectedCategories.length >= 5) {
-                            alert('Maximum 5 categories per post');
+                          if (selectedCategories.length >= MAX_CATEGORIES) {
+                            alert(`Maximum ${MAX_CATEGORIES} categories per post`);
                             return;
                           }
                           setSelectedCategories([...selectedCategories, category.id]);
@@ -487,8 +590,34 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
               )}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-              {selectedCategories.length} / 5 selected
+              {selectedCategories.length} / {MAX_CATEGORIES} selected
             </p>
+            <div className="mt-3 flex gap-2 border-t border-slate-200 dark:border-slate-700 pt-3">
+              <input
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    void handleAddCategory();
+                  }
+                }}
+                placeholder="New category…"
+                className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+              <Button
+                type="button"
+                onClick={handleAddCategory}
+                disabled={addingCategory || !newCategoryName.trim()}
+                loading={addingCategory}
+                variant="outline"
+                size="sm"
+                icon={Plus}
+              >
+                Add
+              </Button>
+            </div>
           </div>
 
           {/* Tags */}
@@ -507,8 +636,8 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
                       checked={selectedTags.includes(tag.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          if (selectedTags.length >= 10) {
-                            alert('Maximum 10 tags per post');
+                          if (selectedTags.length >= MAX_TAGS) {
+                            alert(`Maximum ${MAX_TAGS} tags per post`);
                             return;
                           }
                           setSelectedTags([...selectedTags, tag.id]);
@@ -524,8 +653,34 @@ export default function BlogPostForm({ mode, postId }: BlogPostFormProps) {
               )}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-              {selectedTags.length} / 10 selected
+              {selectedTags.length} / {MAX_TAGS} selected
             </p>
+            <div className="mt-3 flex gap-2 border-t border-slate-200 dark:border-slate-700 pt-3">
+              <input
+                type="text"
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    void handleAddTag();
+                  }
+                }}
+                placeholder="New tag…"
+                className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+              <Button
+                type="button"
+                onClick={handleAddTag}
+                disabled={addingTag || !newTagName.trim()}
+                loading={addingTag}
+                variant="outline"
+                size="sm"
+                icon={Plus}
+              >
+                Add
+              </Button>
+            </div>
           </div>
         </div>
       </div>
