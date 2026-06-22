@@ -1,8 +1,11 @@
 name: Test Report
 
 on:
+  # `push` only on main — develop is covered by pull_request (feature → develop
+  # PRs and the auto develop → main release PR), avoiding duplicate push +
+  # pull_request runs on every develop push.
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main, develop]
 

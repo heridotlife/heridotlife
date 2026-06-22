@@ -1,8 +1,11 @@
 name: CI
 
 on:
+  # `push` only on main. develop is validated via pull_request (feature → develop
+  # PRs and the auto develop → main release PR), so pushing to develop would
+  # otherwise run twice: once for `push` and once for that PR's `synchronize`.
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main, develop]
 
