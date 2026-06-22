@@ -80,6 +80,32 @@ jobs:
           path: coverage/
           retention-days: 30
 
+  integration:
+    name: Integration (real D1)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Runs the data layer against a real D1 (miniflare/workerd) — no Astro
+      # build required, so this is safe in CI (unlike e2e, which needs the
+      # built worker and runs against the Cloudflare preview instead).
+      - name: Run integration tests
+        run: pnpm test:integration
+
   # Build job removed - See DEPLOYMENT_FINAL_SOLUTION.md
   # The Cloudflare adapter has an ESM loader compatibility issue that prevents
   # successful builds in CI. The project builds successfully in the deploy.yml
