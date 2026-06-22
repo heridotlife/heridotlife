@@ -2,10 +2,18 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+minimumReleaseAgeExclude:
+  - astro-eslint-parser@2.0.0
+  - eslint-plugin-astro@2.0.0
 onlyBuiltDependencies:
   - sharp
   - workerd
   - esbuild
+peerDependencyRules:
+  allowedVersions:
+    # vitest 4 / @vitest/mocker / @tailwindcss/vite peer-declare vite ^7, but the
+    # project runs vite 8 (the full unit/integration/e2e suite passes). Accept it.
+    vite: '8'
 overrides:
   yaml: '2.8.4'
   # Security overrides — force patched versions of vulnerable transitive deps.

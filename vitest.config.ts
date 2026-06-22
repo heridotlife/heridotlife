@@ -1,10 +1,13 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, configDefaults } from 'vitest/config';
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
+    // Integration (real D1/miniflare) and e2e (HTTP smoke) layers have their own
+    // configs/scripts — keep them out of the default `vitest run` / coverage.
+    exclude: [...configDefaults.exclude, 'tests/integration/**', 'tests/e2e/**'],
     reporters: ['default', 'junit'],
     // Security: Restrict API/UI server to localhost only to prevent CSRF attacks
     // https://github.com/vitest-dev/vitest/security/advisories (CSRF vulnerability)
