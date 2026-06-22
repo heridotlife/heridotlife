@@ -1,8 +1,11 @@
 name: Test Report
 
 on:
+  # `push` only on main — develop is covered by pull_request (feature → develop
+  # PRs and the auto develop → main release PR), avoiding duplicate push +
+  # pull_request runs on every develop push.
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main, develop]
 
@@ -18,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -45,14 +48,10 @@ jobs:
           reporter: 'java-junit'
           fail-on-error: false
 
-      - name: Coverage Report
-        if: github.event_name == 'pull_request'
-        uses: romeovs/lcov-reporter-action@v0.4.0
-        with:
-          lcov-file: ./coverage/lcov.info
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
-
+      # Coverage is reported on PRs by the maintained MishaKav action below.
+      # The previous romeovs/lcov-reporter-action step was removed: it was the
+      # latest available (v0.4.0, unmaintained) yet still on the deprecated
+      # Node.js 20 runtime, and produced a duplicate coverage comment.
       - name: Coverage Summary Comment
         if: github.event_name == 'pull_request'
         uses: MishaKav/jest-coverage-comment@v1.0.33

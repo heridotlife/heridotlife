@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.6.0",
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=11.0.0"
   },
   "scripts": {
@@ -29,8 +29,11 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:unit": "vitest run --project unit",
-    "test:integration": "vitest run --project integration",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run -c vitest.integration.config.ts",
+    "test:e2e": "vitest run -c vitest.e2e.config.ts",
+    "test:e2e:local": "node scripts/e2e-local.mjs",
+    "test:local": "pnpm run test:unit && pnpm run test:integration && pnpm run test:e2e:local",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
     "type-check": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro check",
@@ -42,7 +45,6 @@
     "@astrojs/cloudflare": "^13.7.0",
     "@astrojs/node": "^10.1.4",
     "@astrojs/react": "^5.0.7",
-    "@astrojs/tailwind": "^6.0.2",
     "@cf-wasm/og": "^0.4.0",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.6",
@@ -60,34 +62,28 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "0.16.17",
-    "@cloudflare/workers-types": "4.20260619.1",
+    "@cloudflare/vitest-pool-workers": "0.16.18",
+    "@cloudflare/workers-types": "4.20260621.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.2.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "4.1.9",
     "@vitest/ui": "4.1.9",
     "esbuild": "^0.28.1",
     "eslint": "^10.5.0",
-    "eslint-plugin-astro": "^1.7.0",
+    "eslint-plugin-astro": "^2.0.0",
     "happy-dom": "^20.10.3",
     "jsdom": "^29.1.1",
+    "miniflare": "4.20260617.1",
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
-    "sharp": "0.35.1",
+    "sharp": "0.35.2",
     "typescript-eslint": "^8.61.0",
     "vitest": "4.1.9",
-    "wrangler": "4.102.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp",
-      "workerd"
-    ]
+    "wrangler": "4.103.0"
   }
 }

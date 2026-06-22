@@ -48,16 +48,14 @@ export default defineConfig({
           manualChunks: (id) => {
             // Separate vendor chunks for better caching
             if (id.includes('node_modules')) {
-              // Core React libraries.
-              // NOTE: match path-bounded `/react/` and `/react-dom/` rather than
-              // a bare `react` substring. A bare match also catches CSS-in-JS
-              // deps like `css-to-react-native` (pulled in by satori via
-              // `@cf-wasm/og`) and splits them from siblings such as
-              // `css-color-keywords`, producing a circular chunk that throws
-              // "Cannot access 'require$$0' before initialization" at runtime.
-              if (id.includes('/react/') || id.includes('/react-dom/')) {
-                return 'react-vendor';
-              }
+              // React core (react / react-dom / scheduler) is intentionally NOT
+              // split into its own chunk: a separate react-vendor chunk both
+              // depends on and is depended upon by `vendor`, which Rollup warns
+              // about as a circular chunk. Keeping it in the single `vendor`
+              // chunk removes the cycle. (Splitting it was also what previously
+              // separated satori's `css-to-react-native` from `css-color-keywords`
+              // and crashed the worker with a `require$$0` TDZ error.)
+
               // Icon libraries (split separately as they're large)
               if (id.includes('lucide-react')) {
                 return 'lucide-icons';
@@ -69,10 +67,9 @@ export default defineConfig({
               if (id.includes('jose') || id.includes('zod')) {
                 return 'validation-libs';
               }
-              // Utility libraries
-              if (id.includes('clsx') || id.includes('tailwind-merge')) {
-                return 'utils';
-              }
+              // clsx / tailwind-merge are tiny and aren't present in every build
+              // pass; a dedicated chunk for them produced an "empty chunk"
+              // warning, so let them fall into `vendor`.
               // All other node_modules
               return 'vendor';
             }

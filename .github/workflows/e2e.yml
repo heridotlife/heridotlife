@@ -1,0 +1,48 @@
+name: E2E (preview smoke)
+
+# Runs the read-only HTTP smoke suite (tests/e2e) against a freshly deployed
+# environment. CI deliberately does NOT build the Astro worker (see
+# DEPLOYMENT.md / ci.yml) — Cloudflare Workers Builds builds & deploys it and
+# emits a GitHub `deployment_status`, which we hook into here.
+#
+# Notes / known caveats:
+#  - `deployment_status`-triggered workflows always run from the DEFAULT branch's
+#    workflow file, so this only takes effect once merged to `main`.
+#  - Relies on Cloudflare's GitHub integration populating `environment_url`. If it
+#    turns out to be empty, switch to `deployment.payload.web_url`/`target_url`.
+#  - The preview host must satisfy the worker's TRUSTED_HOSTS allowlist
+#    (`*.heridotlife.workers.dev`); if a preview alias falls outside it, set
+#    `E2E_HOST: heri.life` below.
+on: deployment_status
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E smoke (preview)
+    # Only for successful deployments that expose a URL.
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment_url != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run e2e smoke against the deployment
+        env:
+          BASE_URL: ${{ github.event.deployment_status.environment_url }}
+        run: pnpm test:e2e
