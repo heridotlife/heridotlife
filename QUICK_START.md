@@ -4,7 +4,7 @@
 
 - ✅ Single worker deployment: `heridotlife`
 - ✅ Multiple routes: staging + production
-- ✅ Validation script: `pnpm validate`
+- ✅ Validation script: `bun run validate`
 - ✅ Auto-deploy ready: Cloudflare Workers Builds
 - ✅ Auto PR workflow: develop → main (on feature merge)
 
@@ -19,7 +19,7 @@
    - Authenticate with GitHub
    - Select your repository: `heridotlife/heridotlife`
    - Set production branch: `main`
-   - Set build command: `pnpm build`
+   - Set build command: `bun run build`
 
 3. **Set Environment Variables in Cloudflare**:
 
@@ -43,7 +43,7 @@
 **Validate everything:**
 
 ```bash
-pnpm validate
+bun run validate
 ```
 
 This runs:
@@ -66,7 +66,7 @@ git checkout -b feature/my-feature
 # ... code ...
 
 # 3. Validate before committing
-pnpm validate
+bun run validate
 
 # 4. Commit and push
 git add .
@@ -98,7 +98,7 @@ git pull origin main
 git checkout -b hotfix/critical-issue
 
 # 2. Fix and validate
-pnpm validate
+bun run validate
 
 # 3. Create PR directly to main
 # 4. Merge after urgent review
@@ -110,16 +110,16 @@ pnpm validate
 **Full validation (recommended):**
 
 ```bash
-pnpm validate
+bun run validate
 ```
 
 **Individual checks:**
 
 ```bash
-pnpm type-check          # TypeScript validation
-pnpm test                # Run tests
-pnpm lint                # Check code quality
-pnpm build               # Build the project
+bun run type-check          # TypeScript validation
+bun run test                # Run tests
+bun run lint                # Check code quality
+bun run build               # Build the project
 wrangler deploy --dry-run # Validate config
 ```
 
@@ -166,7 +166,7 @@ Method 2 - Cloudflare Dashboard:
 - `QUICK_START.md` - This file (quick reference)
 - `docs/AUTO_PR_WORKFLOW.md` - Auto PR workflow documentation
 - `.github/workflows/auto-pr-develop-to-main.yml` - Auto PR workflow
-- `package.json` - `pnpm validate` script
+- `package.json` - `bun run validate` script
 
 ## ⚠️ Remember
 
@@ -179,7 +179,7 @@ Method 2 - Cloudflare Dashboard:
 
 **Quick Help:**
 
-- Validate: `pnpm validate`
+- Validate: `bun run validate`
 - Deploy: Merge to `main` (automatic)
 - Rollback: `git revert HEAD && git push`
 - Logs: Check Cloudflare Dashboard

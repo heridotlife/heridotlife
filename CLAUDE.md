@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**heridotlife** is a production-ready URL shortener and personal portfolio website built with Astro 6, deployed on Cloudflare Workers. The application features a custom admin dashboard, URL analytics, category management, and a full-featured blog system (full-text search, category/tag management, SEO), all optimized for edge computing with multi-tier caching and comprehensive security measures.
+**heridotlife** is a production-ready URL shortener and personal portfolio website built with Astro 7, deployed on Cloudflare Workers. The application features a custom admin dashboard, URL analytics, category management, and a full-featured blog system (full-text search, category/tag management, SEO), all optimized for edge computing with multi-tier caching and comprehensive security measures.
 
 **Tech Stack:**
 
-- **Framework:** Astro 6 (SSR mode) with React 19.2 components
+- **Framework:** Astro 7 (SSR mode) with React 19.2 components
 - **Styling:** Tailwind CSS 4
 - **Language:** TypeScript 6 (strict mode)
 - **Database:** Cloudflare D1 (SQLite, incl. FTS5 full-text search)
@@ -17,6 +17,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Authentication:** JWT-based sessions with HTTP-only cookies
 - **Testing:** Vitest 4 (414 tests passing)
 - **Image Optimization:** Cloudflare Image Resizing (edge optimization)
+- **Toolchain:** **Bun** is the package manager (`bun.lock`) and task runner
+  (`bun run …`). Node (`.nvmrc` → 24) is still required as the runtime that Astro
+  and Vitest execute under — a node-free Bun build is blocked because Vite
+  statically imports `node:module.registerHooks`, which Bun does not implement.
 
 ---
 
@@ -24,37 +28,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development
-pnpm dev                          # Start dev server (local mode, no D1/KV)
-pnpm dev:wrangler                 # Dev with Wrangler (D1/KV bindings, requires setup_db.sh)
-pnpm dev:wrangler:skip-build      # Dev with Wrangler (skip build step)
+bun run dev                          # Start dev server (local mode, no D1/KV)
+bun run dev:wrangler                 # Dev with Wrangler (D1/KV bindings, requires setup_db.sh)
+bun run dev:wrangler:skip-build      # Dev with Wrangler (skip build step)
 
 # Database
-pnpm db:migrate                   # Run schema migration (production D1)
-pnpm db:migrate:local             # Run schema migration (local D1)
-pnpm db:import                    # Import data from remote to local D1
-pnpm db:setup                     # Full local setup (migrate + import)
+bun run db:migrate                   # Run schema migration (production D1)
+bun run db:migrate:local             # Run schema migration (local D1)
+bun run db:import                    # Import data from remote to local D1
+bun run db:setup                     # Full local setup (migrate + import)
 
 # Build & Deploy
-pnpm build                        # Build for production (runs prebuild script)
-pnpm preview                      # Preview production build with Wrangler
-pnpm deploy                       # Deploy to Cloudflare Workers
+bun run build                        # Build for production (runs prebuild script)
+bun run preview                      # Preview production build with Wrangler
+bun run deploy                       # Deploy to Cloudflare Workers
 
 # Code Quality
-pnpm lint                         # Run ESLint + Prettier check
-pnpm lint:fix                     # Auto-fix linting issues
-pnpm type-check                   # Run TypeScript type checking (astro check)
+bun run lint                         # Run ESLint + Prettier check
+bun run lint:fix                     # Auto-fix linting issues
+bun run type-check                   # Run TypeScript type checking (astro check)
 
 # Testing
-pnpm test                         # Run all tests
-pnpm test:watch                   # Run tests in watch mode
-pnpm test:coverage                # Run tests with coverage report
-pnpm test:unit                    # Run unit tests only
-pnpm test:integration             # Run integration tests only
+bun run test                         # Run all tests
+bun run test:watch                   # Run tests in watch mode
+bun run test:coverage                # Run tests with coverage report
+bun run test:unit                    # Run unit tests only
+bun run test:integration             # Run integration tests only
 
 # Logs & Monitoring
-pnpm logs                         # View real-time Worker logs (pretty format)
-pnpm logs:json                    # View logs in JSON format
-pnpm logs:errors                  # View error logs only
+bun run logs                         # View real-time Worker logs (pretty format)
+bun run logs:json                    # View logs in JSON format
+bun run logs:errors                  # View error logs only
 
 # Wrangler Commands (direct)
 wrangler dev                      # Preview built site locally
@@ -62,7 +66,7 @@ wrangler d1 execute D1_db         # Execute SQL against D1 database
 wrangler tail heridotlife         # View real-time logs from deployed worker
 ```
 
-**Important:** Use `pnpm dev:wrangler` when developing features that require D1 or KV access.
+**Important:** Use `bun run dev:wrangler` when developing features that require D1 or KV access.
 
 ---
 
@@ -555,13 +559,13 @@ async getActiveUrlCount(): Promise<number> {
 
    ```bash
    ./setup_db.sh  # Creates .wrangler/state/v3/d1/miniflare-D1DatabaseObject/
-   pnpm db:migrate:local
+   bun run db:migrate:local
    ```
 
 2. **Start dev server with Wrangler:**
 
    ```bash
-   pnpm dev:wrangler
+   bun run dev:wrangler
    ```
 
 3. **Inspect local D1:**
@@ -587,8 +591,8 @@ async getActiveUrlCount(): Promise<number> {
 **Manual Deployment:**
 
 ```bash
-pnpm build          # Generates dist/ folder with _worker.js
-pnpm deploy         # Deploys to Cloudflare Workers via wrangler
+bun run build          # Generates dist/ folder with _worker.js
+bun run deploy         # Deploys to Cloudflare Workers via wrangler
 ```
 
 **Database Migration (Production):**
@@ -731,7 +735,7 @@ Configured in `tsconfig.json`:
 
 **Cause:** Missing D1 binding or using regular dev server.
 
-**Solution:** Use `pnpm dev:wrangler` instead of `pnpm dev`.
+**Solution:** Use `bun run dev:wrangler` instead of `bun run dev`.
 
 ### "AUTH_SECRET is not defined"
 
@@ -758,7 +762,10 @@ Configured in `tsconfig.json`:
 
 ## Testing Infrastructure
 
-**Test Framework:** Vitest 4 with Cloudflare Workers pool
+**Test Framework:** Vitest 4 run under Bun. Unit/component tests use a `happy-dom`
+environment; integration tests boot a real D1/KV via the **Miniflare** programmatic
+API (`tests/integration/helpers/env.ts`) — the project does not use
+`@cloudflare/vitest-pool-workers`.
 
 **Current Status:**
 
@@ -772,22 +779,20 @@ This is the known-good baseline that dependency upgrades and other changes are
 validated against. Always run the **full** suite below — including e2e — before
 merging a dependency bump; the e2e smoke test is what catches routing
 regressions that the unit tests and type-check miss (e.g. an adapter/framework
-upgrade shadowing the homepage `/` route). Reproduce with Node 24 (`.nvmrc`) and
-pnpm 11 (`pnpm install`):
+upgrade shadowing the homepage `/` route). Reproduce with Bun (`bun install`); Node
+24 (`.nvmrc`) must also be available since Astro/Vitest execute under Node:
 
-| Check                         | Command               | Result                           |
-| ----------------------------- | --------------------- | -------------------------------- |
-| Unit tests                    | `pnpm test`           | 414/414 passed (11 files)        |
-| Type-check (`astro check`)    | `pnpm type-check`     | 0 errors, 0 warnings (131 files) |
-| Production build (CF adapter) | `pnpm build`          | success                          |
-| Lint (ESLint + Prettier)      | `pnpm lint`           | clean                            |
-| E2E smoke (local boot)        | `pnpm test:e2e:local` | 4/4 passed                       |
+| Check                         | Command                  | Result                           |
+| ----------------------------- | ------------------------ | -------------------------------- |
+| Unit tests                    | `bun run test`           | 414/414 passed (11 files)        |
+| Type-check (`astro check`)    | `bun run type-check`     | 0 errors, 0 warnings (131 files) |
+| Production build (CF adapter) | `bun run build`          | success                          |
+| Lint (ESLint + Prettier)      | `bun run lint`           | clean                            |
+| E2E smoke (local boot)        | `bun run test:e2e:local` | 4/4 passed                       |
 
-`pnpm test:e2e:local` builds the worker, boots it via `wrangler dev`, and runs
+`bun run test:e2e:local` builds the worker, boots it via `wrangler dev`, and runs
 `tests/e2e/smoke.test.ts` against it — asserting `/` (homepage, SSR 200),
-`/api/og`, `/admin/login`, and `/robots.txt`. Run it locally with Node 24; it
-needs `packageManager` (pnpm) to match the installed pnpm or `wrangler dev`'s
-build step fails the corepack version check.
+`/api/og`, `/admin/login`, and `/robots.txt`.
 
 **Test Categories:**
 
@@ -806,9 +811,9 @@ build step fails the corepack version check.
 **Running Tests:**
 
 ```bash
-pnpm test              # Run all tests
-pnpm test:coverage     # Run with coverage report
-pnpm test:ui           # Interactive test UI
+bun run test              # Run all tests
+bun run test:coverage     # Run with coverage report
+bun run test:ui           # Interactive test UI
 ```
 
 ---
@@ -836,14 +841,14 @@ pnpm test:ui           # Interactive test UI
 ---
 
 **Last Updated:** June 29, 2026
-**Astro Version:** 6.4.8
+**Astro Version:** 7.0.3
 **React Version:** 19.2
-**Node Version:** >=24.0.0 (pnpm >=10.0.0)
+**Package Manager:** Bun 1.3 (`bun.lock`); Node >=24 still required as the Astro/Vitest runtime
 
 **Important Development Notes:**
 
 - Always run `type-check`, `lint`, and `lint:fix` after changes
-- Always run `pnpm test` before committing
-- Use `pnpm dev:wrangler` for D1/KV development
+- Always run `bun run test` before committing
+- Use `bun run dev:wrangler` for D1/KV development
 - Review security implications when adding new features
 - Update tests when modifying core functionality
