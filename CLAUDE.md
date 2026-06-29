@@ -758,13 +758,36 @@ Configured in `tsconfig.json`:
 
 ## Testing Infrastructure
 
-**Test Framework:** Vitest 2.1.8 with Cloudflare Workers pool
+**Test Framework:** Vitest 4 with Cloudflare Workers pool
 
 **Current Status:**
 
 - **Test Files:** 11 passed
 - **Total Tests:** 414 passed
 - **Coverage Threshold:** Lines 80%, Functions 80%, Branches 75%, Statements 80%
+
+### Verified Baseline (2026-06-29)
+
+This is the known-good baseline that dependency upgrades and other changes are
+validated against. Always run the **full** suite below — including e2e — before
+merging a dependency bump; the e2e smoke test is what catches routing
+regressions that the unit tests and type-check miss (e.g. an adapter/framework
+upgrade shadowing the homepage `/` route). Reproduce with Node 24 (`.nvmrc`) and
+pnpm 11 (`pnpm install`):
+
+| Check                         | Command               | Result                           |
+| ----------------------------- | --------------------- | -------------------------------- |
+| Unit tests                    | `pnpm test`           | 414/414 passed (11 files)        |
+| Type-check (`astro check`)    | `pnpm type-check`     | 0 errors, 0 warnings (131 files) |
+| Production build (CF adapter) | `pnpm build`          | success                          |
+| Lint (ESLint + Prettier)      | `pnpm lint`           | clean                            |
+| E2E smoke (local boot)        | `pnpm test:e2e:local` | 4/4 passed                       |
+
+`pnpm test:e2e:local` builds the worker, boots it via `wrangler dev`, and runs
+`tests/e2e/smoke.test.ts` against it — asserting `/` (homepage, SSR 200),
+`/api/og`, `/admin/login`, and `/robots.txt`. Run it locally with Node 24; it
+needs `packageManager` (pnpm) to match the installed pnpm or `wrangler dev`'s
+build step fails the corepack version check.
 
 **Test Categories:**
 
@@ -812,8 +835,8 @@ pnpm test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** June 21, 2026
-**Astro Version:** 6.4.6
+**Last Updated:** June 29, 2026
+**Astro Version:** 6.4.8
 **React Version:** 19.2
 **Node Version:** >=24.0.0 (pnpm >=10.0.0)
 
