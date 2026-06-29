@@ -26,9 +26,7 @@ export const GET: APIRoute = async (context) => {
     const page = parseInt(url.searchParams.get('page') || '1', 10);
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
     const sortBy = (url.searchParams.get('sortBy') || 'createdAt') as
-      | 'publishedAt'
-      | 'viewCount'
-      | 'createdAt';
+      'publishedAt' | 'viewCount' | 'createdAt';
     const sortOrder = (url.searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Fetch posts

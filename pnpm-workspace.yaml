@@ -5,6 +5,8 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - astro-eslint-parser@2.0.0
   - eslint-plugin-astro@2.0.0
+  - '@cloudflare/workers-types@4.20260629.1'
+  - lucide-react@1.22.0
 onlyBuiltDependencies:
   - sharp
   - workerd
