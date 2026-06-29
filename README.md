@@ -4,11 +4,11 @@
   <h2>⚡ DevOps Certified & Backend Engineer</h2>
   <p>Infrastructure System Engineer | Cloud & Backend Specialist</p>
   <p>📍 Tokyo, Japan</p>
-  
-  [![Website](https://img.shields.io/badge/Website-heri.life-blue?style=for-the-badge&logo=chrome&logoColor=white)](https://heri.life)
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-heridotlife-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://heri.life/li)
-  [![GitHub](https://img.shields.io/badge/GitHub-heridotlife-181717?style=for-the-badge&logo=github&logoColor=white)](https://heri.life/gh)
-  [![Email](https://img.shields.io/badge/Email-mail@heri.life-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:mail@heri.life)
+
+[![Website](https://img.shields.io/badge/Website-heri.life-blue?style=for-the-badge&logo=chrome&logoColor=white)](https://heri.life)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-heridotlife-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://heri.life/li)
+[![GitHub](https://img.shields.io/badge/GitHub-heridotlife-181717?style=for-the-badge&logo=github&logoColor=white)](https://heri.life/gh)
+[![Email](https://img.shields.io/badge/Email-mail@heri.life-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:mail@heri.life)
 
   <br/>
 
@@ -205,7 +205,7 @@ Visit [heri.life](https://heri.life) to see it in action!
 ## 💻 Current Focus
 
 <div align="center">
-  
+
 **Building modern web applications | DevOps & Backend Engineering**
 
 🚀 Always learning • 🔗 Creating useful tools • 🌟 Sharing knowledge
@@ -226,7 +226,7 @@ I'm always interested in new opportunities and collaborations. Feel free to reac
 ---
 
 <div align="center">
-  
+
 **"Code is poetry written in logic"** ✨
 
 _Thanks for visiting my profile! Feel free to explore my repositories and don't hesitate to get in touch._
