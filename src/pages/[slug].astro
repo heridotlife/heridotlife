@@ -83,6 +83,9 @@ if (categoryRecord) {
 const linkIcon = "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1";
 const arrowIcon = "M9 5l7 7-7 7";
 const backIcon = "M10 19l-7-7m0 0l7-7m-7 7h18";
+// See index.astro: referencing Astro.locals inside a page-level is:inline
+// script attribute breaks Astro 7's renderer; use a frontmatter const.
+const cspNonce = Astro.locals.cspNonce;
 ---
 
 {categoryRecord ? (
@@ -235,7 +238,7 @@ const backIcon = "M10 19l-7-7m0 0l7-7m-7 7h18";
             </div>
         </main>
         
-        <script is:inline nonce={Astro.locals.cspNonce}>
+        <script is:inline nonce={cspNonce}>
             (function() {
                 const btn = document.getElementById('theme-toggle');
                 const sun = document.getElementById('sun-icon');

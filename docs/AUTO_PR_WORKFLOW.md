@@ -71,10 +71,10 @@ ghi9012 Update dependencies
 
 Before merging this PR to `main`, ensure:
 
-- [ ] All tests pass (`pnpm test`)
+- [ ] All tests pass (`bun run test`)
 - [ ] Code has been reviewed
 - [ ] No breaking changes (or properly documented)
-- [ ] Deployment validation passed (`pnpm validate`)
+- [ ] Deployment validation passed (`bun run validate`)
 - [ ] Ready for production deployment
 
 ### 🌐 Deployment Impact
@@ -106,7 +106,7 @@ Merging this PR will trigger:
 ### 1. Keep Develop Stable
 
 - Only merge reviewed and tested code to `develop`
-- Run `pnpm validate` before merging to `develop`
+- Run `bun run validate` before merging to `develop`
 - Ensure all tests pass
 
 ### 2. Review Auto-Created PRs

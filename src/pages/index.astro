@@ -13,6 +13,10 @@ import {
 } from '../data/profile';
 
 const year = new Date().getFullYear();
+// Read the per-request CSP nonce into a local. Referencing `Astro.locals.*`
+// directly inside a page-level `is:inline` script's attribute crashes Astro 7's
+// renderer ("Astro is not defined"); a frontmatter const avoids that.
+const cspNonce = Astro.locals.cspNonce;
 ---
 
 <Layout
@@ -426,7 +430,7 @@ const year = new Date().getFullYear();
   </div>
 </Layout>
 
-<script is:inline nonce={Astro.locals.cspNonce}>
+<script is:inline nonce={cspNonce}>
   const themeToggleButton = document.getElementById('theme-toggle');
   const sunIcon = document.getElementById('sun-icon');
   const moonIcon = document.getElementById('moon-icon');

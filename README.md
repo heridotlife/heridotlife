@@ -131,10 +131,11 @@ This repository contains my personal website and production-ready URL shortener 
 
 **Frontend & Framework:**
 
-- ⚡ **Astro 6** - Modern SSR web framework
+- ⚡ **Astro 7** - Modern SSR web framework
 - 📝 **TypeScript 6** - Type-safe development (strict mode)
 - ⚛️ **React 19.2** - Interactive admin components
 - 🎨 **Tailwind CSS 4** - Utility-first styling
+- 🥟 **Bun 1.3** - Package manager & task runner (Node 24 is the underlying Astro/Vitest runtime)
 
 **Backend & Infrastructure:**
 

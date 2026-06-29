@@ -1,0 +1,17 @@
+# Bun configuration. Replaces the pnpm-specific policy that previously lived in
+# pnpm-workspace.yaml + .npmrc.
+[install]
+# Flat, hoisted node_modules (mirrors the old `.npmrc shamefully-hoist=true` and
+# the react/@types public-hoist patterns). This is Bun's default, set explicitly.
+linker = "hoisted"
+
+# Supply-chain defense (release cooldown): only adopt dependency versions
+# published at least N seconds ago, so freshly compromised releases are filtered
+# at the install layer. Checked during resolution / `bun update`; not re-checked
+# when installing an already-locked version (see oven-sh/bun#30525).
+#
+# Currently DISABLED (0) by decision: the Astro 7 trio and its fresh transitives
+# (astro 7.0.3, @astrojs/cloudflare 14, @astrojs/node 11, @astrojs/markdown-satteri)
+# are all newer than any reasonable window, and we want them now. Re-enable later
+# by setting this to e.g. 1209600 (14 days) once those versions have aged.
+minimumReleaseAge = 0

@@ -30,17 +30,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
 
+      # Node is still required: `bun run` drives the scripts, but Astro
+      # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4

@@ -107,10 +107,10 @@ jobs:
 
           Before merging this PR to `main`, ensure:
 
-          - [ ] All tests pass (`pnpm test`)
+          - [ ] All tests pass (`bun run test`)
           - [ ] Code has been reviewed
           - [ ] No breaking changes (or properly documented)
-          - [ ] Deployment validation passed (`pnpm validate`)
+          - [ ] Deployment validation passed (`bun run validate`)
           - [ ] Ready for production deployment
 
           ### 🌐 Deployment Impact
