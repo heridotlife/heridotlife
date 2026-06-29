@@ -43,7 +43,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^13.7.0",
-    "@astrojs/node": "^10.1.4",
+    "@astrojs/node": "^11.0.0",
     "@astrojs/react": "^6.0.0",
     "@cf-wasm/og": "^0.4.0",
     "@tailwindcss/vite": "^4.3.1",
