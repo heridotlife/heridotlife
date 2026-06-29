@@ -47,7 +47,7 @@
     "@astrojs/react": "^6.0.0",
     "@cf-wasm/og": "^0.4.0",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^6.4.6",
+    "astro": "^7.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.3",
     "lucide-react": "^1.22.0",
