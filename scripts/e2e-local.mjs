@@ -8,8 +8,8 @@
  * e2e suite (tests/e2e) → tear the worker down. Mirrors how CI runs the same
  * suite against the Cloudflare preview, just with a local target.
  *
- * Uses the project-local binaries (node_modules/.bin) so it doesn't depend on a
- * corepack/global pnpm matching the pinned version.
+ * The worker build runs via the current package runner (`bun run build`); the
+ * wrangler/vitest steps use the project-local binaries (node_modules/.bin).
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -59,7 +59,8 @@ const waitForReady = (worker, timeoutMs) =>
 
 async function main() {
   console.log('\n▶ Building worker...');
-  await run(bin('pnpm'), ['build']);
+  // Build via the current runtime's package runner (`bun run build`).
+  await run(process.execPath, ['run', 'build']);
 
   console.log(`\n▶ Booting worker on ${BASE_URL}...`);
   const worker = spawn(bin('wrangler'), ['dev', '--port', PORT], {

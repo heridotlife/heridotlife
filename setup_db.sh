@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # Check if tables exist
-TABLES_EXISTS=$(pnpm wrangler d1 execute D1_db --local --command="SELECT name FROM sqlite_master WHERE type='table' AND name='ShortUrl';" 2>&1 | grep -q "ShortUrl" && echo "yes" || echo "no")
+TABLES_EXISTS=$(bunx wrangler d1 execute D1_db --local --command="SELECT name FROM sqlite_master WHERE type='table' AND name='ShortUrl';" 2>&1 | grep -q "ShortUrl" && echo "yes" || echo "no")
 
 if [ "$TABLES_EXISTS" = "no" ]; then
   echo "📦 Setting up local D1 database..."
   
   # Create schema
   echo "Creating tables..."
-  pnpm wrangler d1 execute D1_db --local --file=./schema.sql
+  bunx wrangler d1 execute D1_db --local --file=./schema.sql
   
   # Import data
   echo "Importing data..."
-  pnpm wrangler d1 execute D1_db --local --file=./import_remote_data.sql
+  bunx wrangler d1 execute D1_db --local --file=./import_remote_data.sql
   
   echo "✅ Database setup complete!"
 else

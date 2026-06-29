@@ -13,7 +13,7 @@
  * Uses the same all-WASM engine as the runtime `/api/og` endpoint
  * (`@cf-wasm/og` = Satori + resvg-wasm), so there is a single OG-rendering
  * stack across build time and the edge. Outputs `src/assets/og.png` and
- * `public/images/og.png`; run `pnpm og:convert` afterwards for the JPEG.
+ * `public/images/og.png`; run `bun run og:convert` afterwards for the JPEG.
  */
 
 /* global URL */
@@ -180,9 +180,9 @@ async function generateOGImage() {
 
     console.log('🎯 Next steps:');
     console.log('1. Convert PNG to JPEG for smaller file size:');
-    console.log('   pnpm run og:convert');
+    console.log('   bun run og:convert');
     console.log('2. Or use the PNG as-is (slightly larger but supports transparency)');
-    console.log('3. Rebuild and deploy: pnpm build && pnpm wrangler deploy\n');
+    console.log('3. Rebuild and deploy: bun run build && bunx wrangler deploy\n');
   } catch (error) {
     console.error('❌ Failed to generate OG image:', error);
     process.exit(1);

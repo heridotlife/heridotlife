@@ -85,7 +85,7 @@ async function main() {
     console.log('🎯 Next steps:');
     console.log('1. Update your layout/pages to use og.jpg instead of og.png');
     console.log('2. Or keep both formats and serve based on browser support');
-    console.log('3. Rebuild and deploy: pnpm build && pnpm wrangler deploy\n');
+    console.log('3. Rebuild and deploy: bun run build && bunx wrangler deploy\n');
   } catch (error) {
     console.error('\n❌ Conversion failed:', error.message);
     process.exit(1);
