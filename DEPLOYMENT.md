@@ -41,13 +41,15 @@ Updates deployed to all routes:
 6. Select repository: `heridotlife/heridotlife`
 7. Configure build settings:
    - **Production branch**: `main`
-   - **Build command**: `bun install && bun run build`
+   - **Build command**: `bun run build`
    - **Build output directory**: `dist`
 
-   > **Bun note:** Cloudflare Workers Builds does not auto-run `bun install` for the
-   > text-based `bun.lock`, so the build command must run it explicitly
-   > (`bun install && bun run build`). Astro/Vite then build under Node, which the
-   > Cloudflare build image provides alongside Bun.
+   > **Bun note:** Cloudflare detects `bun.lock` and runs the install step
+   > automatically (`bun install --frozen-lockfile`), so the **build command** is
+   > just `bun run build`. Astro/Vite then build under Node, which the Cloudflare
+   > build image provides alongside Bun. If you ever see
+   > `No preset version installed for command pnpm`, the dashboard build command is
+   > still the old `pnpm run build` — change it to `bun run build`.
 
 ### Step 2: Configure Build Settings
 
@@ -56,7 +58,7 @@ Set these in the Cloudflare dashboard:
 **Build configuration:**
 
 ```yaml
-Build command: bun install && bun run build
+Build command: bun run build
 Root directory: /
 ```
 
@@ -205,7 +207,7 @@ Merge PR to main
     ↓
 Cloudflare Builds triggered
     ↓
-Build runs (bun install && bun run build)
+Build runs (bun install --frozen-lockfile, then bun run build)
     ↓
 Wrangler deploys
     ↓
