@@ -2,18 +2,22 @@
   "name": "heridotlife",
   "type": "module",
   "version": "1.0.0",
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "bun@1.3.14",
   "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=11.0.0"
+    "bun": ">=1.3.0"
   },
+  "trustedDependencies": [
+    "sharp",
+    "workerd",
+    "esbuild"
+  ],
   "scripts": {
     "dev": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro dev",
-    "dev:wrangler": "./setup_db.sh && pnpm build && wrangler dev",
+    "dev:wrangler": "./setup_db.sh && bun run build && wrangler dev",
     "dev:wrangler:skip-build": "./setup_db.sh && wrangler dev",
     "start": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro dev",
-    "prebuild": "node scripts/generate-seo-files.mjs",
-    "build": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc node scripts/build-wrapper.mjs",
+    "prebuild": "bun scripts/generate-seo-files.mjs",
+    "build": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc bun scripts/build-wrapper.mjs",
     "preview": "wrangler dev",
     "deploy": "wrangler deploy",
     "validate": "./validate-deploy.sh",
@@ -24,7 +28,7 @@
     "db:migrate": "wrangler d1 execute D1_db --file=./schema.sql",
     "db:migrate:local": "wrangler d1 execute D1_db --local --file=./schema.sql",
     "db:import": "wrangler d1 execute D1_db --local --file=./import_remote_data.sql",
-    "db:setup": "pnpm db:migrate:local && pnpm db:import",
+    "db:setup": "bun run db:migrate:local && bun run db:import",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -32,26 +36,25 @@
     "test:unit": "vitest run",
     "test:integration": "vitest run -c vitest.integration.config.ts",
     "test:e2e": "vitest run -c vitest.e2e.config.ts",
-    "test:e2e:local": "node scripts/e2e-local.mjs",
-    "test:local": "pnpm run test:unit && pnpm run test:integration && pnpm run test:e2e:local",
+    "test:e2e:local": "bun scripts/e2e-local.mjs",
+    "test:local": "bun run test:unit && bun run test:integration && bun run test:e2e:local",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write .",
     "type-check": "CLOUDFLARE_VITE_WRANGLER_CONFIG_PATH=./wrangler.vite.jsonc astro check",
-    "og:generate": "node scripts/generate-og-image.mjs",
-    "og:convert": "node scripts/convert-og-to-jpeg.mjs"
+    "og:generate": "bun scripts/generate-og-image.mjs",
+    "og:convert": "bun scripts/convert-og-to-jpeg.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
-    "@astrojs/cloudflare": "^13.7.0",
-    "@astrojs/node": "^10.1.4",
+    "@astrojs/cloudflare": "^14.0.1",
+    "@astrojs/node": "^11.0.0",
     "@astrojs/react": "^6.0.0",
     "@cf-wasm/og": "^0.4.0",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^6.4.6",
+    "astro": "^7.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.3",
     "lucide-react": "^1.22.0",
-    "pnpm": "^11.9.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-icons": "^5.6.0",
@@ -62,7 +65,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "0.16.20",
     "@cloudflare/workers-types": "4.20260629.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.2.8",
@@ -85,5 +87,13 @@
     "typescript-eslint": "^8.62.0",
     "vitest": "4.1.9",
     "wrangler": "4.105.0"
+  },
+  "overrides": {
+    "yaml": "2.8.4",
+    "js-yaml": "^4.2.0",
+    "undici": "^7.28.0",
+    "esbuild": "^0.28.1",
+    "@babel/core": "^7.29.6",
+    "vite@7": "^7.3.5"
   }
 }

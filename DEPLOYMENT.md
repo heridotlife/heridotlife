@@ -19,8 +19,8 @@ Push to main branch
 Cloudflare detects change
     ↓
 Cloudflare Builds runs:
-  - pnpm install
-  - pnpm build
+  - bun install
+  - bun run build
   - wrangler deploy
     ↓
 Updates deployed to all routes:
@@ -41,8 +41,15 @@ Updates deployed to all routes:
 6. Select repository: `heridotlife/heridotlife`
 7. Configure build settings:
    - **Production branch**: `main`
-   - **Build command**: `pnpm build`
+   - **Build command**: `bun run build`
    - **Build output directory**: `dist`
+
+   > **Bun note:** Cloudflare detects `bun.lock` and runs the install step
+   > automatically (`bun install --frozen-lockfile`), so the **build command** is
+   > just `bun run build`. Astro/Vite then build under Node, which the Cloudflare
+   > build image provides alongside Bun. If you ever see
+   > `No preset version installed for command pnpm`, the dashboard build command is
+   > still the old `pnpm run build` — change it to `bun run build`.
 
 ### Step 2: Configure Build Settings
 
@@ -51,7 +58,7 @@ Set these in the Cloudflare dashboard:
 **Build configuration:**
 
 ```yaml
-Build command: pnpm build
+Build command: bun run build
 Root directory: /
 ```
 
@@ -81,7 +88,7 @@ Before pushing to `main`, validate your `wrangler.jsonc`:
 
 ```bash
 # Dry-run deployment (validates config, doesn't deploy)
-pnpm build
+bun run build
 wrangler deploy --dry-run
 
 # Output shows what would be deployed:
@@ -165,15 +172,15 @@ Bindings:
 2. **Make changes and validate locally**:
 
    ```bash
-   pnpm dev:wrangler  # Test locally
-   pnpm test          # Run tests
-   pnpm lint          # Check code quality
+   bun run dev:wrangler  # Test locally
+   bun run test          # Run tests
+   bun run lint          # Check code quality
    ```
 
 3. **Validate deployment config**:
 
    ```bash
-   pnpm build
+   bun run build
    wrangler deploy --dry-run  # Validates without deploying
    ```
 
@@ -200,7 +207,7 @@ Merge PR to main
     ↓
 Cloudflare Builds triggered
     ↓
-Build runs (pnpm install && pnpm build)
+Build runs (bun install --frozen-lockfile, then bun run build)
     ↓
 Wrangler deploys
     ↓
@@ -238,13 +245,13 @@ Always validate your config before pushing to `main`:
 
 ```bash
 # Step 1: Validate TypeScript
-pnpm type-check
+bun run type-check
 
 # Step 2: Run tests
-pnpm test
+bun run test
 
 # Step 3: Build
-pnpm build
+bun run build
 
 # Step 4: Validate wrangler config (dry-run)
 wrangler deploy --dry-run
@@ -320,8 +327,8 @@ For critical production fixes:
 
    ```bash
    # Make changes
-   pnpm test
-   pnpm build
+   bun run test
+   bun run build
    wrangler deploy --dry-run  # Validate
    ```
 

@@ -78,8 +78,8 @@ async function main() {
   if (buildSucceeded) {
     console.log('\n✅ Build output is valid, running post-build fixes...\n');
 
-    // Run post-build script
-    const postBuildCode = await runCommand('node', ['scripts/post-build-fix-assets.mjs']);
+    // Run post-build script under the current runtime (Bun or Node)
+    const postBuildCode = await runCommand(process.execPath, ['scripts/post-build-fix-assets.mjs']);
 
     if (postBuildCode !== 0) {
       console.error('\n❌ Post-build script failed');

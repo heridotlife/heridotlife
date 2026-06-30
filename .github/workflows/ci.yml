@@ -18,26 +18,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
 
+      # Node is still required: `bun run` drives the scripts, but Astro
+      # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Run ESLint
-        run: pnpm eslint .
+        run: bunx eslint .
 
       - name: Run Prettier check
-        run: pnpm prettier --check .
+        run: bunx prettier --check .
 
       - name: Run type check
-        run: pnpm type-check
+        run: bun run type-check
 
   test:
     name: Test
@@ -47,23 +50,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
 
+      # Node is still required: `bun run` drives the scripts, but Astro
+      # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Run unit tests
-        run: pnpm test
+        run: bun run test
 
       - name: Run tests with coverage
-        run: pnpm test:coverage
+        run: bun run test:coverage
         continue-on-error: true
 
       - name: Upload coverage reports to Codecov
@@ -91,23 +97,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
 
+      # Node is still required: `bun run` drives the scripts, but Astro
+      # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       # Runs the data layer against a real D1 (miniflare/workerd) — no Astro
       # build required, so this is safe in CI (unlike e2e, which needs the
       # built worker and runs against the Cloudflare preview instead).
       - name: Run integration tests
-        run: pnpm test:integration
+        run: bun run test:integration
 
   e2e-local:
     name: E2E (local boot)
@@ -117,26 +126,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
 
+      # Node is still required: `bun run` drives the scripts, but Astro
+      # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       # Per-PR e2e feedback on main & develop without waiting for a preview
       # deploy: scripts/e2e-local.mjs builds the worker, boots it with
       # `wrangler dev`, runs the read-only HTTP smoke, and tears it down.
-      # `pnpm build` goes through build-wrapper.mjs, which tolerates the
+      # `bun run build` goes through build-wrapper.mjs, which tolerates the
       # Cloudflare adapter's post-build ESM-loader warning (the dist output is
       # already written), so the build succeeds in CI.
       - name: Build, boot worker, and run e2e smoke
-        run: pnpm test:e2e:local
+        run: bun run test:e2e:local
 
   # NOTE: there is no standalone build job — the e2e-local job above exercises
   # the build. A separate post-deploy e2e smoke runs against the Cloudflare
