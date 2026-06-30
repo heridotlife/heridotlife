@@ -27,7 +27,7 @@ We actively maintain and provide security updates for the following versions:
 
 ### Security Architecture
 
-- **Cloudflare Pages**: Leverages Cloudflare's security features and DDoS protection
+- **Cloudflare Workers**: Leverages Cloudflare's edge security features and DDoS protection
 - **D1 Database**: Prepared statements prevent SQL injection
 - **KV Storage**: Secure key-value storage for caching and sessions
 - **Environment Isolation**: Proper separation between development and production environments
@@ -150,13 +150,15 @@ Please include the following information in your security report:
 
 ### Security Headers
 
-The application implements the following security headers:
+The application sets the following security headers in `src/middleware.ts`:
 
-- `Strict-Transport-Security` (HSTS)
+- `Strict-Transport-Security` (HSTS, applied on HTTPS requests)
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
 - `X-XSS-Protection: 1; mode=block`
 - `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: geolocation=(), microphone=(), camera=()`
+- `Content-Security-Policy` (nonce-based, no `unsafe-eval`)
 
 ## Security Scanning and Monitoring
 
@@ -200,5 +202,5 @@ We appreciate the security research community and acknowledge contributors who h
 
 ---
 
-**Last Updated**: October 12, 2025
+**Last Updated**: June 30, 2026
 **Version**: 1.0

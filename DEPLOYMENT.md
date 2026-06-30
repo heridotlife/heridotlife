@@ -124,14 +124,17 @@ Bindings:
 ```jsonc
 {
   "name": "heridotlife",
+  "compatibility_date": "2026-04-21",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
   "routes": [
     { "pattern": "heri.life", "custom_domain": true },
     { "pattern": "www.heri.life", "custom_domain": true },
   ],
-  "main": "./dist/_worker.js/index.js",
+  // Astro Cloudflare adapter (v6+) entry point; static assets live in dist/client
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "assets": {
-    "directory": "./dist",
+    "directory": "./dist/client",
     "binding": "ASSETS",
   },
   "d1_databases": [
@@ -156,8 +159,13 @@ Bindings:
     "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.workers.dev,*.heridotlife.pages.dev",
     "CANONICAL_DOMAIN": "heri.life",
   },
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true, "persist": true },
+  },
 }
 ```
+
+> The current `wrangler.jsonc` is the source of truth — this snippet is illustrative.
 
 ## Workflow
 
@@ -394,7 +402,7 @@ wrangler deploy --dry-run 2>&1 | grep -i error
 
 ---
 
-**Last Updated**: November 2, 2025
+**Last Updated**: June 30, 2026
 **Deployment Method**: Cloudflare Workers Builds (Native Git Integration)
 **Worker Name**: `heridotlife`
 **Staging URL**: `heridotlife.workers.dev`

@@ -269,7 +269,7 @@ CacheKeys.adminStats(); // "admin:stats:overview"
 
 ```json
 "vars": {
-  "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.pages.dev",
+  "TRUSTED_HOSTS": "heri.life,www.heri.life,*.heridotlife.workers.dev,*.heridotlife.pages.dev",
   "CANONICAL_DOMAIN": "heri.life"
 }
 ```
@@ -396,7 +396,7 @@ src/
 │   ├── cache-security.ts    # Security event logging
 │   ├── auth.ts              # JWT session management
 │   ├── security.ts          # Host validation
-│   ├── rate-limiter.ts      # Token bucket rate limiting
+│   ├── rate-limiter.ts      # Sliding/fixed window rate limiting
 │   ├── honeypot.ts          # Honeypot detection patterns
 │   ├── validations.ts       # Zod validation schemas
 │   ├── utils.ts             # Helper utilities
@@ -472,8 +472,9 @@ src/
 ### Configuration Files
 
 - `astro.config.mjs` - Astro configuration with Cloudflare adapter
-- `wrangler.toml` - Cloudflare bindings (D1, KV) and environment variables
-- `tailwind.config.cjs` - Tailwind CSS configuration
+- `wrangler.jsonc` - Cloudflare bindings (D1, KV) and environment variables
+- `wrangler.vite.jsonc` - Wrangler config used by the Vite plugin during dev/build/type-check
+- Tailwind CSS 4 is configured via the `@tailwindcss/vite` plugin in `astro.config.mjs` (there is no standalone `tailwind.config.*` file)
 - `tsconfig.json` - TypeScript strict mode configuration
 - `schema.sql` - Database schema with indexes
 - `eslint.config.js` - ESLint rules (TypeScript + Astro)
@@ -840,7 +841,7 @@ bun run test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** June 29, 2026
+**Last Updated:** June 30, 2026
 **Astro Version:** 7.0.3
 **React Version:** 19.2
 **Package Manager:** Bun 1.3 (`bun.lock`); Node >=24 still required as the Astro/Vitest runtime
