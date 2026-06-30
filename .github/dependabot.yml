@@ -1,22 +1,20 @@
 version: 2
 updates:
-  # Enable version updates for npm dependencies
-  - package-ecosystem: 'npm'
+  # Enable version updates for Bun dependencies (package.json + bun.lock).
+  # NOTE: Dependabot's Bun ecosystem performs VERSION updates only — it does not
+  # support security updates (see GitHub's supported-ecosystems docs). Using the
+  # 'bun' ecosystem (not 'npm') is required so Dependabot regenerates bun.lock;
+  # the 'npm' ecosystem leaves bun.lock stale and breaks --frozen-lockfile CI.
+  - package-ecosystem: 'bun'
     directory: '/'
     schedule:
-      interval: 'daily' # Check daily for security updates
+      interval: 'daily'
       time: '09:00'
     open-pull-requests-limit: 15
-    # Prioritize security updates
+    # Allow updates for all dependency types
     allow:
       - dependency-type: 'all'
     groups:
-      # Group security updates with high priority
-      security-updates:
-        patterns:
-          - '*'
-        update-types:
-          - 'security'
       # Group Astro and related packages
       astro:
         patterns:
@@ -40,7 +38,7 @@ updates:
     labels:
       - 'dependencies'
       - 'automated'
-    # Auto-approve security patches for known safe packages
+    # Request review from the maintainer on dependency PRs
     reviewers:
       - 'heridotlife'
     commit-message:
