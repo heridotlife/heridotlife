@@ -1,5 +1,5 @@
 -- Test Blog Post Data
--- Run: npx wrangler d1 execute heridotlife --local --file=migrations/004_seed_test_blog_post.sql
+-- Run: bunx wrangler d1 execute heridotlife --local --file=migrations/004_seed_test_blog_post.sql
 
 -- Insert a test blog post
 INSERT INTO BlogPost (
