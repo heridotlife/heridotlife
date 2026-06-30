@@ -42,14 +42,16 @@ The workflow will:
 
 The workflow will:
 
-1. ✅ Create a new PR from `develop` to `main`
+1. ✅ Create a new PR from `develop` to `main` (title: `Release: Develop → Main`)
 2. ✅ Set it as **DRAFT** (requires manual approval)
-3. ✅ Add labels: `release`, `auto-pr`
-4. ✅ Include:
+3. ✅ Include:
    - List of recent commits
    - Pre-merge checklist
    - Deployment impact summary
    - Review information
+
+> Labels are not applied automatically. To add them, append a `--label` flag to the
+> `gh pr create` command in the workflow (see [Customization](#customization)).
 
 ## Example PR Body
 
@@ -196,9 +198,7 @@ develop → main (reviewed and merged)
 ### Pull Requests Tab
 
 1. Go to **Pull Requests** tab
-2. Look for PR with labels:
-   - `release`
-   - `auto-pr`
+2. Look for the draft PR titled **Release: Develop → Main** (base `main`, head `develop`)
 3. Check if it's a draft or ready for review
 
 ## Troubleshooting
@@ -353,6 +353,6 @@ Required setting:
 
 ---
 
-**Last Updated**: November 2, 2025
+**Last Updated**: June 30, 2026
 **Workflow Version**: 1.0
 **Status**: Active

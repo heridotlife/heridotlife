@@ -2,8 +2,7 @@ dist/
 .astro/
 node_modules/
 .wrangler/
-pnpm-lock.yaml
-package-lock.json
+bun.lock
 
 # Prettier has issues with complex Astro files
 src/pages/\[slug\].astro

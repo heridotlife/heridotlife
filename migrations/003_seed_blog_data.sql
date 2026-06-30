@@ -1,5 +1,5 @@
 -- Seed initial blog categories and tags
--- Run: npx wrangler d1 execute heridotlife --local --file=migrations/003_seed_blog_data.sql
+-- Run: bunx wrangler d1 execute heridotlife --local --file=migrations/003_seed_blog_data.sql
 
 -- Insert categories
 INSERT INTO BlogCategory (name, slug, description, color) VALUES
