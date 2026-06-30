@@ -58,19 +58,6 @@ When debugging a blank/empty page after dependency upgrades (Astro/Vite/Cloudfla
 
 If a regression appears only with Cloudflare bindings, prioritize Worker adapter/config and middleware assumptions over component-level changes.
 
-## Branch Comparison: copilot/debug-empty-page-issue
-
-Use non-destructive commands to compare with the known debug branch:
-
-- Ensure refs are current: `git fetch origin --prune`.
-- View changed files: `git diff --name-status HEAD..origin/copilot/debug-empty-page-issue`.
-- Inspect key config diffs first:
-  - `git diff HEAD..origin/copilot/debug-empty-page-issue -- astro.config.mjs wrangler.vite.jsonc wrangler.jsonc package.json`
-- Inspect app-level diffs next:
-  - `git diff HEAD..origin/copilot/debug-empty-page-issue -- src/middleware.ts src/pages src/layouts`
-
-Do not run destructive git commands unless explicitly requested.
-
 ## Change Hygiene
 
 - Keep changes scoped to the user request.
