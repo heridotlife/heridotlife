@@ -1,0 +1,9 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/heridotlife/heridotlife/security/advisories/new
+    about: Please report security issues privately via a GitHub Security Advisory, not a public issue.
+  - name: 💬 Question or general contact
+    url: mailto:mail@heri.life
+    about: For questions or anything that isn't a bug or feature request, email me.

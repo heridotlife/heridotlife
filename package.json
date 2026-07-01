@@ -2,6 +2,27 @@
   "name": "heridotlife",
   "type": "module",
   "version": "1.0.0",
+  "private": true,
+  "description": "Personal website, portfolio, and URL shortener with a blog, built on Astro 7 and deployed to Cloudflare Workers (D1 + KV).",
+  "license": "UNLICENSED",
+  "author": "Heri Rusmanto <mail@heri.life> (https://heri.life)",
+  "homepage": "https://heri.life",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heridotlife/heridotlife.git"
+  },
+  "bugs": {
+    "url": "https://github.com/heridotlife/heridotlife/issues"
+  },
+  "keywords": [
+    "astro",
+    "cloudflare-workers",
+    "url-shortener",
+    "portfolio",
+    "blog",
+    "d1",
+    "kv"
+  ],
   "packageManager": "bun@1.3.14",
   "engines": {
     "bun": ">=1.3.0"

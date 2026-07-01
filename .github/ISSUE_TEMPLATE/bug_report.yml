@@ -1,0 +1,89 @@
+---
+name: Bug Report
+description: Report something that isn't working as expected
+title: '[BUG] '
+labels: ['bug']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report!
+
+        ⚠️ **Do not report security vulnerabilities here** — please follow
+        [SECURITY.md](https://github.com/heridotlife/heridotlife/blob/main/SECURITY.md).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: 'When I do X, Y happens instead of Z...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can this be reliably reproduced?
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. See error
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages or screenshots if helpful.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the project is affected?
+      options:
+        - URL shortener / redirects
+        - Blog
+        - Admin dashboard
+        - Authentication
+        - API
+        - Build / deploy / tooling
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Where did you see this? (browser, OS, local vs. production, etc.)
+      placeholder: 'e.g., Chrome 126 on macOS, production (heri.life)'
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Anything else that might help.
+    validations:
+      required: false
