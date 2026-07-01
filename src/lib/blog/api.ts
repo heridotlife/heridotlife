@@ -23,7 +23,11 @@ import type {
 import { buildFtsMatchQuery, buildHighlightedSnippet, tokenizeSearchQuery } from './utils';
 
 /**
- * Get all published blog posts with pagination and filtering
+ * Get blog posts with pagination and filtering.
+ *
+ * Without a `status` option this returns published posts only (the public
+ * listings). The admin list passes `status` to see drafts/archived posts, or
+ * `'all'` for every post regardless of status.
  */
 export async function getAllPublishedPosts(
   db: D1Database,
@@ -34,6 +38,7 @@ export async function getAllPublishedPosts(
     limit = 10,
     categorySlug,
     tagSlug,
+    status,
     sortBy = 'publishedAt',
     sortOrder = 'desc',
   } = options;
@@ -41,8 +46,17 @@ export async function getAllPublishedPosts(
   const offset = (page - 1) * limit;
 
   // Build WHERE clause
-  let whereClause = 'WHERE bp.isPublished = 1';
+  let whereClause: string;
   const bindings: (string | number)[] = [];
+
+  if (status === 'all') {
+    whereClause = 'WHERE 1 = 1';
+  } else if (status) {
+    whereClause = 'WHERE bp.status = ?';
+    bindings.push(status);
+  } else {
+    whereClause = 'WHERE bp.isPublished = 1';
+  }
 
   if (categorySlug) {
     whereClause += `
@@ -79,10 +93,11 @@ export async function getAllPublishedPosts(
   // Get posts
   const orderByClause = `ORDER BY bp.${sortBy} ${sortOrder.toUpperCase()}`;
   const postsQuery = `
-    SELECT 
+    SELECT
       bp.id, bp.slug, bp.title, bp.excerpt,
       bp.featuredImage, bp.featuredImageAlt,
-      bp.publishedAt, bp.readTime, bp.viewCount
+      bp.status, bp.isPublished,
+      bp.publishedAt, bp.createdAt, bp.readTime, bp.viewCount
     FROM BlogPost bp
     ${whereClause}
     ${orderByClause}

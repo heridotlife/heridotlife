@@ -58,7 +58,10 @@ export interface BlogPostListItem extends EntityWithId {
   excerpt: string;
   featuredImage: string | null;
   featuredImageAlt: string | null;
+  status: string;
+  isPublished: boolean;
   publishedAt: number | null;
+  createdAt: number;
   readTime: number;
   viewCount: number;
   categories: BlogCategory[];
@@ -79,7 +82,11 @@ export interface BlogListResponse {
 export interface BlogQueryOptions extends QueryOptions {
   categorySlug?: string;
   tagSlug?: string;
-  status?: 'draft' | 'published' | 'archived';
+  /**
+   * Filter by post status. Omitted → published posts only (public listings);
+   * 'all' → no status filter (admin listing).
+   */
+  status?: 'draft' | 'published' | 'archived' | 'all';
   authorId?: string;
 }
 
@@ -117,7 +124,6 @@ export interface CreateBlogPostInput {
   content: string;
   featuredImage?: string;
   featuredImageAlt?: string;
-  authorId: string;
   metaTitle?: string;
   metaDescription?: string;
   ogImage?: string;

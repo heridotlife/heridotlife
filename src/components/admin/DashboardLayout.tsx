@@ -162,7 +162,12 @@ function DashboardLayout({ children, pathname }: { children: React.ReactNode; pa
         {/* Mobile Slide-out Menu */}
         <div
           className={`md:hidden mobile-menu absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-lg transform transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+            isMobileMenuOpen
+              ? 'translate-y-0 opacity-100'
+              : // pointer-events-none/invisible: while closed, the menu still overlaps
+                // the nav bar (translated up by its own height), so without these the
+                // invisible Logout button swallows taps meant for the burger button.
+                '-translate-y-full opacity-0 pointer-events-none invisible'
           }`}
         >
           <div className="px-4 py-4 space-y-2">
