@@ -81,7 +81,7 @@ export default function CategoriesPage() {
     if (!editName.trim()) return;
 
     try {
-      const response = await fetch(`/api/admin/categories/id?id=${id}`, {
+      const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: editName.trim() }),
@@ -111,7 +111,7 @@ export default function CategoriesPage() {
 
     try {
       setDeleting(id);
-      const response = await fetch(`/api/admin/categories/id?id=${id}`, {
+      const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'DELETE',
       });
 

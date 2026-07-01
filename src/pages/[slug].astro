@@ -74,8 +74,13 @@ if (categoryRecord) {
         return new Response('This short URL has expired', { status: 410 });
     }
 
-    // Update click count (this will invalidate the URL cache)
-    await db.incrementClickCount(slug);
+    // Record the click without blocking the redirect: the D1 write runs via
+    // waitUntil after the 302 is sent. Falls back to fire-and-forget if the
+    // execution context is unavailable (e.g. some local dev modes).
+    const clickWrite = db.incrementClickCount(slug).catch((error) => {
+        console.error('Failed to record click for', slug, error);
+    });
+    Astro.locals.cfContext?.waitUntil(clickWrite);
     return Astro.redirect(shortUrlRecord.originalUrl, 302);
 }
 

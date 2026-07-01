@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth';
 import { updateUrlSchema } from '../../../../lib/validations';
-import { D1Helper, toBool, toDate } from '../../../../lib/d1';
+import { toBool, toDate } from '../../../../lib/d1';
+import { createCachedD1Helper } from '../../../../lib/cached-d1';
 import { env } from 'cloudflare:workers';
 
 // GET URL by ID
@@ -19,7 +20,11 @@ export const GET: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid URL ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
     const urlData = await db.findShortUrlById(urlId);
 
     if (!urlData) {
@@ -74,7 +79,11 @@ export const PUT: APIRoute = async (context) => {
 
     const { slug, originalUrl, title, categoryIds, expiresAt } = validation.data;
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
 
     // Check if slug already exists (excluding current URL)
     const existingSlug = await db.findShortUrl(slug);
@@ -130,7 +139,11 @@ export const DELETE: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid URL ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
     await db.deleteShortUrl(urlId);
 
     return new Response(null, { status: 204 });
