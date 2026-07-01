@@ -1,0 +1,32 @@
+Copyright (c) 2026 Heri Rusmanto. All rights reserved.
+
+This source code is made publicly available for reference, evaluation, and
+portfolio/demonstration purposes only. It is NOT open-source software.
+
+No license or permission is granted to any person to use, copy, modify, merge,
+publish, distribute, sublicense, host, or sell copies of this software or any
+portion of it, in whole or in part, for commercial or non-commercial purposes,
+without the prior written permission of the copyright holder.
+
+You MAY:
+  - View and read the source code.
+  - Fork the repository on GitHub for the sole purpose of proposing changes
+    back to this project via a pull request.
+
+You MAY NOT:
+  - Deploy, run, or host this software (or any derivative) as your own site or
+    service.
+  - Reuse the code, in whole or in part, in other projects.
+  - Redistribute the code outside of GitHub's fork / pull-request mechanism.
+
+Any contribution intentionally submitted for inclusion in this project (e.g.,
+via pull request) is provided to the copyright holder under these same terms
+for use within this project.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

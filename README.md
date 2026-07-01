@@ -182,8 +182,18 @@ Visit [heri.life](https://heri.life) to see it in action!
 
 ### 📚 Documentation
 
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to report issues and propose changes
+- **[CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)** - Community guidelines
 - **[SECURITY.md](./SECURITY.md)** - Security policy and vulnerability reporting
 - **[schema.sql](./schema.sql)** - Database schema with indexes
+
+### 📄 License
+
+Copyright © 2026 Heri Rusmanto. **All rights reserved.**
+
+This source is published for reference and portfolio purposes and is **not
+open-source software** — it is not licensed for reuse in other projects. See
+[LICENSE](./LICENSE) for the full terms.
 
 ---
 
