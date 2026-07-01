@@ -1,15 +1,15 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { createSession, verifyPassword } from '../../../lib/auth';
 import { loginSchema } from '../../../lib/validations';
-import { RateLimiter } from '../../../lib/rate-limiter';
+import { KVRateLimiter } from '../../../lib/rate-limiter';
 
-// Create a dedicated rate limiter for login attempts
-// More restrictive than general API rate limiting
-const loginRateLimiter = new RateLimiter({
-  maxRequests: 5, // Only 5 login attempts
-  windowMs: 300000, // Per 5 minutes
-  slidingWindow: true,
-});
+// Login attempts are limited via KV so the counter survives isolate recycling
+// and is shared across PoPs — an in-memory limiter on Workers is per-isolate
+// and provides little real brute-force protection. Stored in the SESSION
+// namespace (not heridotlife_kv) so the admin "clear cache" tool can't reset it.
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS = 300000; // 5 minutes
 
 export const POST: APIRoute = async (context) => {
   try {
@@ -20,10 +20,20 @@ export const POST: APIRoute = async (context) => {
       context.clientAddress ||
       'unknown';
 
+    const loginRateLimiter = new KVRateLimiter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.SESSION as any,
+      {
+        maxRequests: LOGIN_MAX_ATTEMPTS,
+        windowMs: LOGIN_WINDOW_MS,
+        keyPrefix: 'ratelimit:login',
+      }
+    );
+
     // Check rate limit BEFORE processing
-    if (loginRateLimiter.isRateLimited(clientIp)) {
-      const resetTime = loginRateLimiter.getResetTime(clientIp);
-      const resetInSeconds = Math.ceil(resetTime / 1000);
+    const rateLimit = await loginRateLimiter.check(clientIp);
+    if (rateLimit.limited) {
+      const resetInSeconds = Math.ceil(rateLimit.resetIn / 1000);
 
       console.warn(`[Security] Login rate limit exceeded for IP: ${clientIp}`);
 
@@ -36,9 +46,9 @@ export const POST: APIRoute = async (context) => {
           status: 429,
           headers: {
             'Retry-After': resetInSeconds.toString(),
-            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Limit': LOGIN_MAX_ATTEMPTS.toString(),
             'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(Date.now() + resetTime).toISOString(),
+            'X-RateLimit-Reset': new Date(Date.now() + rateLimit.resetIn).toISOString(),
           },
         }
       );
@@ -67,7 +77,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Successful login - reset rate limit for this IP
-    loginRateLimiter.reset(clientIp);
+    await loginRateLimiter.reset(clientIp);
 
     await createSession(context);
 

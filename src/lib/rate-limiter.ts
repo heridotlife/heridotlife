@@ -258,6 +258,94 @@ export class RateLimiter {
 }
 
 /**
+ * KV-backed rate limiter for security-critical endpoints (e.g. login).
+ *
+ * The in-memory RateLimiter above only lives inside a single Workers isolate:
+ * limits silently reset whenever the isolate is recycled, and requests served
+ * by other isolates/PoPs never see each other's counts. That is fine for
+ * best-effort abuse damping on cache operations, but not for brute-force
+ * protection. This variant persists the counter in KV so it survives isolate
+ * recycling and is shared globally.
+ *
+ * Caveat: KV is eventually consistent (~60s cross-PoP propagation), so a
+ * determined attacker rotating PoPs can briefly exceed the limit. This is
+ * still a hard improvement over per-isolate memory; exact global counting
+ * would require a Durable Object or Cloudflare's native rate limiting.
+ */
+export interface KVRateLimiterConfig {
+  /** Maximum number of requests allowed in the time window */
+  maxRequests: number;
+  /** Time window in milliseconds */
+  windowMs: number;
+  /** Prefix for KV keys, e.g. 'ratelimit:login' */
+  keyPrefix: string;
+}
+
+interface KVRateLimitEntry {
+  count: number;
+  firstAttempt: number;
+}
+
+export class KVRateLimiter {
+  constructor(
+    private kv: import('@cloudflare/workers-types').KVNamespace,
+    private config: KVRateLimiterConfig
+  ) {}
+
+  /**
+   * Check the limit for an identifier and record this attempt (fixed window).
+   */
+  async check(identifier: string): Promise<RateLimitStatus> {
+    const now = Date.now();
+    const key = this.key(identifier);
+    const entry = await this.kv.get<KVRateLimitEntry>(key, 'json');
+
+    if (!entry || now - entry.firstAttempt > this.config.windowMs) {
+      // First attempt of a new window
+      await this.put(key, { count: 1, firstAttempt: now });
+      return {
+        limited: false,
+        remaining: this.config.maxRequests - 1,
+        resetIn: this.config.windowMs,
+        count: 1,
+      };
+    }
+
+    const resetIn = Math.max(0, this.config.windowMs - (now - entry.firstAttempt));
+
+    if (entry.count >= this.config.maxRequests) {
+      return { limited: true, remaining: 0, resetIn, count: entry.count };
+    }
+
+    // This attempt is allowed (entry.count < maxRequests above); record it.
+    const count = entry.count + 1;
+    await this.put(key, { count, firstAttempt: entry.firstAttempt });
+    return {
+      limited: false,
+      remaining: Math.max(0, this.config.maxRequests - count),
+      resetIn,
+      count,
+    };
+  }
+
+  /** Clear the limit for an identifier (e.g. after a successful login). */
+  async reset(identifier: string): Promise<void> {
+    await this.kv.delete(this.key(identifier));
+  }
+
+  private key(identifier: string): string {
+    return `${this.config.keyPrefix}:${identifier}`;
+  }
+
+  private async put(key: string, entry: KVRateLimitEntry): Promise<void> {
+    // KV enforces a minimum expirationTtl of 60 seconds; keep entries for the
+    // full window so an expired-but-present entry can never extend a limit.
+    const ttl = Math.max(60, Math.ceil(this.config.windowMs / 1000));
+    await this.kv.put(key, JSON.stringify(entry), { expirationTtl: ttl });
+  }
+}
+
+/**
  * Create a rate limiter with preset configurations
  */
 export const createRateLimiters = () => ({

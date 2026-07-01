@@ -155,7 +155,6 @@ The application sets the following security headers in `src/middleware.ts`:
 - `Strict-Transport-Security` (HSTS, applied on HTTPS requests)
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
-- `X-XSS-Protection: 1; mode=block`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: geolocation=(), microphone=(), camera=()`
 - `Content-Security-Policy` (nonce-based, no `unsafe-eval`)

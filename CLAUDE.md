@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Cache:** Cloudflare KV (multi-tier strategy)
 - **Deployment:** Cloudflare Workers with Workers Assets
 - **Authentication:** JWT-based sessions with HTTP-only cookies
-- **Testing:** Vitest 4 (414 tests passing)
+- **Testing:** Vitest 4 (422 unit tests passing)
 - **Image Optimization:** Cloudflare Image Resizing (edge optimization)
 - **Toolchain:** **Bun** is the package manager (`bun.lock`) and task runner
   (`bun run …`). Node (`.nvmrc` → 24) is still required as the runtime that Astro
@@ -112,8 +112,7 @@ GET /tech
   → CachedD1Helper.findShortUrl("tech")
      ├─ Cache HIT  → Return from KV (~50ms)
      └─ Cache MISS → Query D1 → Store in KV → Return (~200ms)
-  → Increment click count (async)
-  → Redirect 302
+  → Redirect 302 (click count written via ctx.waitUntil, off the blocking path)
 ```
 
 **Performance:** >95% cache hit rate expected, ~50ms P50 latency on cache hits.
@@ -184,7 +183,7 @@ A full-featured blog lives alongside the URL shortener.
 - `tags.ts` (GET, POST), `tags/[id].ts` (PUT, DELETE) — admin.
 - `GET /api/admin/blog/stats` — aggregate stats for the dashboard.
 
-Blog API routes use the **RESTful dynamic `[id]`** convention (`/api/blog/.../${id}`), unlike the older URL/category admin endpoints which use a literal `id` route + `?id=` query param. Match the convention of the endpoint you are calling.
+All admin and blog API routes use the **RESTful dynamic `[id]`** convention (`/api/.../${id}` path parameter).
 
 **Pages:**
 
@@ -215,6 +214,9 @@ adminStats:  30 min   - Dashboard statistics
 - **Update URL:** Invalidate specific URL + related categories + stats
 - **Delete URL:** Invalidate specific URL + related categories + stats
 - **Category changes:** Invalidate category listings + affected URLs
+- **Clicks (redirects):** Do **NOT** invalidate the URL cache — a stale
+  `clickCount` inside the cached record is harmless, and evicting on every
+  click would defeat the 24h urlLookup cache. Only admin stats are invalidated.
 
 ### Cache Key Security
 
@@ -303,11 +305,15 @@ CacheKeys.adminStats(); // "admin:stats:overview"
 
 ### 4. Rate Limiting (src/lib/rate-limiter.ts)
 
-Three separate limiters with different thresholds:
+Two mechanisms:
 
-- **cacheRead:** 100 requests/minute
-- **cacheWrite:** 50 requests/minute
-- **suspicious:** 10 requests/minute (honeypot triggers)
+- **`KVRateLimiter` (KV-backed, login):** `/api/auth/login` allows 5 attempts
+  per 5 minutes per IP, persisted in the `SESSION` KV namespace so the counter
+  survives isolate recycling and is shared across PoPs (an in-memory limiter on
+  Workers is per-isolate and gives little real brute-force protection).
+- **`RateLimiter` (in-memory, best effort):** used for cache-operation abuse
+  damping — cacheWrite 100/min, cacheRead 1000/min, suspicious 10 per 5 min
+  (honeypot triggers).
 
 ### 5. SQL Injection Prevention
 
@@ -436,7 +442,7 @@ src/
 │       │   │       ├── toggle.ts        # POST toggle active status
 │       │   │       └── fetch-metadata.ts # POST fetch OG metadata
 │       │   ├── categories.ts            # GET, POST /api/admin/categories
-│       │   ├── categories/id.ts         # PUT, DELETE /api/admin/categories/[id]
+│       │   ├── categories/[id].ts       # PUT, DELETE /api/admin/categories/[id]
 │       │   ├── stats.ts                 # GET /api/admin/stats
 │       │   └── cache.ts                 # POST /api/admin/cache (actions)
 │       │
@@ -770,11 +776,11 @@ API (`tests/integration/helpers/env.ts`) — the project does not use
 
 **Current Status:**
 
-- **Test Files:** 11 passed
-- **Total Tests:** 414 passed
-- **Coverage Threshold:** Lines 80%, Functions 80%, Branches 75%, Statements 80%
+- **Test Files:** 12 passed
+- **Total Tests:** 422 passed
+- **Coverage Threshold:** Lines 85%, Functions 85%, Branches 80%, Statements 85%
 
-### Verified Baseline (2026-06-29)
+### Verified Baseline (2026-07-01)
 
 This is the known-good baseline that dependency upgrades and other changes are
 validated against. Always run the **full** suite below — including e2e — before
@@ -785,8 +791,8 @@ upgrade shadowing the homepage `/` route). Reproduce with Bun (`bun install`); N
 
 | Check                         | Command                  | Result                           |
 | ----------------------------- | ------------------------ | -------------------------------- |
-| Unit tests                    | `bun run test`           | 414/414 passed (11 files)        |
-| Type-check (`astro check`)    | `bun run type-check`     | 0 errors, 0 warnings (131 files) |
+| Unit tests                    | `bun run test`           | 422/422 passed (12 files)        |
+| Type-check (`astro check`)    | `bun run type-check`     | 0 errors, 0 warnings (129 files) |
 | Production build (CF adapter) | `bun run build`          | success                          |
 | Lint (ESLint + Prettier)      | `bun run lint`           | clean                            |
 | E2E smoke (local boot)        | `bun run test:e2e:local` | 4/4 passed                       |
@@ -832,7 +838,7 @@ bun run test:ui           # Interactive test UI
 ## Quality Metrics
 
 - **Security Rating:** A (Excellent)
-- **Tests Passing:** 414/414 (11 files)
+- **Tests Passing:** 422/422 (12 files)
 - **ESLint Errors:** 0
 - **ESLint Warnings:** 15 (acceptable)
 - **Build Warnings:** 1 (down from 6)
@@ -841,7 +847,7 @@ bun run test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** June 30, 2026
+**Last Updated:** July 1, 2026
 **Astro Version:** 7.0.3
 **React Version:** 19.2
 **Package Manager:** Bun 1.3 (`bun.lock`); Node >=24 still required as the Astro/Vitest runtime

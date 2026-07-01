@@ -15,7 +15,7 @@
 [![CI](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/ci.yml)
 [![Test Report](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml/badge.svg)](https://github.com/heridotlife/heridotlife/actions/workflows/test-report.yml)
 [![codecov](https://codecov.io/gh/heridotlife/heridotlife/branch/main/graph/badge.svg)](https://codecov.io/gh/heridotlife/heridotlife)
-[![Tests](https://img.shields.io/badge/tests-414%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
+[![Tests](https://img.shields.io/badge/tests-422%20passed-success)](https://github.com/heridotlife/heridotlife/actions)
 [![Coverage](https://img.shields.io/badge/coverage-92.99%25-brightgreen)](https://github.com/heridotlife/heridotlife/actions)
 [![Security](https://img.shields.io/badge/security-A%20rating-brightgreen)](https://github.com/heridotlife/heridotlife/blob/main/SECURITY.md)
 
@@ -125,7 +125,7 @@ This repository contains my personal website and production-ready URL shortener 
 - ⚡ **Edge Performance** - Deployed on Cloudflare Workers for sub-50ms latency
 - 🛡️ **Security Hardened** - SSRF protection, rate limiting, CSP, and comprehensive security measures
 - 🖼️ **Image Optimization** - Cloudflare Image Resizing with automatic WebP/AVIF conversion
-- 🧪 **Comprehensive Test Coverage** - Tested with Vitest (414 tests)
+- 🧪 **Comprehensive Test Coverage** - Tested with Vitest (422 tests)
 
 ### 🛠️ Built With
 
@@ -149,7 +149,7 @@ This repository contains my personal website and production-ready URL shortener 
 - 🛡️ **SSRF Protection** - Blocks private IPs and metadata endpoints
 - 🚦 **Rate Limiting** - Sliding window algorithm
 - 🔒 **Content Security Policy** - Hardened CSP without unsafe-eval
-- 🧪 **Vitest 4** - 414 tests passing
+- 🧪 **Vitest 4** - 422 tests passing
 - ✅ **ESLint & Prettier** - Zero errors, clean codebase
 
 ### 🔗 Live Demo

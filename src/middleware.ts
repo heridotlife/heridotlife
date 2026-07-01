@@ -21,8 +21,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return hostValidation.response;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const session = await getSession(context as any);
+  const session = await getSession(context);
 
   if (context.url.pathname.startsWith('/admin') && context.url.pathname !== '/admin/login') {
     if (!session) {
@@ -39,7 +38,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Add security headers to all responses
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
+  // X-XSS-Protection is deliberately not set: the header is deprecated and the
+  // legacy auditor it controlled introduced vulnerabilities of its own. CSP
+  // below is the actual XSS mitigation.
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
