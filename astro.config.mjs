@@ -15,6 +15,33 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://heri.life',
   output: 'server',
+  security: {
+    // Astro-managed CSP (v6+): for SSR routes Astro emits the policy as a
+    // content-security-policy response header, hashing its own inline
+    // hydration scripts. The middleware adds a per-request 'nonce-…' script
+    // resource for the project's is:inline scripts (see src/middleware.ts).
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data: https:", // allow external OG images
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        "frame-ancestors 'none'", // prevents clickjacking
+        "base-uri 'self'",
+        "form-action 'self'",
+        'upgrade-insecure-requests',
+      ],
+      scriptDirective: {
+        resources: ["'self'"],
+      },
+      styleDirective: {
+        // unsafe-inline is required for style="" attributes (theme icons) and
+        // Tailwind-injected styles. Note: if Astro ever tracks a style hash,
+        // browsers ignore unsafe-inline in this directive.
+        resources: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  },
   adapter: cloudflare({
     // Use compile-time image optimization (works with free tier)
     // Images are optimized at build time instead of on-demand

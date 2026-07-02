@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../../lib/auth';
-import { D1Helper, toBool, toDate } from '../../../../../lib/d1';
+import { toBool, toDate } from '../../../../../lib/d1';
+import { createCachedD1Helper } from '../../../../../lib/cached-d1';
 import { env } from 'cloudflare:workers';
 
 export const PATCH: APIRoute = async (context) => {
@@ -17,7 +18,11 @@ export const PATCH: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Invalid URL ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
     const updatedUrl = await db.toggleShortUrlActive(urlId);
 
     if (!updatedUrl) {

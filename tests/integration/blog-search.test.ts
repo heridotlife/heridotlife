@@ -23,7 +23,6 @@ describe('blog FTS5 search (real D1 + sync triggers)', () => {
       excerpt: 'A practical guide to caching at the edge with Workers and KV for low latency.',
       content:
         '<p>Practical caching techniques: how to cache responses at the edge with the Cache API.</p>',
-      authorId: 'test',
       status: 'published',
       isPublished: true,
       publishedAt: Math.floor(Date.now() / 1000),
@@ -45,7 +44,6 @@ describe('blog FTS5 search (real D1 + sync triggers)', () => {
       title: 'Secret Draft about Vectorize',
       excerpt: 'An unpublished draft mentioning Vectorize and embeddings for semantic search.',
       content: '<p>Draft content about Vectorize indexes.</p>',
-      authorId: 'test',
       status: 'draft',
       isPublished: false,
     });

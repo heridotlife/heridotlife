@@ -45,6 +45,7 @@ declare namespace Cloudflare {
     ADMIN_PASSWORD: string;
     D1_db: D1Database;
     heridotlife_kv: KVNamespace;
+    SESSION: KVNamespace;
     CANONICAL_DOMAIN?: string;
     TRUSTED_HOSTS?: string;
     [key: string]: string | D1Database | KVNamespace | undefined;

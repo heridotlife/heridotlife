@@ -62,6 +62,12 @@ async function main() {
   // Build via the current runtime's package runner (`bun run build`).
   await run(process.execPath, ['run', 'build']);
 
+  console.log('\n▶ Applying D1 migrations to the local database...');
+  // Gives the booted worker a real schema so D1-backed routes (/blog,
+  // /categories, sitemap, search) can be smoke-tested. Idempotent: the
+  // baseline migration is IF NOT EXISTS-guarded and tracked in d1_migrations.
+  await run(bin('wrangler'), ['d1', 'migrations', 'apply', 'D1_db', '--local']);
+
   console.log(`\n▶ Booting worker on ${BASE_URL}...`);
   const worker = spawn(bin('wrangler'), ['dev', '--port', PORT], {
     cwd: ROOT,

@@ -1,5 +1,23 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { RateLimiter, createRateLimiters } from './rate-limiter';
+import { RateLimiter, KVRateLimiter, createRateLimiters } from './rate-limiter';
+import type { KVNamespace } from '@cloudflare/workers-types';
+
+/** Minimal in-memory KV mock covering the surface KVRateLimiter uses. */
+function createMockKV(): KVNamespace {
+  const store = new Map<string, string>();
+  return {
+    get: vi.fn(async (key: string) => {
+      const value = store.get(key);
+      return value === undefined ? null : JSON.parse(value);
+    }),
+    put: vi.fn(async (key: string, value: string) => {
+      store.set(key, value);
+    }),
+    delete: vi.fn(async (key: string) => {
+      store.delete(key);
+    }),
+  } as unknown as KVNamespace;
+}
 
 describe('RateLimiter', () => {
   let rateLimiter: RateLimiter;
@@ -293,6 +311,85 @@ describe('RateLimiter', () => {
 
       limiter.destroy();
     });
+  });
+});
+
+describe('KVRateLimiter', () => {
+  const config = { maxRequests: 5, windowMs: 300000, keyPrefix: 'ratelimit:login' };
+
+  beforeEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('allows exactly maxRequests attempts, then limits', async () => {
+    const limiter = new KVRateLimiter(createMockKV(), config);
+
+    for (let i = 1; i <= 5; i++) {
+      const status = await limiter.check('1.2.3.4');
+      expect(status.limited).toBe(false);
+      expect(status.count).toBe(i);
+    }
+
+    const status = await limiter.check('1.2.3.4');
+    expect(status.limited).toBe(true);
+    expect(status.remaining).toBe(0);
+    expect(status.resetIn).toBeGreaterThan(0);
+  });
+
+  it('tracks identifiers independently', async () => {
+    const limiter = new KVRateLimiter(createMockKV(), config);
+
+    for (let i = 0; i < 6; i++) {
+      await limiter.check('1.2.3.4');
+    }
+
+    const other = await limiter.check('5.6.7.8');
+    expect(other.limited).toBe(false);
+  });
+
+  it('resets after the window expires', async () => {
+    vi.useFakeTimers();
+    const limiter = new KVRateLimiter(createMockKV(), config);
+
+    for (let i = 0; i < 6; i++) {
+      await limiter.check('1.2.3.4');
+    }
+    expect((await limiter.check('1.2.3.4')).limited).toBe(true);
+
+    vi.advanceTimersByTime(config.windowMs + 1);
+
+    const status = await limiter.check('1.2.3.4');
+    expect(status.limited).toBe(false);
+    expect(status.count).toBe(1);
+  });
+
+  it('reset() clears the counter for an identifier', async () => {
+    const kv = createMockKV();
+    const limiter = new KVRateLimiter(kv, config);
+
+    for (let i = 0; i < 6; i++) {
+      await limiter.check('1.2.3.4');
+    }
+    expect((await limiter.check('1.2.3.4')).limited).toBe(true);
+
+    await limiter.reset('1.2.3.4');
+
+    expect((await limiter.check('1.2.3.4')).limited).toBe(false);
+    expect(kv.delete).toHaveBeenCalledWith('ratelimit:login:1.2.3.4');
+  });
+
+  it('persists entries with a TTL of at least 60 seconds', async () => {
+    const kv = createMockKV();
+    // 10s window would be below KV's minimum expirationTtl of 60s
+    const limiter = new KVRateLimiter(kv, { ...config, windowMs: 10000 });
+
+    await limiter.check('1.2.3.4');
+
+    expect(kv.put).toHaveBeenCalledWith(
+      'ratelimit:login:1.2.3.4',
+      expect.any(String),
+      expect.objectContaining({ expirationTtl: 60 })
+    );
   });
 });
 

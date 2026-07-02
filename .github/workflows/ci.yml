@@ -68,9 +68,10 @@ jobs:
       - name: Run unit tests
         run: bun run test
 
+      # Gating: the coverage thresholds in vitest.config.ts (85% lines/functions/
+      # statements, 80% branches) fail this step — and the job — if regressed.
       - name: Run tests with coverage
         run: bun run test:coverage
-        continue-on-error: true
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v7

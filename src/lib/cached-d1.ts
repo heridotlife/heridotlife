@@ -166,12 +166,26 @@ export class CachedD1Helper extends D1Helper {
     await this.invalidateRelatedCaches(id);
   }
 
-  // Override incrementClickCount to update cache
+  // Override toggleShortUrlActive to invalidate the URL caches — the redirect
+  // path checks isActive, so a toggle must become visible immediately.
+  async toggleShortUrlActive(id: number): Promise<ShortUrl> {
+    const result = await super.toggleShortUrlActive(id);
+
+    await this.cache.urlLookup.delete(CacheKeys.url(result.shortUrl));
+    await this.cache.urlLookup.delete(CacheKeys.urlById(id));
+    await this.invalidateRelatedCaches(id);
+
+    return result;
+  }
+
+  // Override incrementClickCount to keep the admin stats fresh.
+  //
+  // Deliberately does NOT invalidate the URL cache: the redirect path only
+  // needs originalUrl/isActive/expiresAt, so a stale clickCount inside the
+  // cached record is harmless. Evicting the entry on every click made every
+  // redirect of an active URL a cache miss, defeating the 24h urlLookup cache.
   async incrementClickCount(shortUrl: string): Promise<void> {
     await super.incrementClickCount(shortUrl);
-
-    // Invalidate the URL cache to reflect updated click count
-    await this.cache.urlLookup.delete(CacheKeys.url(shortUrl));
 
     // Invalidate stats cache since click count changed
     await this.cache.adminStats.delete(CacheKeys.adminStats());
