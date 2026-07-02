@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Cache:** Cloudflare KV (multi-tier strategy)
 - **Deployment:** Cloudflare Workers with Workers Assets
 - **Authentication:** JWT-based sessions with HTTP-only cookies
-- **Testing:** Vitest 4 (414 tests passing)
+- **Testing:** Vitest 4 (422 unit tests passing)
 - **Image Optimization:** Cloudflare Image Resizing (edge optimization)
 - **Toolchain:** **Bun** is the package manager (`bun.lock`) and task runner
   (`bun run …`). Node (`.nvmrc` → 24) is still required as the runtime that Astro
@@ -32,9 +32,11 @@ bun run dev                          # Start dev server (local mode, no D1/KV)
 bun run dev:wrangler                 # Dev with Wrangler (D1/KV bindings, requires setup_db.sh)
 bun run dev:wrangler:skip-build      # Dev with Wrangler (skip build step)
 
-# Database
-bun run db:migrate                   # Run schema migration (production D1)
-bun run db:migrate:local             # Run schema migration (local D1)
+# Database (wrangler d1 migrations — tracked in the d1_migrations table)
+bun run db:migrate                   # Apply pending migrations (production D1)
+bun run db:migrate:local             # Apply pending migrations (local D1)
+bun run db:migrate:new <name>        # Scaffold a new migration in migrations/
+bun run db:migrate:status            # List applied/pending migrations (production)
 bun run db:import                    # Import data from remote to local D1
 bun run db:setup                     # Full local setup (migrate + import)
 
@@ -112,8 +114,7 @@ GET /tech
   → CachedD1Helper.findShortUrl("tech")
      ├─ Cache HIT  → Return from KV (~50ms)
      └─ Cache MISS → Query D1 → Store in KV → Return (~200ms)
-  → Increment click count (async)
-  → Redirect 302
+  → Redirect 302 (click count written via ctx.waitUntil, off the blocking path)
 ```
 
 **Performance:** >95% cache hit rate expected, ~50ms P50 latency on cache hits.
@@ -184,7 +185,7 @@ A full-featured blog lives alongside the URL shortener.
 - `tags.ts` (GET, POST), `tags/[id].ts` (PUT, DELETE) — admin.
 - `GET /api/admin/blog/stats` — aggregate stats for the dashboard.
 
-Blog API routes use the **RESTful dynamic `[id]`** convention (`/api/blog/.../${id}`), unlike the older URL/category admin endpoints which use a literal `id` route + `?id=` query param. Match the convention of the endpoint you are calling.
+All admin and blog API routes use the **RESTful dynamic `[id]`** convention (`/api/.../${id}` path parameter).
 
 **Pages:**
 
@@ -215,6 +216,9 @@ adminStats:  30 min   - Dashboard statistics
 - **Update URL:** Invalidate specific URL + related categories + stats
 - **Delete URL:** Invalidate specific URL + related categories + stats
 - **Category changes:** Invalidate category listings + affected URLs
+- **Clicks (redirects):** Do **NOT** invalidate the URL cache — a stale
+  `clickCount` inside the cached record is harmless, and evicting on every
+  click would defeat the 24h urlLookup cache. Only admin stats are invalidated.
 
 ### Cache Key Security
 
@@ -251,8 +255,16 @@ CacheKeys.adminStats(); // "admin:stats:overview"
    - 5-second timeout on metadata fetching
 
 2. **Content Security Policy Hardening**
-   - Removed `unsafe-eval` from CSP directives
-   - Strict CSP with nonce-based script execution
+   - Astro-managed CSP (`security.csp` in `astro.config.mjs`): for SSR pages
+     Astro emits the `Content-Security-Policy` header and hashes its own inline
+     hydration scripts, so `script-src` carries **no `'unsafe-inline'`**.
+   - The middleware (`src/middleware.ts`) splices the per-request
+     `'nonce-…'` into Astro's `script-src` so the project's own `is:inline`
+     scripts (which carry `nonce={Astro.locals.cspNonce}`) are allowed.
+   - `style-src` keeps `'unsafe-inline'` (required by `style=""` attributes and
+     Tailwind/React SSR); the middleware normalizes it so an Astro-emitted
+     style hash can't silently disable `'unsafe-inline'` there.
+   - Non-page responses (API routes, errors) get a strict static CSP fallback.
    - Image sources limited to trusted domains
 
 3. **Build & Code Quality**
@@ -303,11 +315,15 @@ CacheKeys.adminStats(); // "admin:stats:overview"
 
 ### 4. Rate Limiting (src/lib/rate-limiter.ts)
 
-Three separate limiters with different thresholds:
+Two mechanisms:
 
-- **cacheRead:** 100 requests/minute
-- **cacheWrite:** 50 requests/minute
-- **suspicious:** 10 requests/minute (honeypot triggers)
+- **`KVRateLimiter` (KV-backed, login):** `/api/auth/login` allows 5 attempts
+  per 5 minutes per IP, persisted in the `SESSION` KV namespace so the counter
+  survives isolate recycling and is shared across PoPs (an in-memory limiter on
+  Workers is per-isolate and gives little real brute-force protection).
+- **`RateLimiter` (in-memory, best effort):** used for cache-operation abuse
+  damping — cacheWrite 100/min, cacheRead 1000/min, suspicious 10 per 5 min
+  (honeypot triggers).
 
 ### 5. SQL Injection Prevention
 
@@ -436,7 +452,7 @@ src/
 │       │   │       ├── toggle.ts        # POST toggle active status
 │       │   │       └── fetch-metadata.ts # POST fetch OG metadata
 │       │   ├── categories.ts            # GET, POST /api/admin/categories
-│       │   ├── categories/id.ts         # PUT, DELETE /api/admin/categories/[id]
+│       │   ├── categories/[id].ts       # PUT, DELETE /api/admin/categories/[id]
 │       │   ├── stats.ts                 # GET /api/admin/stats
 │       │   └── cache.ts                 # POST /api/admin/cache (actions)
 │       │
@@ -599,8 +615,14 @@ bun run deploy         # Deploys to Cloudflare Workers via wrangler
 **Database Migration (Production):**
 
 ```bash
-wrangler d1 execute D1_db --remote --file=schema.sql
+bun run db:migrate         # wrangler d1 migrations apply D1_db --remote
 ```
+
+Migrations live in `migrations/` and are tracked in the `d1_migrations` table.
+`0001_baseline_schema.sql` is an idempotent snapshot of `schema.sql` (the
+canonical schema still used by tests and local setup) — keep the two in sync
+when adding a migration. Pre-migrations ad-hoc SQL is archived under
+`migrations/archive/` (do not re-run it).
 
 **Environment Variables (Production):**
 Set via Cloudflare Dashboard → Workers & Pages → heridotlife → Settings → Environment Variables:
@@ -770,11 +792,12 @@ API (`tests/integration/helpers/env.ts`) — the project does not use
 
 **Current Status:**
 
-- **Test Files:** 11 passed
-- **Total Tests:** 414 passed
-- **Coverage Threshold:** Lines 80%, Functions 80%, Branches 75%, Statements 80%
+- **Test Files:** 15 unit + 5 integration passed
+- **Total Tests:** 432 unit + 18 integration passed
+- **Coverage Threshold:** Lines 85%, Functions 85%, Branches 80%, Statements 85%
+  (the CI coverage step is **gating** — a regression below threshold fails the build)
 
-### Verified Baseline (2026-06-29)
+### Verified Baseline (2026-07-02)
 
 This is the known-good baseline that dependency upgrades and other changes are
 validated against. Always run the **full** suite below — including e2e — before
@@ -783,17 +806,21 @@ regressions that the unit tests and type-check miss (e.g. an adapter/framework
 upgrade shadowing the homepage `/` route). Reproduce with Bun (`bun install`); Node
 24 (`.nvmrc`) must also be available since Astro/Vitest execute under Node:
 
-| Check                         | Command                  | Result                           |
-| ----------------------------- | ------------------------ | -------------------------------- |
-| Unit tests                    | `bun run test`           | 414/414 passed (11 files)        |
-| Type-check (`astro check`)    | `bun run type-check`     | 0 errors, 0 warnings (131 files) |
-| Production build (CF adapter) | `bun run build`          | success                          |
-| Lint (ESLint + Prettier)      | `bun run lint`           | clean                            |
-| E2E smoke (local boot)        | `bun run test:e2e:local` | 4/4 passed                       |
+| Check                         | Command                    | Result                           |
+| ----------------------------- | -------------------------- | -------------------------------- |
+| Unit tests                    | `bun run test`             | 432/432 passed (15 files)        |
+| Integration (real D1/KV)      | `bun run test:integration` | 18/18 passed (5 files)           |
+| Type-check (`astro check`)    | `bun run type-check`       | 0 errors, 0 warnings (129 files) |
+| Production build (CF adapter) | `bun run build`            | success                          |
+| Lint (ESLint + Prettier)      | `bun run lint`             | clean                            |
+| E2E smoke (local boot)        | `bun run test:e2e:local`   | 12/12 passed                     |
 
-`bun run test:e2e:local` builds the worker, boots it via `wrangler dev`, and runs
-`tests/e2e/smoke.test.ts` against it — asserting `/` (homepage, SSR 200),
-`/api/og`, `/admin/login`, and `/robots.txt`.
+`bun run test:e2e:local` builds the worker, applies the D1 migrations to the
+local database, boots it via `wrangler dev`, and runs `tests/e2e/smoke.test.ts`
+against it — asserting the homepage, `/api/og`, `/admin/login`, `/robots.txt`,
+the D1-backed `/blog` and `/categories` pages, the shortener 302 fallback, the
+`/admin` auth-guard redirect, `sitemap.xml`, `blog/rss.xml`, the blog search
+API, and the hardened security headers (nonce-based CSP, no `X-XSS-Protection`).
 
 **Test Categories:**
 
@@ -832,7 +859,7 @@ bun run test:ui           # Interactive test UI
 ## Quality Metrics
 
 - **Security Rating:** A (Excellent)
-- **Tests Passing:** 414/414 (11 files)
+- **Tests Passing:** 432/432 unit + 18/18 integration
 - **ESLint Errors:** 0
 - **ESLint Warnings:** 15 (acceptable)
 - **Build Warnings:** 1 (down from 6)
@@ -841,7 +868,7 @@ bun run test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** June 30, 2026
+**Last Updated:** July 2, 2026
 **Astro Version:** 7.0.3
 **React Version:** 19.2
 **Package Manager:** Bun 1.3 (`bun.lock`); Node >=24 still required as the Astro/Vitest runtime

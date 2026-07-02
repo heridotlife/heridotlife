@@ -60,4 +60,64 @@ describe('e2e smoke (read-only)', () => {
     const res = await get('/robots.txt');
     expect(res.status).toBe(200);
   });
+
+  it('GET /blog renders the blog listing (D1-backed SSR)', async () => {
+    const res = await get('/blog');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+    expect(await res.text()).toContain('</html>');
+  });
+
+  it('GET /categories renders the categories page (D1-backed SSR)', async () => {
+    const res = await get('/categories');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+  });
+
+  it('GET an unknown slug redirects to /categories (shortener fallback)', async () => {
+    const res = await get('/e2e-definitely-not-a-real-slug');
+    expect(res.status).toBe(302);
+    expect(res.headers.get('location')).toContain('/categories');
+  });
+
+  it('GET /admin/dashboard unauthenticated redirects to the login page (auth guard)', async () => {
+    const res = await get('/admin/dashboard');
+    expect(res.status).toBe(302);
+    expect(res.headers.get('location')).toContain('/admin/login');
+  });
+
+  it('GET /sitemap.xml is served as XML', async () => {
+    const res = await get('/sitemap.xml');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('xml');
+  });
+
+  it('GET /blog/rss.xml is served as XML', async () => {
+    const res = await get('/blog/rss.xml');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('xml');
+  });
+
+  it('GET /api/blog/search returns JSON results (public FTS endpoint)', async () => {
+    const res = await get('/api/blog/search?q=smoke');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { results: unknown[] };
+    expect(Array.isArray(body.results)).toBe(true);
+  });
+
+  it('serves hardened security headers on HTML pages', async () => {
+    const res = await get('/');
+    const csp = res.headers.get('content-security-policy') ?? '';
+    const scriptSrc = /script-src [^;]*/.exec(csp)?.[0] ?? '';
+
+    // Astro-managed CSP with per-request nonce — no unsafe-inline for scripts.
+    expect(scriptSrc).toContain("'nonce-");
+    expect(scriptSrc).not.toContain("'unsafe-inline'");
+    expect(csp).toContain("frame-ancestors 'none'");
+
+    expect(res.headers.get('x-frame-options')).toBe('DENY');
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+    // Deprecated header must stay removed.
+    expect(res.headers.get('x-xss-protection')).toBeNull();
+  });
 });

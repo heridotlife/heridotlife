@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth';
-import { D1Helper } from '../../../../lib/d1';
+import { createCachedD1Helper } from '../../../../lib/cached-d1';
 import { updateCategorySchema } from '../../../../lib/validations';
 import { env } from 'cloudflare:workers';
 
@@ -12,9 +12,7 @@ export const PUT: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const url = new URL(context.request.url);
-    const id = url.searchParams.get('id');
-    const categoryId = Number(id);
+    const categoryId = Number(context.params.id);
 
     if (isNaN(categoryId)) {
       return new Response(JSON.stringify({ error: 'Invalid category ID' }), { status: 400 });
@@ -33,7 +31,11 @@ export const PUT: APIRoute = async (context) => {
 
     const { name } = validation.data;
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
 
     try {
       const updated = await db.updateCategory(categoryId, name);
@@ -63,15 +65,17 @@ export const DELETE: APIRoute = async (context) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    const url = new URL(context.request.url);
-    const id = url.searchParams.get('id');
-    const categoryId = Number(id);
+    const categoryId = Number(context.params.id);
 
     if (isNaN(categoryId)) {
       return new Response(JSON.stringify({ error: 'Invalid category ID' }), { status: 400 });
     }
 
-    const db = new D1Helper(env.D1_db);
+    const db = createCachedD1Helper(
+      env.D1_db,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      env.heridotlife_kv as any
+    );
 
     try {
       await db.deleteCategory(categoryId);

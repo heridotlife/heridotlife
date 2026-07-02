@@ -21,8 +21,10 @@ export const GET: APIRoute = async (context) => {
     const db = env.D1_db as D1Database;
     const url = new URL(context.request.url);
 
-    // Parse query parameters
-    const status = url.searchParams.get('status') as 'draft' | 'published' | 'archived' | null;
+    // Parse query parameters. This endpoint is admin-only (session-gated
+    // above), so the default is 'all' — the admin list must include drafts.
+    const status = (url.searchParams.get('status') || 'all') as
+      'draft' | 'published' | 'archived' | 'all';
     const page = parseInt(url.searchParams.get('page') || '1', 10);
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
     const sortBy = (url.searchParams.get('sortBy') || 'createdAt') as
@@ -31,7 +33,7 @@ export const GET: APIRoute = async (context) => {
 
     // Fetch posts
     const result = await getAllPublishedPosts(db, {
-      status: status || undefined,
+      status,
       page,
       limit,
       sortBy,
@@ -83,11 +85,9 @@ export const POST: APIRoute = async (context) => {
 
     const db = env.D1_db as D1Database;
 
-    // Create the blog post
-    const input: CreateBlogPostInput = {
-      ...validation.data,
-      authorId: 'admin', // TODO: Get from session when user auth is implemented
-    };
+    // Create the blog post. Single-admin site: posts have no author identity
+    // (BlogPost.authorId is nullable and unused since migration 005).
+    const input: CreateBlogPostInput = validation.data;
 
     const post = await createBlogPost(db, input);
 
