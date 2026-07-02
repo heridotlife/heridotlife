@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestEnv, type TestEnv } from './helpers/env';
-import { createBlogPost, getAllPublishedPosts } from '@/lib/blog/api';
+import { createBlogPost, updateBlogPost, getAllPublishedPosts } from '@/lib/blog/api';
 
 // Regression test: drafts used to be invisible in the admin list because
 // getAllPublishedPosts ignored the `status` option and always filtered on
@@ -66,5 +66,30 @@ describe('blog post listing status filters (real D1)', () => {
     const published = posts.find((p) => p.slug === 'published-post');
     expect(published?.status).toBe('published');
     expect(Boolean(published?.isPublished)).toBe(true);
+  });
+
+  it('publishing a draft makes it appear in the public listing', async () => {
+    const created = await createBlogPost(testEnv.db, {
+      slug: 'promote-me',
+      title: 'Promoted From Draft',
+      excerpt: 'A draft that gets promoted to published during the test run.',
+      content: '<p>Content long enough to look like a real post body for the transition.</p>',
+      status: 'draft',
+      isPublished: false,
+    });
+
+    expect(
+      (await getAllPublishedPosts(testEnv.db, {})).posts.some((p) => p.slug === 'promote-me')
+    ).toBe(false);
+
+    await updateBlogPost(testEnv.db, created.id, {
+      status: 'published',
+      isPublished: true,
+      publishedAt: Math.floor(Date.now() / 1000),
+    });
+
+    expect(
+      (await getAllPublishedPosts(testEnv.db, {})).posts.some((p) => p.slug === 'promote-me')
+    ).toBe(true);
   });
 });

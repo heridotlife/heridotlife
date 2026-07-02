@@ -157,7 +157,11 @@ The application sets the following security headers in `src/middleware.ts`:
 - `X-Frame-Options: DENY`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: geolocation=(), microphone=(), camera=()`
-- `Content-Security-Policy` (nonce-based, no `unsafe-eval`)
+- `Content-Security-Policy` — Astro-managed (`security.csp`): SSR pages get a
+  header with hashes for Astro's own hydration scripts plus a per-request
+  `'nonce-…'` (spliced in by the middleware) for the app's `is:inline` scripts,
+  so `script-src` has **no `'unsafe-inline'`**. `style-src` retains
+  `'unsafe-inline'` for `style=""` attributes and Tailwind/React SSR.
 
 ## Security Scanning and Monitoring
 
