@@ -8,7 +8,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Using crypto.randomUUID for cryptographically secure random values
   const cspNonce = crypto.randomUUID().replace(/-/g, '');
 
-  // Store nonce in locals so it can be accessed by pages/components
+  // Store nonce in locals so it can be accessed by pages/components. The
+  // nonce is spliced into Astro's CSP header after render (see below).
   context.locals.cspNonce = cspNonce;
 
   // Validate host headers to prevent Host Header Injection attacks
@@ -52,26 +53,38 @@ export const onRequest = defineMiddleware(async (context, next) => {
     );
   }
 
-  // Content Security Policy (CSP)
-  // Note: Nonce is generated but not used in CSP because Astro's React hydration
-  // scripts are auto-generated and can't have nonces added to them.
-  // Per CSP spec: when nonce is present, 'unsafe-inline' is ignored.
-  // TODO: Investigate Astro CSP nonce integration for better security
-  const cspDirectives = [
-    "default-src 'self'",
-    // unsafe-inline needed for Astro React hydration scripts
-    `script-src 'self' 'unsafe-inline'`,
-    "style-src 'self' 'unsafe-inline'", // Unsafe-inline needed for Tailwind CSS
-    "img-src 'self' data: https:", // Allow external images (OG metadata)
-    "font-src 'self' data:",
-    "connect-src 'self'",
-    "frame-ancestors 'none'", // Prevents clickjacking
-    "base-uri 'self'",
-    "form-action 'self'",
-    'upgrade-insecure-requests', // Force HTTPS in production
-  ].join('; ');
-
-  response.headers.set('Content-Security-Policy', cspDirectives);
+  // Content Security Policy: Astro emits the header for SSR pages (see
+  // security.csp in astro.config.mjs) with build-time hashes for its own
+  // hydration scripts — no 'unsafe-inline' for scripts. The project's
+  // is:inline scripts carry the per-request nonce, which is spliced into
+  // Astro's computed policy here. (Astro's runtime csp.insert* APIs can't be
+  // used for this: with streaming SSR the header is finalized before
+  // component frontmatter runs.)
+  const astroCsp = response.headers.get('content-security-policy');
+  if (astroCsp && astroCsp.includes('script-src ')) {
+    const hardened = astroCsp
+      .replace('script-src ', `script-src 'nonce-${cspNonce}' `)
+      // Astro also emits hashes for its tracked inline styles, but a hash in
+      // style-src makes browsers ignore 'unsafe-inline', which would break the
+      // style="" attributes used across the site (theme icons, React SSR).
+      // Keep styles at the previous posture; scripts are the real mitigation.
+      .replace(/style-src [^;]*/, "style-src 'self' 'unsafe-inline'");
+    response.headers.set('content-security-policy', hardened);
+  } else if (!astroCsp) {
+    const fallbackCsp = [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      'upgrade-insecure-requests',
+    ].join('; ');
+    response.headers.set('Content-Security-Policy', fallbackCsp);
+  }
 
   return response;
 });
