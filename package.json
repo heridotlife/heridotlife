@@ -87,7 +87,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20260702.1",
+    "@cloudflare/workers-types": "5.20260705.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.2.8",
     "@testing-library/jest-dom": "^6.9.1",
