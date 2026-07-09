@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Cache:** Cloudflare KV (multi-tier strategy)
 - **Deployment:** Cloudflare Workers with Workers Assets
 - **Authentication:** JWT-based sessions with HTTP-only cookies
-- **Testing:** Vitest 4 (422 unit tests passing)
+- **Testing:** Vitest 4 (432 unit tests passing)
 - **Image Optimization:** Cloudflare Image Resizing (edge optimization)
 - **Toolchain:** **Bun** is the package manager (`bun.lock`) and task runner
   (`bun run …`). Node (`.nvmrc` → 24) is still required as the runtime that Astro
@@ -797,7 +797,7 @@ API (`tests/integration/helpers/env.ts`) — the project does not use
 - **Coverage Threshold:** Lines 85%, Functions 85%, Branches 80%, Statements 85%
   (the CI coverage step is **gating** — a regression below threshold fails the build)
 
-### Verified Baseline (2026-07-02)
+### Verified Baseline (2026-07-09)
 
 This is the known-good baseline that dependency upgrades and other changes are
 validated against. Always run the **full** suite below — including e2e — before
@@ -810,7 +810,7 @@ upgrade shadowing the homepage `/` route). Reproduce with Bun (`bun install`); N
 | ----------------------------- | -------------------------- | -------------------------------- |
 | Unit tests                    | `bun run test`             | 432/432 passed (15 files)        |
 | Integration (real D1/KV)      | `bun run test:integration` | 18/18 passed (5 files)           |
-| Type-check (`astro check`)    | `bun run type-check`       | 0 errors, 0 warnings (129 files) |
+| Type-check (`astro check`)    | `bun run type-check`       | 0 errors, 0 warnings (133 files) |
 | Production build (CF adapter) | `bun run build`            | success                          |
 | Lint (ESLint + Prettier)      | `bun run lint`             | clean                            |
 | E2E smoke (local boot)        | `bun run test:e2e:local`   | 12/12 passed                     |
@@ -868,8 +868,8 @@ bun run test:ui           # Interactive test UI
 
 ---
 
-**Last Updated:** July 2, 2026
-**Astro Version:** 7.0.3
+**Last Updated:** July 9, 2026
+**Astro Version:** 7.0.7
 **React Version:** 19.2
 **Package Manager:** Bun 1.3 (`bun.lock`); Node >=24 still required as the Astro/Vitest runtime
 
