@@ -99,7 +99,7 @@
     "@vitest/ui": "4.1.10",
     "esbuild": "^0.28.1",
     "eslint": "^10.6.0",
-    "eslint-plugin-astro": "^2.1.1",
+    "eslint-plugin-astro": "^3.0.0",
     "happy-dom": "^20.10.3",
     "jsdom": "^29.1.1",
     "miniflare": "4.20260708.1",
