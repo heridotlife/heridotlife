@@ -31,7 +31,7 @@ jobs:
       # Node is still required: `bun run` drives the scripts, but Astro
       # (build/check) and Vitest execute under Node via their bin shebangs.
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
