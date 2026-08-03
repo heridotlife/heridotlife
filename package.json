@@ -87,14 +87,14 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20260730.1",
+    "@cloudflare/workers-types": "5.20260731.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/inter": "^5.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.1.2",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "4.1.10",
     "esbuild": "^0.28.1",
@@ -102,13 +102,13 @@
     "eslint-plugin-astro": "^3.0.0",
     "happy-dom": "^20.11.1",
     "jsdom": "^29.1.1",
-    "miniflare": "4.20260722.1",
+    "miniflare": "4.20260730.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "sharp": "0.35.3",
     "typescript-eslint": "^8.65.0",
     "vitest": "4.1.10",
-    "wrangler": "4.115.0"
+    "wrangler": "4.116.0"
   },
   "overrides": {
     "yaml": "2.8.4",
