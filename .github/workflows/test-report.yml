@@ -57,7 +57,7 @@ jobs:
       # Node.js 20 runtime, and produced a duplicate coverage comment.
       - name: Coverage Summary Comment
         if: github.event_name == 'pull_request'
-        uses: MishaKav/jest-coverage-comment@v1.0.34
+        uses: MishaKav/jest-coverage-comment@v1.0.36
         with:
           coverage-path: ./coverage/coverage-summary.json
           junitxml-path: ./coverage/junit.xml
