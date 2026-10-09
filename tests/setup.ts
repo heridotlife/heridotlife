@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 // Mock crypto.randomUUID for Node.js environments that don't have it
 if (!global.crypto) {
