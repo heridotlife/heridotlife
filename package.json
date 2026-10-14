@@ -76,7 +76,7 @@
     "astro": "^7.3.5",
     "clsx": "^2.1.1",
     "jose": "^6.2.12",
-    "lucide-react": "^1.52.0",
+    "lucide-react": "^1.55.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-icons": "^5.7.0",
@@ -84,7 +84,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vite": "^8.3.2",
-    "zod": "^4.6.5"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261006.1",
