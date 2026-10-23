@@ -68,23 +68,23 @@
     "og:convert": "bun scripts/convert-og-to-jpeg.mjs"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@astrojs/cloudflare": "^14.3.3",
-    "@astrojs/react": "^7.0.0",
+    "@astrojs/check": "^0.9.11",
+    "@astrojs/cloudflare": "^14.4.1",
+    "@astrojs/react": "^7.1.0",
     "@cf-wasm/og": "^0.5.0",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.5",
+    "astro": "^7.4.1",
     "clsx": "^2.1.1",
-    "jose": "^6.2.12",
-    "lucide-react": "^1.52.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "jose": "^6.2.13",
+    "lucide-react": "^1.60.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-icons": "^5.7.0",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vite": "^8.3.2",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261006.1",
