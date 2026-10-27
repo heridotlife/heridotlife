@@ -31,9 +31,7 @@ const cspNonce = Astro.locals.cspNonce;
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <main
-    class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950"
-  >
+  <main class="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-sky-950 dark:to-slate-950">
     <button
       id="theme-toggle"
       class="fixed top-6 right-6 w-11 h-11 p-2.5 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-slate-200 dark:border-slate-700 z-50"
@@ -49,10 +47,10 @@ const cspNonce = Astro.locals.cspNonce;
         stroke-linecap="round"
         stroke-linejoin="round"
         class="w-6 h-6 text-amber-500"
-        ><circle cx="12" cy="12" r="4"></circle><path
-          d="M12 2v2M12 20v2m-8.93-9.07 1.41 1.41m12.02 0 1.41-1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m12.02 0l1.41 1.41"
-        ></path></svg
       >
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2m-8.93-9.07 1.41 1.41m12.02 0 1.41-1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m12.02 0l1.41 1.41"></path>
+      </svg>
       <svg
         id="moon-icon"
         style="display: none;"
@@ -62,8 +60,10 @@ const cspNonce = Astro.locals.cspNonce;
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-6 h-6 text-sky-600"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg
+        class="w-6 h-6 text-sky-600"
       >
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+      </svg>
     </button>
 
     <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
@@ -74,7 +74,11 @@ const cspNonce = Astro.locals.cspNonce;
           class="inline-flex items-center justify-center mb-6 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors text-sm font-medium"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={backIcon}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d={backIcon}
             ></path>
           </svg>
           Back to Home
@@ -82,9 +86,7 @@ const cspNonce = Astro.locals.cspNonce;
 
         <!-- Profile Avatar - Simplified -->
         <div class="relative inline-block mb-6">
-          <div
-            class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full"
-          >
+          <div class="relative bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400 p-1 rounded-full">
             <div class="bg-white dark:bg-slate-900 p-1 rounded-full">
               <img
                 src="/profile_picture.jpg"
@@ -110,57 +112,33 @@ const cspNonce = Astro.locals.cspNonce;
 
       <!-- Categories List - Optimized -->
       <div class="w-full max-w-2xl mx-auto space-y-4 mb-12">
-        {
-          activeCategories.length === 0 ? (
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 text-center border border-slate-200 dark:border-slate-700">
-              <svg
-                class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tagIcon} />
-              </svg>
-              <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                No Categories Yet
-              </h2>
-              <p class="text-slate-600 dark:text-slate-400">
-                There are no categories with links at the moment.
-              </p>
-            </div>
-          ) : (
-            activeCategories.map((category) => (
-              <a
-                href={`/${category.name.toLowerCase()}`}
-                class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 p-6 min-h-[80px]"
-              >
-                <div class="flex items-center gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center">
-                    <svg
-                      class="w-6 h-6 text-sky-600 dark:text-sky-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d={tagIcon}
-                      />
-                    </svg>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1">
-                      {category.name}
-                    </h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">
-                      {category._count.shortUrls}{' '}
-                      {category._count.shortUrls === 1 ? 'link' : 'links'}
-                    </p>
-                  </div>
+        {activeCategories.length === 0 ? (
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 text-center border border-slate-200 dark:border-slate-700">
+            <svg
+              class="w-16 h-16 mx-auto mb-4 text-sky-400 dark:text-sky-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tagIcon} />
+            </svg>
+            <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              No Categories Yet
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400">
+              There are no categories with links at the moment.
+            </p>
+          </div>
+        ) : (
+          activeCategories.map((category) => (
+            <a
+              href={`/${category.name.toLowerCase()}`}
+              class="group block w-full bg-white dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-600 p-6 min-h-[80px]"
+            >
+              <div class="flex items-center gap-4">
+                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900 dark:to-cyan-900 rounded-xl flex items-center justify-center">
                   <svg
-                    class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex-shrink-0"
+                    class="w-6 h-6 text-sky-600 dark:text-sky-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -169,14 +147,35 @@ const cspNonce = Astro.locals.cspNonce;
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d={arrowIcon}
+                      d={tagIcon}
                     />
                   </svg>
                 </div>
-              </a>
-            ))
-          )
-        }
+                <div class="flex-1 min-w-0">
+                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1">
+                    {category.name}
+                  </h2>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    {category._count.shortUrls} {category._count.shortUrls === 1 ? 'link' : 'links'}
+                  </p>
+                </div>
+                <svg
+                  class="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d={arrowIcon}
+                  />
+                </svg>
+              </div>
+            </a>
+          ))
+        )}
       </div>
 
       <footer class="text-center text-sm text-slate-500 dark:text-slate-400">

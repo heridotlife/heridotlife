@@ -96,7 +96,8 @@ const articleMeta = {
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          ></path>
         </svg>
         Back to Blog
       </a>
@@ -104,80 +105,66 @@ const articleMeta = {
       <!-- Post Header -->
       <header class="mb-8">
         <!-- Categories -->
-        {
-          post.categories && post.categories.length > 0 && (
-            <div class="flex flex-wrap gap-2 mb-4">
-              {post.categories.map((category) => (
-                <a
-                  href={`/blog?category=${category.slug}`}
-                  class="px-3 py-1 text-sm font-medium rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800"
-                  style={category.color ? `borderLeft: 4px solid ${category.color}` : ''}
-                >
-                  {category.name}
-                </a>
-              ))}
-            </div>
-          )
-        }
+        {post.categories && post.categories.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-4">
+            {post.categories.map((category) => (
+              <a
+                href={`/blog?category=${category.slug}`}
+                class="px-3 py-1 text-sm font-medium rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-sky-800"
+                style={category.color ? `borderLeft: 4px solid ${category.color}` : ''}
+              >
+                {category.name}
+              </a>
+            ))}
+          </div>
+        )}
 
         <!-- Title -->
-        <h1
-          class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4 leading-tight"
-        >
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
           {post.title}
         </h1>
 
         <!-- Meta -->
         <div class="flex flex-wrap items-center gap-4 text-slate-500 dark:text-slate-400 mb-6">
-          <time datetime={publishedDate.toISOString()}>
-            {formattedDate}
-          </time>
+          <time datetime={publishedDate.toISOString()}>{formattedDate}</time>
           {post.readTime && <span>📖 {post.readTime} min read</span>}
           {post.viewCount > 0 && <span>👁️ {post.viewCount} views</span>}
         </div>
 
         <!-- Featured Image -->
-        {
-          post.featuredImage && (
-            <img
-              src={post.featuredImage}
-              alt={post.featuredImageAlt || post.title}
-              class="w-full h-auto rounded-lg shadow-lg mb-8"
-            />
-          )
-        }
+        {post.featuredImage && (
+          <img
+            src={post.featuredImage}
+            alt={post.featuredImageAlt || post.title}
+            class="w-full h-auto rounded-lg shadow-lg mb-8"
+          />
+        )}
 
         <!-- Excerpt -->
-        {
-          post.excerpt && (
-            <p class="text-xl text-slate-600 dark:text-slate-300 mb-8 font-medium">
-              {post.excerpt}
-            </p>
-          )
-        }
+        {post.excerpt && (
+          <p class="text-xl text-slate-600 dark:text-slate-300 mb-8 font-medium">{post.excerpt}</p>
+        )}
       </header>
 
       <!-- Post Content -->
       <div class="prose prose-sky dark:prose-invert max-w-none mb-12" set:html={post.content} />
 
       <!-- Tags -->
-      {
-        post.tags && post.tags.length > 0 && (
-          <div class="border-t border-slate-200 dark:border-slate-800 pt-8 mb-8">
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tags</h3>
-            <div class="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <a
-                  href={`/blog?tag=${tag.slug}`}
-                  class="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                >
-                  #{tag.name}
-                </a>
-              ))}
-            </div>
+      {post.tags && post.tags.length > 0 && (
+        <div class="border-t border-slate-200 dark:border-slate-800 pt-8 mb-8">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tags</h3>
+          <div class="flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <a
+                href={`/blog?tag=${tag.slug}`}
+                class="px-3 py-1 text-sm bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                #{tag.name}
+              </a>
+            ))}
           </div>
-        )
-      }
+        </div>
+      )}
 
       <!-- Share Section -->
       <div class="border-t border-slate-200 dark:border-slate-800 pt-8">
