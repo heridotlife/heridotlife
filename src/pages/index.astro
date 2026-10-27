@@ -28,20 +28,11 @@ const cspNonce = Astro.locals.cspNonce;
     <Nav />
 
     <!-- Hero -->
-    <section
-      class="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-b border-slate-200 dark:border-slate-800"
-    >
-      <div
-        class="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
-      >
-      </div>
-      <div
-        class="mx-auto flex w-full max-w-5xl flex-1 flex-col-reverse items-center gap-10 px-4 py-16 sm:px-6 md:flex-row"
-      >
+    <section class="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-b border-slate-200 dark:border-slate-800">
+      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"></div>
+      <div class="mx-auto flex w-full max-w-5xl flex-1 flex-col-reverse items-center gap-10 px-4 py-16 sm:px-6 md:flex-row">
         <div class="flex-1 text-center md:text-left">
-          <p
-            class="text-body-sm font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400"
-          >
+          <p class="text-body-sm font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
             Hello, I am
           </p>
           <h1 class="mt-3 text-display-lg font-bold text-slate-900 dark:text-white">
@@ -50,12 +41,8 @@ const cspNonce = Astro.locals.cspNonce;
           <p class="mt-3 text-heading-md font-medium text-slate-700 dark:text-slate-200">
             {profile.role}
           </p>
-          <p class="mt-1 text-body-md text-slate-500 dark:text-slate-400">
-            {profile.subtitle}
-          </p>
-          <p
-            class="mt-4 inline-flex items-center gap-1.5 text-body-sm text-slate-500 dark:text-slate-400"
-          >
+          <p class="mt-1 text-body-md text-slate-500 dark:text-slate-400">{profile.subtitle}</p>
+          <p class="mt-4 inline-flex items-center gap-1.5 text-body-sm text-slate-500 dark:text-slate-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -66,11 +53,10 @@ const cspNonce = Astro.locals.cspNonce;
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              ><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle
-                cx="12"
-                cy="10"
-                r="3"></circle></svg
             >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
             {profile.location}
           </p>
 
@@ -103,10 +89,7 @@ const cspNonce = Astro.locals.cspNonce;
         </div>
 
         <div class="relative shrink-0">
-          <div
-            class="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 blur-2xl opacity-30"
-          >
-          </div>
+          <div class="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 blur-2xl opacity-30"></div>
           <div class="relative rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 p-1">
             <img
               src="/profile_picture.jpg"
@@ -139,7 +122,9 @@ const cspNonce = Astro.locals.cspNonce;
     <section id="about" class="mx-auto max-w-3xl px-4 py-20 sm:px-6">
       <SectionHeading eyebrow="Who I Am" title="About Me" />
       <div class="space-y-4 text-body-lg leading-relaxed text-slate-600 dark:text-slate-300">
-        {profile.about.map((para) => <p>{para}</p>)}
+        {profile.about.map((para) => (
+          <p>{para}</p>
+        ))}
       </div>
     </section>
 
@@ -151,29 +136,25 @@ const cspNonce = Astro.locals.cspNonce;
       <div class="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <SectionHeading eyebrow="What I Do" title="Skills & Tools" />
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {
-            skillGroups.map((group) => (
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-                <h3 class="mb-4 text-heading-sm font-semibold text-slate-900 dark:text-white">
-                  {group.category}
-                </h3>
-                <ul class="space-y-2">
-                  {group.items.map((item) => (
-                    <li class="flex items-baseline justify-between gap-3 text-body-sm">
-                      <span class="font-medium text-slate-700 dark:text-slate-200">
-                        {item.name}
+          {skillGroups.map((group) => (
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mb-4 text-heading-sm font-semibold text-slate-900 dark:text-white">
+                {group.category}
+              </h3>
+              <ul class="space-y-2">
+                {group.items.map((item) => (
+                  <li class="flex items-baseline justify-between gap-3 text-body-sm">
+                    <span class="font-medium text-slate-700 dark:text-slate-200">{item.name}</span>
+                    {item.note && (
+                      <span class="text-right text-caption text-slate-400 dark:text-slate-500">
+                        {item.note}
                       </span>
-                      {item.note && (
-                        <span class="text-right text-caption text-slate-400 dark:text-slate-500">
-                          {item.note}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -182,27 +163,25 @@ const cspNonce = Astro.locals.cspNonce;
     <section id="experience" class="mx-auto max-w-3xl px-4 py-20 sm:px-6">
       <SectionHeading eyebrow="My Journey" title="Experience" />
       <ol class="relative border-l border-slate-200 dark:border-slate-700">
-        {
-          experience.map((job) => (
-            <li class="mb-10 ml-6 last:mb-0">
-              <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-sky-500 dark:border-slate-950" />
-              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-heading-sm font-semibold text-slate-900 dark:text-white">
-                  {job.role}
-                </h3>
-                <span class="text-caption font-medium text-sky-600 dark:text-sky-400">
-                  {job.period}
-                </span>
-              </div>
-              <p class="mb-3 text-body-sm text-slate-500 dark:text-slate-400">{job.location}</p>
-              <ul class="list-disc space-y-1.5 pl-4 text-body-sm text-slate-600 dark:text-slate-300 marker:text-sky-400">
-                {job.bullets.map((b) => (
-                  <li>{b}</li>
-                ))}
-              </ul>
-            </li>
-          ))
-        }
+        {experience.map((job) => (
+          <li class="mb-10 ml-6 last:mb-0">
+            <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-sky-500 dark:border-slate-950" />
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+              <h3 class="text-heading-sm font-semibold text-slate-900 dark:text-white">
+                {job.role}
+              </h3>
+              <span class="text-caption font-medium text-sky-600 dark:text-sky-400">
+                {job.period}
+              </span>
+            </div>
+            <p class="mb-3 text-body-sm text-slate-500 dark:text-slate-400">{job.location}</p>
+            <ul class="list-disc space-y-1.5 pl-4 text-body-sm text-slate-600 dark:text-slate-300 marker:text-sky-400">
+              {job.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </li>
+        ))}
       </ol>
     </section>
 
@@ -214,50 +193,48 @@ const cspNonce = Astro.locals.cspNonce;
       <div class="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <SectionHeading eyebrow="Selected Work" title="Projects" />
         <div class="grid gap-6 md:grid-cols-2">
-          {
-            projects.map((project) => (
-              <article
-                class:list={[
-                  'group flex flex-col rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-slate-800',
-                  project.featured
-                    ? 'border-sky-300 ring-1 ring-sky-200 dark:border-sky-700 dark:ring-sky-900'
-                    : 'border-slate-200 dark:border-slate-700',
-                ]}
-              >
-                <div class="mb-2 flex items-center gap-2">
-                  {project.featured && (
-                    <span class="rounded-full bg-sky-100 px-2.5 py-0.5 text-caption font-semibold text-sky-700 dark:bg-sky-900/60 dark:text-sky-300">
-                      Featured
-                    </span>
-                  )}
-                </div>
-                <h3 class="text-heading-sm font-semibold text-slate-900 dark:text-white">
-                  {project.href ? (
-                    <a
-                      href={project.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="hover:text-sky-600 dark:hover:text-sky-400"
-                    >
-                      {project.title}
-                    </a>
-                  ) : (
-                    project.title
-                  )}
-                </h3>
-                <p class="mt-2 flex-1 text-body-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                  {project.description}
-                </p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span class="rounded-md bg-slate-100 px-2.5 py-1 text-caption font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))
-          }
+          {projects.map((project) => (
+            <article
+              class:list={[
+                'group flex flex-col rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-slate-800',
+                project.featured
+                  ? 'border-sky-300 ring-1 ring-sky-200 dark:border-sky-700 dark:ring-sky-900'
+                  : 'border-slate-200 dark:border-slate-700',
+              ]}
+            >
+              <div class="mb-2 flex items-center gap-2">
+                {project.featured && (
+                  <span class="rounded-full bg-sky-100 px-2.5 py-0.5 text-caption font-semibold text-sky-700 dark:bg-sky-900/60 dark:text-sky-300">
+                    Featured
+                  </span>
+                )}
+              </div>
+              <h3 class="text-heading-sm font-semibold text-slate-900 dark:text-white">
+                {project.href ? (
+                  <a
+                    href={project.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="hover:text-sky-600 dark:hover:text-sky-400"
+                  >
+                    {project.title}
+                  </a>
+                ) : (
+                  project.title
+                )}
+              </h3>
+              <p class="mt-2 flex-1 text-body-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                {project.description}
+              </p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span class="rounded-md bg-slate-100 px-2.5 py-1 text-caption font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -266,38 +243,30 @@ const cspNonce = Astro.locals.cspNonce;
     <section class="mx-auto max-w-5xl px-4 py-20 sm:px-6">
       <SectionHeading eyebrow="Credentials" title="Certifications & Languages" />
       <div class="grid gap-6 md:grid-cols-2">
-        <div
-          class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
-        >
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
           <h3 class="mb-4 text-heading-sm font-semibold text-slate-900 dark:text-white">
             Certifications
           </h3>
           <ul class="space-y-3">
-            {
-              certifications.map((cert) => (
-                <li class="flex gap-3 text-body-sm text-slate-600 dark:text-slate-300">
-                  <span class="mt-1 text-sky-500">▹</span>
-                  <span>{cert}</span>
-                </li>
-              ))
-            }
+            {certifications.map((cert) => (
+              <li class="flex gap-3 text-body-sm text-slate-600 dark:text-slate-300">
+                <span class="mt-1 text-sky-500">▹</span>
+                <span>{cert}</span>
+              </li>
+            ))}
           </ul>
         </div>
-        <div
-          class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
-        >
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
           <h3 class="mb-4 text-heading-sm font-semibold text-slate-900 dark:text-white">
             Languages
           </h3>
           <ul class="space-y-3">
-            {
-              languages.map((lang) => (
-                <li class="flex items-baseline justify-between gap-3 text-body-sm">
-                  <span class="font-medium text-slate-700 dark:text-slate-200">{lang.name}</span>
-                  <span class="text-caption text-slate-400 dark:text-slate-500">{lang.level}</span>
-                </li>
-              ))
-            }
+            {languages.map((lang) => (
+              <li class="flex items-baseline justify-between gap-3 text-body-sm">
+                <span class="font-medium text-slate-700 dark:text-slate-200">{lang.name}</span>
+                <span class="text-caption text-slate-400 dark:text-slate-500">{lang.level}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -329,9 +298,10 @@ const cspNonce = Astro.locals.cspNonce;
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              ><rect width="20" height="16" x="2" y="4" rx="2"></rect><path
-                d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg
             >
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
             {profile.email}
           </a>
           <a
@@ -350,68 +320,66 @@ const cspNonce = Astro.locals.cspNonce;
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              ><path d="M8 2v4"></path><path d="M16 2v4"></path><rect
-                width="18"
-                height="18"
-                x="3"
-                y="4"
-                rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg
             >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="m9 16 2 2 4-4"></path>
+            </svg>
             Book a Meeting
           </a>
         </div>
 
         <div class="mt-10 flex justify-center gap-4">
-          {
-            socials.map((social) => (
-              <a
-                href={social.href}
-                target={social.icon === 'email' ? undefined : '_blank'}
-                rel="noopener noreferrer"
-                aria-label={social.label}
-                title={social.label}
-                class="flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 transition-all hover:scale-110 hover:border-sky-400 hover:text-sky-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-sky-500 dark:hover:text-sky-400"
-              >
-                {social.icon === 'linkedin' && (
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                  </svg>
-                )}
-                {social.icon === 'github' && (
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                )}
-                {social.icon === 'email' && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <rect width="20" height="16" x="2" y="4" rx="2" />
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                  </svg>
-                )}
-                {social.icon === 'website' && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M2 12h20" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                )}
-              </a>
-            ))
-          }
+          {socials.map((social) => (
+            <a
+              href={social.href}
+              target={social.icon === 'email' ? undefined : '_blank'}
+              rel="noopener noreferrer"
+              aria-label={social.label}
+              title={social.label}
+              class="flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 transition-all hover:scale-110 hover:border-sky-400 hover:text-sky-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-sky-500 dark:hover:text-sky-400"
+            >
+              {social.icon === 'linkedin' && (
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+              )}
+              {social.icon === 'github' && (
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+              )}
+              {social.icon === 'email' && (
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              )}
+              {social.icon === 'website' && (
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              )}
+            </a>
+          ))}
         </div>
       </div>
     </section>
